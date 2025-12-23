@@ -1,13 +1,11 @@
-
 kind: pipeline
 type: kubernetes
 name: default
+
 steps:
-  - name: test
-    image: alpine
-    commands:
-      - "echo 'Hello From DRONE CI!'
-      - "echo 'Build number: ${DRONE_BUILD_NUMBER}'"
-      - "echo 'Commit: ${DRONE_COMMIT_SHA:0:8}'"
-
-
+- name: test
+  image: alpine
+  commands:
+  - echo "Hello from Drone CI!"
+  - echo "Build number is $DRONE_BUILD_NUMBER"
+  - echo "Commit is $DRONE_COMMIT_SHA"
