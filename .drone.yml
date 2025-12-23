@@ -6,7 +6,8 @@ steps:
   - name: test
     image: alpine
     commands:
-      - echo "Build number: ${DRONE_BUILD_NUMBER}"
-      - echo "Commit: ${DRONE_COMMIT_SHA:0:8}"
+      - "echo 'Hello From DRONE CI!'
+      - "echo 'Build number: ${DRONE_BUILD_NUMBER}'"
+      - "echo 'Commit: ${DRONE_COMMIT_SHA:0:8}'"
 
 
