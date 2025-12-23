@@ -1,3 +1,6 @@
+
+[![Build Status](https://ci.bunyad.io/api/badges/bitx-dev/docs/status.svg)](https://ci.bunyad.io/bitx-dev/docs)
+
 # 🛡️ Secure Wallet & Authentication Platform
 
 **High-Assurance Digital Wallet System Using Intel SGX + WebAuthn + JWT**
