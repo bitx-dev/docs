@@ -198,7 +198,7 @@ The contract is deployed to the **SAME address on all networks**:
 
 ```bash
 # .env
-DEPLOYER_PRIVATE_KEY=0x50be52da736d8dd2c9130c7a78057b58de2e1781203f6743cf99dc791ca1bc81
+DEPLOYER_PRIVATE_KEY=YOUR_DEPLOYER_PRIVATE_KEY
 ALCHEMY_API_KEY_ETHEREUM=your-ethereum-key
 ALCHEMY_API_KEY_ARBITRUM=your-arbitrum-key
 ALCHEMY_API_KEY_POLYGON=your-polygon-key
