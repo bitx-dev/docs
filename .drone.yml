@@ -6,11 +6,13 @@ steps:
   - name: install
     image: node:20-alpine
     commands:
+      - apk add --no-cache git
       - npm ci
 
   - name: build
     image: node:20-alpine
     commands:
+      - apk add --no-cache git
       - npm run docs:build
 
   - name: deploy
