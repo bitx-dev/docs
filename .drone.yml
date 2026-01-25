@@ -3,9 +3,31 @@ type: kubernetes
 name: default
 
 steps:
-- name: test
-  image: alpine
-  commands:
-  - echo "Hello from Drone CI!"
-  - echo "Build number is $DRONE_BUILD_NUMBER"
-  - echo "Commit is $DRONE_COMMIT_SHA"
+  - name: install
+    image: node:20-alpine
+    commands:
+      - npm ci
+
+  - name: build
+    image: node:20-alpine
+    commands:
+      - npm run docs:build
+
+  - name: deploy
+    image: plugins/gh-pages
+    settings:
+      netrc: true
+      pages_directory: docs/.vitepress/dist
+      target_branch: gh-pages
+    when:
+      branch:
+        - main
+      event:
+        - push
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
+    - pull_request
