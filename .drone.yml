@@ -18,7 +18,10 @@ steps:
   - name: deploy
     image: plugins/gh-pages
     settings:
-      netrc: true
+      username:
+        from_secret: github_username
+      password:
+        from_secret: github_token
       pages_directory: docs/.vitepress/dist
       target_branch: gh-pages
     when:
