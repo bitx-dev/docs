@@ -22,7 +22,9 @@ steps:
         from_secret: github_username
       password:
         from_secret: github_token
-      pages_directory: docs/.vitepress/dist/
+      pages_directory: docs/.vitepress/dist
+      copy_contents: true
+      delete: true
       target_branch: gh-pages
     when:
       branch:
