@@ -22,7 +22,7 @@ steps:
         from_secret: github_username
       password:
         from_secret: github_token
-      pages_directory: docs/.vitepress/dist
+      pages_directory: docs/.vitepress/dist/
       target_branch: gh-pages
     when:
       branch:
