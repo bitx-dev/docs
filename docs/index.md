@@ -53,6 +53,9 @@ features:
 - [Payments API](/api-reference/payments) - Create and manage payments
 - [Wallets API](/api-reference/wallets) - Wallet management endpoints
 
+### Contribution Guidelines 
+- [Contribution](/contribution) - Follow the contribution guidelines
+
 ### Security
 - [Best Practices](/security/best-practices) - Security recommendations
 
