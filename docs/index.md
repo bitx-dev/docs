@@ -54,7 +54,7 @@ features:
 - [Wallets API](/api-reference/wallets) - Wallet management endpoints
 
 ### Contribution Guidelines 
-- [Contribution](/contribution) - Follow the contribution guidelines
+- [Contribution](/contribution/index) - Follow the contribution guidelines
 
 ### Security
 - [Best Practices](/security/best-practices) - Security recommendations
