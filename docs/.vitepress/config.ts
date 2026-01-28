@@ -70,6 +70,14 @@ export default defineConfig({
           ]
         }
       ],
+      '/Contribution-Guidelines/': [
+        {
+          text: 'Contribution Guidelines',
+          items: [
+            { text: 'Overview', link: '/contribution/' }        
+          ]
+        }     
+          ],
       '/security/': [
         {
           text: 'Security',
