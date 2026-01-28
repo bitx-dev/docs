@@ -11,7 +11,7 @@ description: Learn how to integrate BitXPay into your application and start acce
 
 ### 1.1 What is BitxPay?
 
-BitxPay is a modern payment platform that enables businesses worldwide to **send, receive, convert, and settle money**—including both cryptocurrency and local fiat currencies—**quickly and securely**.
+BitxPay is a modern payment platform that enables businesses worldwide to **send, receive, convert, and settle money** including both cryptocurrency and local fiat currencies **quickly and securely**.
 
 Unlike traditional bank transfers that can take days, BitxPay allows funds to move **within minutes**, operating **24/7**, including weekends and holidays.
 
@@ -21,11 +21,11 @@ Think of BitxPay as a **global bridge between traditional finance and cryptocurr
 
 ### 1.2 Vision & Mission
 
-### Vision
+#### Vision
 
-To make global payments **fast, reliable, and accessible** for every business—regardless of location or currency.
+To make global payments **fast, reliable, and accessible** for every business regardless of location or currency.
 
-### Mission
+#### Mission
 
 To build a payment platform where:
 
@@ -36,11 +36,11 @@ To build a payment platform where:
 
 BitxPay aims to **empower businesses to grow globally** without being limited by slow banking systems or complicated payment processes.
 
-## 1.3 Target Audience
+### 1.3 Target Audience
 
 BitxPay is designed for:
 
-- **Businesses of all sizes** — from small shops to large enterprises  
+- **Businesses of all sizes** from small shops to large enterprises  
 - **Payment processors** supporting merchant payments  
 - **Banks and financial institutions** seeking to modernize treasury and settlement services  
 - **Fintech companies and payment gateways** that require fast, global payout systems  
@@ -48,7 +48,7 @@ BitxPay is designed for:
 
 ---
 
-## 1.4 Key Benefits & Value Proposition
+### 1.4 Key Benefits & Value Proposition
 
 Here’s what makes BitxPay powerful and different:
 
@@ -70,29 +70,29 @@ Seamlessly **swap between cryptocurrencies and local currencies** using built-in
 ### Regulatory Compliance
 BitxPay complies with global financial regulations and is registered under **U.S. Money Service Business (MSB)** rules and **EU Virtual Asset Service Provider (VASP)** regulations, with strict **KYC** and **AML** requirements.
 
-# 2. Overview of BitxPay
+## 2. Overview of BitxPay
 
 BitxPay is designed to simplify how businesses and financial partners **send, receive, convert, and settle money** using **stablecoins, cryptocurrencies, and traditional fiat currencies** across the globe.
 
 By combining blockchain technology with compliant financial infrastructure, BitxPay enables **fast, secure, and reliable transactions**, helping organizations move money globally with ease and confidence.
 
-## 2.1 Core Features
+### 2.1 Core Features
 
 Below are the main features that make BitxPay stand out:
 
 ---
 
-### 2.1.1 Instant Settlement
+#### 2.1.1 Instant Settlement
 
 BitxPay settles payments **in minutes, not days**.
 
 Traditional banking systems often take several business days to complete cross-border transactions. BitxPay eliminates this delay by enabling **instant settlement**, operating **24/7**, including weekends and holidays.
 
-Businesses no longer need to wait for banking hours or clearing cycles—money moves **fast, reliably, and globally**.
+Businesses no longer need to wait for banking hours or clearing cycles money moves **fast, reliably, and globally**.
 
 ---
 
-### 2.1.2 Multi-Chain Wallet Support
+#### 2.1.2 Multi-Chain Wallet Support
 
 BitxPay supports **multiple blockchain networks**.
 
@@ -102,9 +102,9 @@ Multi-chain support helps users avoid network congestion, reduce fees, and enabl
 
 ---
 
-### 2.1.3 Stablecoin & Fiat Conversions
+#### 2.1.3 Stablecoin & Fiat Conversions
 
-BitxPay supports payments in **stablecoins**—cryptocurrencies designed to maintain a stable value (such as the US dollar)—and enables seamless conversion into **local fiat currencies**.
+BitxPay supports payments in **stablecoins** cryptocurrencies designed to maintain a stable value (such as the US dollar) and enables seamless conversion into **local fiat currencies**.
 
 For example:
 
@@ -116,7 +116,7 @@ This makes stablecoin payments practical even for businesses that prefer traditi
 
 ---
 
-### 2.1.4 Secure Self-Custodial Wallet
+#### 2.1.4 Secure Self-Custodial Wallet
 
 BitxPay uses a **self-custodial wallet model**, meaning users control their own private keys.
 
@@ -130,7 +130,7 @@ Self-custody enhances security and reduces the risks associated with custodial w
 
 ---
 
-### 2.1.5 Compliance & Regulatory Coverage
+#### 2.1.5 Compliance & Regulatory Coverage
 
 BitxPay is built to meet financial regulations in major global markets. It is registered as a **Money Services Business (MSB)** in the United States and licensed as a **Virtual Asset Service Provider (VASP)** in the European Union.
 
@@ -142,7 +142,7 @@ This includes:
 
 Strong compliance enables businesses to use BitxPay confidently, even in highly regulated environments.
 
-## 2.2 Supported Blockchain Networks
+### 2.2 Supported Blockchain Networks
 
 BitxPay operates on **six major blockchain networks**. Blockchain-based transfers enable **faster settlement and lower costs** compared to traditional payment rails.
 
@@ -150,7 +150,7 @@ For every transaction, BitxPay automatically selects the **optimal network** bas
 
 ---
 
-## 2.3 Supported Fiat & Local Currencies
+### 2.3 Supported Fiat & Local Currencies
 
 BitxPay supports conversion and payout in **25+ local currencies worldwide**.
 
@@ -160,7 +160,7 @@ Supported payout currencies include **major and widely used global currencies**,
 
 ---
 
-## 2.4 High-Level Architecture
+### 2.4 High-Level Architecture
 
 BitxPay leverages advanced blockchain technology behind the scenes, while keeping the user experience **simple and non-technical**.
 
@@ -180,14 +180,14 @@ At a high level, the process works as follows:
 
 This architecture is designed to be **seamless, fast, and transparent**, with no complex setup or technical steps required from the user.
 
-# 3. Getting Started
+## 3. Getting Started
 
 BitxPay is built for simplicity, but as a **regulated global payment platform**, a few setup steps are required before you can begin using it.  
 This section covers everything you need to get started **quickly and safely**.
 
 ---
 
-## 3.1 Creating a BitxPay Account
+### 3.1 Creating a BitxPay Account
 
 To begin using BitxPay, you first need to create an account on the platform.
 
@@ -200,7 +200,7 @@ Typical steps include:
 
 ---
 
-## 3.2 Account Types (Individual / Business / Enterprise)
+### 3.2 Account Types (Individual / Business / Enterprise)
 
 BitxPay supports multiple account types depending on your usage needs:
 
@@ -217,7 +217,7 @@ Each account type unlocks features appropriate to its scale—from simple transf
 
 ---
 
-## 3.3 KYC & AML Requirements
+### 3.3 KYC & AML Requirements
 
 As a regulated financial platform, BitxPay complies with global **Know Your Customer (KYC)** and **Anti-Money Laundering (AML)** regulations.
 
@@ -233,7 +233,7 @@ These checks are standard for licensed payment providers and are required to unl
 
 ---
 
-## 3.4 Logging In & Security Best Practices
+### 3.4 Logging In & Security Best Practices
 
 Account security is critical. Follow these best practices to protect your BitxPay account:
 
@@ -246,9 +246,9 @@ BitxPay applies **industry-standard security measures**, and combining them with
 
 ---
 
-## 3.5 Wallet Setup & Recovery
+### 3.5 Wallet Setup & Recovery
 
-Once your account is created, you’ll have access to a **self-custodial wallet**, meaning **you control your private keys and funds**—not BitxPay or any third party.
+Once your account is created, you’ll have access to a **self-custodial wallet**, meaning **you control your private keys and funds** not BitxPay or any third party.
 
 To set up and secure your wallet:
 
