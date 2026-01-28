@@ -19,7 +19,7 @@ With BitxPay’s **self-custodial wallet**, you remain fully in control of your 
 
 Think of BitxPay as a **global bridge between traditional finance and cryptocurrency**, empowering businesses to pay and get paid seamlessly across borders.
 
-## 1.2 Vision & Mission
+### 1.2 Vision & Mission
 
 ### Vision
 
