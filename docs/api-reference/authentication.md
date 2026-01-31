@@ -5,7 +5,200 @@ description: Learn how to authenticate API requests with BitXPay.
 
 # Authentication
 
-BitXPay uses HMAC-based authentication to secure API requests. Every request must include your API key and a signature.
+BitXPay supports two authentication methods depending on the API you're using:
+
+1. **RSA-PSS Signature** - For merchant-facing APIs (Payment Links, etc.)
+2. **HMAC-SHA256** - For standard payment APIs
+
+---
+
+## RSA-PSS Signature Authentication (Merchant APIs)
+
+Merchant-facing APIs use RSA-PSS (Probabilistic Signature Scheme) for enhanced security. This method provides stronger cryptographic guarantees and is used for sensitive merchant operations.
+
+### Required Headers
+
+| Header | Description |
+|--------|-------------|
+| `X-API-Key` | Your merchant API key |
+| `X-API-Signature` | RSA-PSS signature of the request |
+| `X-API-Timestamp` | ISO 8601 timestamp (e.g., `2026-01-31T17:53:56Z`) |
+| `Content-Type` | `application/json` |
+
+### Obtaining Your Keys
+
+1. Log in to your [BitXPay Dashboard](https://dashboard.bitxpay.com)
+2. Navigate to **Settings** → **API Keys**
+3. Generate your **Merchant API Key** and **Private Key**
+4. Store both securely - the private key is shown only once
+
+Your credentials will include:
+- **API Key:** `bknn_xxxxxxxxxx` (public identifier)
+- **Private Key:** RSA private key in PEM format (keep secret)
+
+### Generating the Signature
+
+The signature is created by signing a message with your RSA private key using PSS padding:
+
+**Message Format:**
+```
+METHOD + PATH + TIMESTAMP + BODY
+```
+
+**Example Message:**
+```
+POST/payments/links2026-01-31T17:53:56Z{"merchant_key":"mkey-xxx","order_amount":10}
+```
+
+**Signature Parameters:**
+- **Algorithm:** RSA-PSS
+- **Hash Function:** SHA-256
+- **MGF (Mask Generation Function):** MGF1 with SHA-256
+- **Salt Length:** 32 bytes
+
+### Node.js Example
+
+```javascript
+import crypto from 'crypto';
+import fs from 'fs';
+
+function generateRSAPSSSignature(privateKeyPEM, method, path, timestamp, body = '') {
+  const message = `${method}${path}${timestamp}${body}`;
+  
+  const signature = crypto.sign(
+    'sha256',
+    Buffer.from(message, 'utf8'),
+    {
+      key: privateKeyPEM,
+      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+      saltLength: 32
+    }
+  );
+  
+  return signature.toString('base64');
+}
+
+// Usage
+const privateKey = fs.readFileSync('private-key.pem', 'utf8');
+const apiKey = process.env.MERCHANT_API_KEY;
+
+const method = 'POST';
+const path = '/payments/links';
+const timestamp = new Date().toISOString();
+const body = JSON.stringify({
+  merchant_key: 'mkey-xxx',
+  order_currency: 'USD',
+  order_amount: 10,
+  payment_name: 'Test Payment',
+  payer_email: 'test@example.com',
+  success_url: 'https://example.com/success',
+  cancel_url: 'https://example.com/cancel'
+});
+
+const signature = generateRSAPSSSignature(privateKey, method, path, timestamp, body);
+
+// Make request
+const response = await fetch(`https://api.bitxpay.com/api/v1${path}`, {
+  method,
+  headers: {
+    'X-API-Key': apiKey,
+    'X-API-Signature': signature,
+    'X-API-Timestamp': timestamp,
+    'Content-Type': 'application/json'
+  },
+  body
+});
+```
+
+### Python Example
+
+```python
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.backends import default_backend
+import base64
+from datetime import datetime
+import json
+import requests
+
+def generate_rsa_pss_signature(private_key_pem, method, path, timestamp, body=''):
+    message = f"{method}{path}{timestamp}{body}"
+    
+    private_key = serialization.load_pem_private_key(
+        private_key_pem.encode(),
+        password=None,
+        backend=default_backend()
+    )
+    
+    signature = private_key.sign(
+        message.encode('utf-8'),
+        padding.PSS(
+            mgf=padding.MGF1(hashes.SHA256()),
+            salt_length=32
+        ),
+        hashes.SHA256()
+    )
+    
+    return base64.b64encode(signature).decode('utf-8')
+
+# Usage
+with open('private-key.pem', 'r') as f:
+    private_key = f.read()
+
+api_key = os.environ.get('MERCHANT_API_KEY')
+
+method = 'POST'
+path = '/payments/links'
+timestamp = datetime.utcnow().isoformat() + 'Z'
+body_data = {
+    'merchant_key': 'mkey-xxx',
+    'order_currency': 'USD',
+    'order_amount': 10,
+    'payment_name': 'Test Payment',
+    'payer_email': 'test@example.com',
+    'success_url': 'https://example.com/success',
+    'cancel_url': 'https://example.com/cancel'
+}
+body = json.dumps(body_data)
+
+signature = generate_rsa_pss_signature(private_key, method, path, timestamp, body)
+
+# Make request
+response = requests.post(
+    f'https://api.bitxpay.com/api/v1{path}',
+    headers={
+        'X-API-Key': api_key,
+        'X-API-Signature': signature,
+        'X-API-Timestamp': timestamp,
+        'Content-Type': 'application/json'
+    },
+    data=body
+)
+```
+
+### Testing with Postman
+
+For easy testing with Postman, see our [Postman Setup Guide](/testing/postman-setup) which includes a pre-request script that automatically generates signatures.
+
+### Timestamp Validation
+
+Requests with timestamps older than **5 minutes** will be rejected:
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Request timestamp is too old or invalid",
+  "code": 401
+}
+```
+
+Ensure your system clock is synchronized with NTP servers.
+
+---
+
+## HMAC-SHA256 Authentication (Standard APIs)
+
+Standard payment APIs use HMAC-based authentication to secure API requests. Every request must include your API key and a signature.
 
 ## Required Headers
 

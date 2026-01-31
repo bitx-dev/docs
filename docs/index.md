@@ -53,6 +53,12 @@ features:
 - [Payment Links API](/api-reference/payments) - Create and manage payment links
 - [Wallets API](/api-reference/wallets) - Wallet management endpoints
 
+### Testing & Tools
+- [Testing Guide](/testing/) - Overview of API testing
+- [Postman Setup](/testing/postman-setup) - Complete Postman configuration with auto-signature
+- [API Testing Tools](/testing/api-testing-tools) - Test with cURL, Insomnia, HTTPie, and more
+- [Troubleshooting](/testing/troubleshooting) - Common issues and solutions
+
 ### Contribution Guidelines 
 - [Contribution](/contribution/index) - Follow the contribution guidelines
 
