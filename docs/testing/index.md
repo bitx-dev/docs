@@ -11,7 +11,7 @@ Welcome to the BitXPay API testing documentation. This guide will help you quick
 
 Choose your preferred testing method:
 
-- **[Postman Setup](/testing/postman-setup)** - Complete guide for Postman with RSA-PSS signature automation
+- **[Postman Setup](/testing/postman-setup)** - Complete guide for Postman with DSA signature automation
 - **[Other API Tools](/testing/api-testing-tools)** - Test with Insomnia, cURL, HTTPie, and more
 - **[Troubleshooting](/testing/troubleshooting)** - Common issues and solutions
 
@@ -20,7 +20,7 @@ Choose your preferred testing method:
 Before testing, you'll need:
 
 1. **Merchant API Key** - Your unique API key (format: `bknn_xxxxxxxx`)
-2. **Merchant Private Key** - RSA private key in PEM format
+2. **Merchant Private Key** - DSA private key in PEM format
 3. **API Testing Tool** - Postman, Insomnia, cURL, etc.
 
 ## Getting Your API Keys
@@ -54,11 +54,12 @@ Production keys are available after account verification:
 
 ## Authentication Overview
 
-BitXPay merchant APIs use **RSA-PSS signature authentication** for enhanced security:
+BitXPay merchant APIs use **DSA signature authentication** for enhanced security:
 
 1. Each request includes an API key, timestamp, and signature
-2. The signature is generated using RSA-PSS with SHA-256
+2. The signature is generated using DSA with SHA-256
 3. Signatures are valid for 5 minutes from the timestamp
+4. DSA provides smaller signatures and faster signing compared to RSA
 
 For detailed authentication information, see the [Authentication Reference](/api-reference/authentication).
 

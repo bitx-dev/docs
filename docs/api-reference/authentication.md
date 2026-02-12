@@ -7,21 +7,21 @@ description: Learn how to authenticate API requests with BitXPay.
 
 BitXPay supports two authentication methods depending on the API you're using:
 
-1. **RSA-PSS Signature** - For merchant-facing APIs (Payment Links, etc.)
+1. **DSA Signature** - For merchant-facing APIs (Payment Links, etc.)
 2. **HMAC-SHA256** - For standard payment APIs
 
 ---
 
-## RSA-PSS Signature Authentication (Merchant APIs)
+## DSA Signature Authentication (Merchant APIs)
 
-Merchant-facing APIs use RSA-PSS (Probabilistic Signature Scheme) for enhanced security. This method provides stronger cryptographic guarantees and is used for sensitive merchant operations.
+Merchant-facing APIs use DSA (Digital Signature Algorithm) for enhanced security. DSA is a FIPS 186-4 standard that provides efficient digital signatures with smaller signature sizes, making it ideal for bandwidth-sensitive merchant operations.
 
 ### Required Headers
 
 | Header | Description |
 |--------|-------------|
 | `X-API-Key` | Your merchant API key |
-| `X-API-Signature` | RSA-PSS signature of the request |
+| `X-API-Signature` | DSA signature of the request (base64-encoded DER format) |
 | `X-API-Timestamp` | ISO 8601 timestamp (e.g., `2026-01-31T17:53:56Z`) |
 | `Content-Type` | `application/json` |
 
@@ -34,11 +34,12 @@ Merchant-facing APIs use RSA-PSS (Probabilistic Signature Scheme) for enhanced s
 
 Your credentials will include:
 - **API Key:** `bknn_xxxxxxxxxx` (public identifier)
-- **Private Key:** RSA private key in PEM format (keep secret)
+- **Private Key:** DSA private key in PEM format (keep secret)
+- **Public Key:** DSA public key in PEM format (for verification)
 
 ### Generating the Signature
 
-The signature is created by signing a message with your RSA private key using PSS padding:
+The signature is created by signing a message with your DSA private key:
 
 **Message Format:**
 ```
@@ -51,10 +52,16 @@ POST/payments/links2026-01-31T17:53:56Z{"merchant_key":"mkey-xxx","order_amount"
 ```
 
 **Signature Parameters:**
-- **Algorithm:** RSA-PSS
+- **Algorithm:** DSA (Digital Signature Algorithm)
 - **Hash Function:** SHA-256
-- **MGF (Mask Generation Function):** MGF1 with SHA-256
-- **Salt Length:** 32 bytes
+- **Key Size:** 2048 bits (minimum recommended)
+- **Output Format:** DER-encoded signature, base64-encoded for transmission
+- **Standard:** FIPS 186-4
+
+**Important Security Notes:**
+- DSA requires a unique random value (k) for each signature
+- Never reuse the k value - this would leak your private key
+- Use cryptographically secure random number generation
 
 ### Node.js Example
 
@@ -62,16 +69,16 @@ POST/payments/links2026-01-31T17:53:56Z{"merchant_key":"mkey-xxx","order_amount"
 import crypto from 'crypto';
 import fs from 'fs';
 
-function generateRSAPSSSignature(privateKeyPEM, method, path, timestamp, body = '') {
+function generateDSASignature(privateKeyPEM, method, path, timestamp, body = '') {
   const message = `${method}${path}${timestamp}${body}`;
   
+  // DSA signature using SHA-256
   const signature = crypto.sign(
     'sha256',
     Buffer.from(message, 'utf8'),
     {
       key: privateKeyPEM,
-      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-      saltLength: 32
+      dsaEncoding: 'der' // DER encoding for DSA signature
     }
   );
   
@@ -95,7 +102,7 @@ const body = JSON.stringify({
   cancel_url: 'https://example.com/cancel'
 });
 
-const signature = generateRSAPSSSignature(privateKey, method, path, timestamp, body);
+const signature = generateDSASignature(privateKey, method, path, timestamp, body);
 
 // Make request
 const response = await fetch(`https://api.bitxpay.com/api/v1${path}`, {
@@ -114,31 +121,31 @@ const response = await fetch(`https://api.bitxpay.com/api/v1${path}`, {
 
 ```python
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import dsa
 from cryptography.hazmat.backends import default_backend
 import base64
 from datetime import datetime
 import json
 import requests
+import os
 
-def generate_rsa_pss_signature(private_key_pem, method, path, timestamp, body=''):
+def generate_dsa_signature(private_key_pem, method, path, timestamp, body=''):
     message = f"{method}{path}{timestamp}{body}"
     
+    # Load DSA private key
     private_key = serialization.load_pem_private_key(
         private_key_pem.encode(),
         password=None,
         backend=default_backend()
     )
     
+    # Sign with DSA using SHA-256
     signature = private_key.sign(
         message.encode('utf-8'),
-        padding.PSS(
-            mgf=padding.MGF1(hashes.SHA256()),
-            salt_length=32
-        ),
         hashes.SHA256()
     )
     
+    # Return base64-encoded DER signature
     return base64.b64encode(signature).decode('utf-8')
 
 # Usage
@@ -161,7 +168,7 @@ body_data = {
 }
 body = json.dumps(body_data)
 
-signature = generate_rsa_pss_signature(private_key, method, path, timestamp, body)
+signature = generate_dsa_signature(private_key, method, path, timestamp, body)
 
 # Make request
 response = requests.post(

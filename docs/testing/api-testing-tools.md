@@ -5,7 +5,7 @@ description: Test BitXPay APIs using various tools including cURL, Insomnia, HTT
 
 # API Testing Tools
 
-While Postman is our recommended tool, you can test BitXPay APIs using various other tools. This guide covers popular alternatives with RSA-PSS signature generation examples.
+While Postman is our recommended tool, you can test BitXPay APIs using various other tools. This guide covers popular alternatives with DSA signature generation examples.
 
 ## cURL
 
@@ -34,8 +34,8 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 # Create message to sign
 MESSAGE="${METHOD}${ENDPOINT}${TIMESTAMP}${BODY}"
 
-# Generate signature using OpenSSL
-SIGNATURE=$(echo -n "$MESSAGE" | openssl dgst -sha256 -sign "$PRIVATE_KEY_FILE" -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:32 | base64 -w 0)
+# Generate signature using OpenSSL (DSA)
+SIGNATURE=$(echo -n "$MESSAGE" | openssl dgst -sha256 -sign "$PRIVATE_KEY_FILE" | base64 -w 0)
 
 # Make request
 if [ -z "$BODY" ]; then
@@ -86,8 +86,7 @@ const message = `${method}${endpoint}${timestamp}${body}`;
 
 const signature = crypto.sign('sha256', Buffer.from(message, 'utf8'), {
   key: privateKey,
-  padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-  saltLength: 32
+  dsaEncoding: 'der'
 }).toString('base64');
 
 const curlCmd = body
@@ -124,7 +123,7 @@ Create an environment with:
 {
   "base_url": "https://sandboxapi.bitxpay.com/api/v1",
   "api_key": "your_api_key",
-  "private_key": "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+  "private_key": "-----BEGIN DSA PRIVATE KEY-----\n...\n-----END DSA PRIVATE KEY-----"
 }
 ```
 
@@ -157,8 +156,7 @@ module.exports.requestHooks = [
     
     const signature = crypto.sign('sha256', Buffer.from(message, 'utf8'), {
       key: privateKey,
-      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-      saltLength: 32
+      dsaEncoding: 'der'
     }).toString('base64');
     
     request.setHeader('X-API-Key', apiKey);
@@ -213,7 +211,7 @@ BODY=$3
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 MESSAGE="${METHOD}${ENDPOINT}${TIMESTAMP}${BODY}"
 
-SIGNATURE=$(echo -n "$MESSAGE" | openssl dgst -sha256 -sign "$PRIVATE_KEY_FILE" -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:32 | base64 -w 0)
+SIGNATURE=$(echo -n "$MESSAGE" | openssl dgst -sha256 -sign "$PRIVATE_KEY_FILE" | base64 -w 0)
 
 if [ -z "$BODY" ]; then
   http "$METHOD" "${BASE_URL}${ENDPOINT}" \
@@ -323,8 +321,7 @@ Thunder Client is a lightweight REST client for VS Code.
    
    const signature = crypto.sign('sha256', Buffer.from(message, 'utf8'), {
      key: privateKey,
-     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-     saltLength: 32
+     dsaEncoding: 'der'
    }).toString('base64');
    
    tc.setVar('signature', signature);
@@ -369,10 +366,6 @@ class BitXPayClient:
         
         signature = self.private_key.sign(
             message.encode('utf-8'),
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=32
-            ),
             hashes.SHA256()
         )
         
@@ -457,11 +450,7 @@ class BitXPayClient {
             $message,
             $signature,
             $this->privateKey,
-            [
-                'digest_alg' => 'sha256',
-                'padding' => OPENSSL_PKCS1_PSS_PADDING,
-                'salt_length' => 32
-            ]
+            OPENSSL_ALGO_SHA256
         );
         
         return base64_encode($signature);

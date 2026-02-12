@@ -7,11 +7,11 @@ description: Create and manage payment links for accepting cryptocurrency paymen
 
 ## Overview
 
-The Merchant API Payments endpoints allow you to create, manage, and retrieve payment links for accepting cryptocurrency payments. All endpoints require Merchant API Key authentication with RSA-PSS signature verification.
+The Merchant API Payments endpoints allow you to create, manage, and retrieve payment links for accepting cryptocurrency payments. All endpoints require Merchant API Key authentication with DSA signature verification.
 
 **Base URL:** `https://api.bitxpay.com/payment_links`
 
-**Authentication:** Merchant API Key (Asymmetric RSA-PSS)
+**Authentication:** Merchant API Key (Asymmetric DSA)
 
 ---
 
@@ -355,21 +355,21 @@ All requests require the following headers:
 
 ```
 X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_rsa_pss_signature>
+X-API-Signature: <base64_encoded_dsa_signature>
 X-API-Timestamp: 2026-01-31T12:00:00Z
 Content-Type: application/json
 ```
 
 ### Signing Process
 
-1. **Construct the message:**
+1. **Construct message:**
    ```
    message = METHOD + PATH + TIMESTAMP + BODY
    ```
 
-2. **Sign with RSA-PSS:**
+2. **Sign with DSA:**
    - Hash using SHA-256
-   - Sign using RSA-PSS with salt length = 32 (PSS_SALTLEN_DIGEST)
+   - Sign using DSA with DER encoding
    - Encode as Base64
 
 3. **Include in request headers**

@@ -1,17 +1,17 @@
 ---
 title: Postman Setup Guide
-description: Complete guide to configure Postman for testing BitXPay merchant APIs with RSA-PSS signature authentication.
+description: Complete guide to configure Postman for testing BitXPay merchant APIs with Ed25519 signature authentication.
 ---
 
 # Postman Setup Guide
 
-This guide will walk you through setting up Postman to test BitXPay merchant-facing APIs with automatic RSA-PSS signature generation.
+This guide will walk you through setting up Postman to test BitXPay merchant-facing APIs with automatic Ed25519 signature generation.
 
 ## Prerequisites
 
 - [Postman](https://www.postman.com/downloads/) installed (Desktop or Web)
 - Merchant API Key
-- Merchant Private Key (RSA format)
+- Merchant Private Key (Ed25519 format)
 
 ## Quick Setup (3 Steps)
 
@@ -30,7 +30,7 @@ Add the following variables to your environment:
 |--------------|------|---------------|---------------|
 | `BASE_URL` | default | `https://sandboxapi.bitxpay.com/api/v1` | (same) |
 | `MERCHANT_API_KEY` | default | `bknn_e552de1d1e0` | Your API key |
-| `MERCHANT_PRIVATE_KEY` | secret | `-----BEGIN RSA PRIVATE KEY-----\n...` | Your private key |
+| `MERCHANT_PRIVATE_KEY` | secret | `Ed25519:base64_encoded_pkcs8_key` | Your private key |
 | `X_API_KEY` | default | (leave empty) | (auto-generated) |
 | `X_API_SIGNATURE` | default | (leave empty) | (auto-generated) |
 | `X_API_TIMESTAMP` | default | (leave empty) | (auto-generated) |
@@ -41,17 +41,13 @@ The last three variables (`X_API_KEY`, `X_API_SIGNATURE`, `X_API_TIMESTAMP`) wil
 
 #### How to Add Your Private Key
 
-Your private key should be in PEM format:
+Your private key should be in Ed25519:base64 format:
 
 ```
------BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA...
-(multiple lines)
-...
------END RSA PRIVATE KEY-----
+Ed25519:MC4CAQAwBQYDK2VwBCIEIE8VdFJvfWXyGKm9...base64_encoded_pkcs8_key
 ```
 
-**Important:** When pasting into Postman, keep the newlines or use `\n` to represent line breaks.
+**Important:** The key must start with `Ed25519:` prefix followed by the base64-encoded PKCS8 private key.
 
 ### Step 3: Add Pre-Request Script
 
@@ -62,12 +58,14 @@ MIIEpAIBAAKCAQEA...
 
 ```javascript
 // ============================================
-// BitXPay Merchant API - RSA-PSS Signature
+// BITXpay Merchant API - Ed25519 Signature
 // ============================================
 
 new Promise((resolve, reject) => {
     const forgeUrl = 'https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js';
+    const ed25519Url = 'https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/+esm';
 
+    // Load forge first
     pm.sendRequest(forgeUrl, (err, res) => {
         if (err) {
             console.error('❌ Failed to load forge:', err);
@@ -93,10 +91,15 @@ new Promise((resolve, reject) => {
             const forge = eval(wrappedCode);
 
             const apiKey = pm.environment.get("MERCHANT_API_KEY");
-            const privateKeyPEM = pm.environment.get("MERCHANT_PRIVATE_KEY");
+            const privateKeyFormatted = pm.environment.get("MERCHANT_PRIVATE_KEY");
 
-            if (!apiKey || !privateKeyPEM) {
+            if (!apiKey || !privateKeyFormatted) {
                 throw new Error("❌ Missing MERCHANT_API_KEY or MERCHANT_PRIVATE_KEY");
+            }
+
+            // Check if private key is in Ed25519:base64 format
+            if (!privateKeyFormatted.startsWith("Ed25519:")) {
+                throw new Error("❌ Private key must be in Ed25519:base64 format");
             }
 
             const method = pm.request.method;
@@ -108,31 +111,113 @@ new Promise((resolve, reject) => {
 
             console.log('🔐 Signing:', method, path);
             console.log('  Timestamp:', timestamp);
+            console.log('  API Key:', apiKey);
 
-            const privateKey = forge.pki.privateKeyFromPem(privateKeyPEM);
+            // Extract base64 part from Ed25519:base64 format
+            const base64PrivateKey = privateKeyFormatted.substring(8); // Remove "Ed25519:" prefix
+            
+            // Decode the PKCS8 private key using forge
+            const pkcs8Bytes = forge.util.decode64(base64PrivateKey);
+            const pkcs8Der = forge.util.createBuffer(pkcs8Bytes, 'raw');
+            
+            // Parse PKCS8 DER to extract Ed25519 seed
+            const asn1 = forge.asn1.fromDer(pkcs8Der);
+            
+            // Navigate ASN.1 structure: SEQUENCE -> PrivateKey OctetString
+            const privateKeyOctetString = asn1.value[2]; // Third element contains the private key
+            const privateKeyBytes = privateKeyOctetString.value;
+            
+            // Parse inner OCTET STRING to get the actual 32-byte seed
+            const innerAsn1 = forge.asn1.fromDer(forge.util.createBuffer(privateKeyBytes, 'raw'));
+            const seedBytes = innerAsn1.value;
 
-            const md = forge.md.sha256.create();
-            md.update(message, 'utf8');
+            // Convert seed to Uint8Array
+            const seedArray = new Uint8Array(32);
+            for (let i = 0; i < 32; i++) {
+                seedArray[i] = seedBytes.charCodeAt(i) & 0xff;
+            }
 
-            const pss = forge.pss.create({
-                md: forge.md.sha256.create(),
-                mgf: forge.mgf.mgf1.create(forge.md.sha256.create()),
-                saltLength: 32
+            // Manual Ed25519 signing using pure JavaScript
+            // Since we can't load external Ed25519 libraries easily, let's use a different approach
+            // We'll use the tweetnacl standalone version
+            
+            const tweetnaclStandaloneUrl = 'https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl-fast.js';
+            
+            pm.sendRequest(tweetnaclStandaloneUrl, (err2, res2) => {
+                if (err2) {
+                    console.error('❌ Failed to load tweetnacl:', err2);
+                    reject(err2);
+                    return;
+                }
+
+                try {
+                    // Clean the response to avoid 'use strict' issues
+                    let tweetnaclCode = res2.text();
+                    
+                    // Remove any 'use strict' at the top that might cause issues
+                    tweetnaclCode = tweetnaclCode.replace(/['"]use strict['"];?\s*/g, '');
+                    
+                    // Wrap in IIFE to avoid global scope pollution
+                    const wrappedNacl = `
+                        (function() {
+                            var window = window || {};
+                            var self = window;
+                            var document = {};
+                            var global = window;
+                            var crypto = undefined;
+                            var require = undefined;
+                            var module = { exports: {} };
+                            var exports = module.exports;
+                            
+                            ${tweetnaclCode}
+                            
+                            return module.exports || window.nacl || nacl;
+                        })()
+                    `;
+                    
+                    const nacl = eval(wrappedNacl);
+
+                    // Generate Ed25519 keypair from seed
+                    const keyPair = nacl.sign.keyPair.fromSeed(seedArray);
+
+                    // Convert message string to Uint8Array
+                    const messageArray = new Uint8Array(message.length);
+                    for (let i = 0; i < message.length; i++) {
+                        messageArray[i] = message.charCodeAt(i);
+                    }
+
+                    // Sign the message with Ed25519
+                    const signature = nacl.sign.detached(messageArray, keyPair.secretKey);
+
+                    // Convert signature Uint8Array to base64 using forge
+                    let sigBytes = '';
+                    for (let i = 0; i < signature.length; i++) {
+                        sigBytes += String.fromCharCode(signature[i]);
+                    }
+                    const signatureBase64 = forge.util.encode64(sigBytes);
+
+                    console.log('✅ Signature:', signatureBase64.substring(0, 50) + '...');
+
+                    pm.environment.set("X_API_KEY", apiKey);
+                    pm.environment.set("X_API_SIGNATURE", signatureBase64);
+                    pm.environment.set("X_API_TIMESTAMP", timestamp);
+
+                    // pm.request.headers.upsert({ key: 'X-API-Key', value: apiKey });
+                    // pm.request.headers.upsert({ key: 'X-API-Signature', value: signatureBase64 });
+                    // pm.request.headers.upsert({ key: 'X-API-Timestamp', value: timestamp });
+
+                    resolve();
+
+                } catch (error) {
+                    console.error('❌ Error during Ed25519 signing:', error.message);
+                    console.error('Stack:', error.stack);
+                    reject(error);
+                }
             });
 
-            const signature = privateKey.sign(md, pss);
-            const signatureBase64 = forge.util.encode64(signature);
-
-            console.log('✅ Signature:', signatureBase64.substring(0, 50) + '...');
-
-            pm.environment.set("X_API_KEY", apiKey);
-            pm.environment.set("X_API_SIGNATURE", signatureBase64);
-            pm.environment.set("X_API_TIMESTAMP", timestamp);
-
-            resolve();
-
         } catch (error) {
-            console.error('❌ Error:', error.message);
+            console.error('❌ Error parsing private key:', error.message);
+            console.error('Stack:', error.stack);
             reject(error);
         }
     });
@@ -147,11 +232,12 @@ new Promise((resolve, reject) => {
 
 The pre-request script automatically:
 
-1. **Loads the node-forge library** - Required for RSA-PSS signature generation
-2. **Constructs the signature message** - Combines `METHOD + PATH + TIMESTAMP + BODY`
-3. **Signs the message** - Uses RSA-PSS with SHA-256, MGF1, and 32-byte salt
-4. **Encodes the signature** - Converts to Base64
-5. **Sets environment variables** - Populates `X_API_KEY`, `X_API_SIGNATURE`, and `X_API_TIMESTAMP`
+1. **Loads cryptographic libraries** - node-forge for ASN.1 parsing and TweetNaCl for Ed25519 signing
+2. **Parses the private key** - Extracts the 32-byte seed from PKCS8 format
+3. **Constructs the signature message** - Combines `METHOD + PATH + TIMESTAMP + BODY`
+4. **Signs the message** - Uses Ed25519 signature algorithm (64-byte signature)
+5. **Encodes the signature** - Converts to Base64
+6. **Sets environment variables** - Populates `X_API_KEY`, `X_API_SIGNATURE`, and `X_API_TIMESTAMP`
 
 ### Signature Components
 
@@ -165,10 +251,11 @@ POST/payments/links2026-01-31T17:53:56Z{"merchant_key":"mkey-xxx","order_amount"
 ```
 
 This message is then signed using:
-- **Algorithm:** RSA-PSS
-- **Hash:** SHA-256
-- **MGF:** MGF1 with SHA-256
-- **Salt Length:** 32 bytes
+- **Algorithm:** Ed25519 (Edwards-curve Digital Signature Algorithm)
+- **Curve:** Curve25519
+- **Signature Size:** 64 bytes (fixed)
+- **Key Size:** 32 bytes (256 bits)
+- **Libraries:** TweetNaCl for signing, node-forge for key parsing
 
 ## Creating Your First Request
 
@@ -321,9 +408,11 @@ Now you can use `{{payment_id}}` in other requests.
 ### Error: "Invalid signature"
 
 **Possible causes:**
-1. **Incorrect private key format** - Ensure it's in PEM format with proper line breaks
-2. **Key mismatch** - The private key must match the public key associated with your API key
-3. **Timestamp issues** - Check your system clock is synchronized
+1. **Incorrect private key format** - Must be in `Ed25519:base64` format
+2. **Missing Ed25519 prefix** - Key must start with `Ed25519:`
+3. **Key mismatch** - The private key must match the public key associated with your API key
+4. **Timestamp issues** - Check your system clock is synchronized
+5. **Library loading failure** - Check console for CDN errors
 
 **Debug steps:**
 1. Open Postman Console
@@ -343,7 +432,8 @@ The pre-request script generates a fresh timestamp each time, so simply resend t
 **Solution:**
 1. Ensure the script is in the **Collection** pre-request script, not individual request
 2. Check Postman Console for JavaScript errors
-3. Verify you have internet access (script loads forge library from CDN)
+3. Verify you have internet access (script loads node-forge and TweetNaCl from CDN)
+4. Check that both libraries loaded successfully in the console logs
 
 ### Private Key Format Issues
 
@@ -351,17 +441,13 @@ If your private key has issues, ensure it's formatted correctly:
 
 **Correct format:**
 ```
------BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEAyourkey...
-(multiple lines of base64)
-...endofkey==
------END RSA PRIVATE KEY-----
+Ed25519:MC4CAQAwBQYDK2VwBCIEIE8VdFJvfWXyGKm9base64encodedkey
 ```
 
-**In Postman variable (with newlines):**
-```
------BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAyourkey...\n...endofkey==\n-----END RSA PRIVATE KEY-----
-```
+**Format explanation:**
+- Prefix: `Ed25519:`
+- Followed by: Base64-encoded PKCS8 private key
+- No newlines or spaces in the base64 part
 
 ## Downloadable Resources
 

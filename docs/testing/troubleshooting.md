@@ -73,18 +73,18 @@ const message = `${METHOD}${PATH}${TIMESTAMP}${BODY}`;
 ```
 
 ✅ **Check signature parameters:**
-- Algorithm: RSA-PSS
+- Algorithm: DSA (Digital Signature Algorithm)
 - Hash: SHA-256
-- MGF: MGF1 with SHA-256
-- Salt length: 32 bytes
+- Encoding: DER format
+- Key size: 2048 bits minimum
 
 ✅ **Validate private key format:**
 ```
------BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA...
+-----BEGIN DSA PRIVATE KEY-----
+MIIBuwIBAAKBgQD...
 (base64 encoded key)
 ...
------END RSA PRIVATE KEY-----
+-----END DSA PRIVATE KEY-----
 ```
 
 ✅ **Debug signature generation:**
@@ -368,7 +368,7 @@ Wrong: merchant_api_key, Merchant_Api_Key
 
 **Option 1: Use `\n` for newlines**
 ```
------BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----
+-----BEGIN DSA PRIVATE KEY-----\nMIIBuwIBAAKBgQD...\n-----END DSA PRIVATE KEY-----
 ```
 
 **Option 2: Use actual newlines**
@@ -388,9 +388,9 @@ MIIEpAIBAAKCAQEA...
 
 ✅ **Verify key markers:**
 ```
-Correct: -----BEGIN RSA PRIVATE KEY-----
-Wrong: -----BEGIN PRIVATE KEY-----
-Wrong: -----BEGIN RSA KEY-----
+Correct: -----BEGIN DSA PRIVATE KEY-----
+Also acceptable: -----BEGIN PRIVATE KEY----- (PKCS#8 format)
+Wrong: -----BEGIN RSA PRIVATE KEY-----
 ```
 
 ---
