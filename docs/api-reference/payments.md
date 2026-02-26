@@ -15,9 +15,139 @@ The Merchant API Payments endpoints allow you to create, manage, and retrieve pa
 
 ---
 
+## Supported Cryptocurrencies
+
+BitXPay supports multiple cryptocurrencies across various blockchain networks. When creating a payment link, you must specify a valid currency code.
+
+### Available Currencies
+
+| Currency Code | Name | Networks Available |
+|--------------|------|-------------------|
+| **AVAX** | Avalanche | 2 networks |
+| **BNB** | BNB | 3 networks |
+| **ETH** | Ethereum | 5 networks |
+| **LINK** | ChainLink | 6 networks |
+| **USDC** | USD Coin | 7 networks |
+| **USDT** | Tether USD | 7 networks |
+| **WBTC** | Wrapped BTC | 5 networks |
+| **WETH** | Wrapped Ethereum | 6 networks |
+
+::: tip Get Real-Time Currency List
+Use the [Get Currencies](#1-get-currencies) endpoint to retrieve the current list of supported currencies with their network IDs.
+:::
+
+### Currency Validation
+
+When creating a payment link:
+
+1. **Currency code is required** - You must provide a valid currency code
+2. **Case-sensitive** - Use uppercase currency codes (e.g., `USDT`, not `usdt`)
+3. **Length**: 3-10 characters
+4. **Network selection** - The system will automatically select an available network for the currency
+
+**Example valid currencies:**
+```json
+{
+  "currency": "USDT",  // ✅ Valid - Tether USD
+  "currency": "ETH",   // ✅ Valid - Ethereum
+  "currency": "USDC"   // ✅ Valid - USD Coin
+}
+```
+
+**Invalid examples:**
+```json
+{
+  "currency": "usdt",  // ❌ Invalid - must be uppercase
+  "currency": "BTC",   // ❌ Invalid - not supported (use WBTC)
+  "currency": "XYZ"    // ❌ Invalid - currency doesn't exist
+}
+```
+
+---
+
 ## Endpoints
 
-### 1. Create Payment Link
+### 1. Get Currencies
+
+Retrieve the complete list of supported cryptocurrencies with their network details.
+
+#### Request
+
+**GET** `/currencies?currency_type=string`
+
+#### Authentication
+
+```
+X-API-Key: btxm_live_xxxxxxxxxxxx
+X-API-Signature: <base64_encoded_dsa_signature>
+X-API-Timestamp: 2026-01-31T12:00:00Z
+Accept: application/json
+```
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|------|
+| `currency_type` | string | No | Filter by currency type | "string" |
+
+#### Response (200 OK)
+
+```json
+{
+  "message": "Currencies retrieved successfully",
+  "data": [
+    {
+      "id": "25193059-4008-4522-8eb4-3c2583ee1ebf",
+      "code": "USDT",
+      "name": "Tether USD"
+    },
+    {
+      "id": "eff091bc-223e-4326-b64f-140625b3f008",
+      "code": "USDC",
+      "name": "USD Coin"
+    },
+    {
+      "id": "a93e5a54-9725-4af1-85be-c389ce485017",
+      "code": "ETH",
+      "name": "Ethereum"
+    }
+    // ... more currencies
+  ]
+}
+```
+
+**Response Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string (UUID) | Unique network identifier for the currency |
+| `code` | string | Currency code (use this when creating payment links) |
+| `name` | string | Full currency name |
+
+::: warning Multiple Networks
+Some currencies like USDT and ETH are available on multiple networks (Ethereum, BSC, Polygon, etc.). Each network has a unique `id`. When creating a payment link, you only need to specify the `code` - the system will handle network selection.
+:::
+
+#### Error Responses
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 401 | Unauthorized | Missing or invalid API key/signature |
+| 500 | Internal Server Error | Server error |
+
+#### Example Request
+
+```bash
+curl --location 'https://api.bitxpay.com/api/v1/currencies?currency_type=string' \
+  --header 'X-API-Key: btxm_live_xxxxxxxxxxxx' \
+  --header 'X-API-Signature: <signature>' \
+  --header 'X-API-Timestamp: 2026-01-31T12:00:00Z' \
+  --header 'Accept: application/json'
+```
+
+---
+
+### 2. Create Payment Link
 
 Creates a new payment link for accepting payments.
 
@@ -40,7 +170,7 @@ Content-Type: application/json
 |-------|------|----------|-------------|---------|
 | `payment_name` | string | Yes | Payment link name (1-100 chars) | "Invoice #12345" |
 | `amount` | float | Yes | Payment amount (must be > 0) | 100.50 |
-| `currency` | string | Yes | Currency code (3-10 chars) | "USD" |
+| `currency` | string | Yes | Currency code (3-10 chars, uppercase). Must be a valid currency from [supported list](#supported-cryptocurrencies) | "USDT" |
 | `description` | string | No | Payment description (max 1000 chars) | "Payment for Order #12345" |
 | `expires_at` | timestamp | No | Expiration time (ISO 8601) | "2026-02-01T12:00:00Z" |
 | `max_uses` | integer | No | Maximum number of uses (must be > 0) | 1 |
@@ -88,14 +218,19 @@ Content-Type: application/json
 
 | Status | Error | Description |
 |--------|-------|-------------|
-| 400 | Bad Request | Invalid request payload or validation failed |
+| 400 | Bad Request | Invalid request payload, validation failed, or unsupported currency |
 | 401 | Unauthorized | Missing or invalid API key/signature |
 | 409 | Conflict | Duplicate payment link or resource conflict |
 | 500 | Internal Server Error | Server error |
 
+**Common 400 Errors:**
+- `Invalid currency code` - Currency not supported or doesn't exist
+- `Currency code must be uppercase` - Use uppercase letters (e.g., USDT not usdt)
+- `Currency is required` - Missing currency field
+
 ---
 
-### 2. List Payment Links
+### 3. List Payment Links
 
 Retrieve all payment links for the authenticated merchant with filtering, searching, and pagination.
 
@@ -185,7 +320,7 @@ Retrieve all payment links for the authenticated merchant with filtering, search
 
 ---
 
-### 3. Get Payment Link by ID
+### 4. Get Payment Link by ID
 
 Retrieve a specific payment link with all related details including payers, transactions, and summary statistics.
 
@@ -286,7 +421,7 @@ Retrieve a specific payment link with all related details including payers, tran
 
 ---
 
-### 4. Update Payment Link Status
+### 5. Update Payment Link Status
 
 Update the status of a payment link (activate, deactivate, or expire).
 
@@ -389,6 +524,18 @@ For detailed implementation examples in various languages, see the [Merchant API
 
 ## Common Use Cases
 
+### Get Available Currencies
+
+Before creating a payment link, fetch the list of supported currencies:
+
+```bash
+curl https://api.bitxpay.com/api/v1/currencies \
+  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
+  -H "X-API-Signature: <signature>" \
+  -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
+  -H "Accept: application/json"
+```
+
 ### Create a Simple Payment Link
 
 ```bash
@@ -400,14 +547,34 @@ curl -X POST https://api.bitxpay.com/payment_links \
   -d '{
     "payment_name": "Product Purchase",
     "amount": 99.99,
-    "currency": "USD"
+    "currency": "USDT"
+  }'
+```
+
+### Create Payment Link with Full Details
+
+```bash
+curl -X POST https://api.bitxpay.com/payment_links \
+  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
+  -H "X-API-Signature: <signature>" \
+  -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payment_name": "Premium Course",
+    "amount": 299.99,
+    "currency": "USDC",
+    "description": "Advanced Web Development Course",
+    "customer_email": "customer@example.com",
+    "product_name": "Web Dev Pro",
+    "success_url": "https://yoursite.com/success",
+    "cancel_url": "https://yoursite.com/cancel"
   }'
 ```
 
 ### List Payment Links with Filters
 
 ```bash
-curl https://api.bitxpay.com/payment_links?status=pending&currency=USD&limit=10 \
+curl https://api.bitxpay.com/payment_links?status=pending&currency=USDT&limit=10 \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z"
