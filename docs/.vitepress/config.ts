@@ -65,8 +65,7 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/api-reference/' },
             { text: 'Authentication', link: '/api-reference/authentication' },
-            { text: 'Payments', link: '/api-reference/payments' },
-            { text: 'Wallets', link: '/api-reference/wallets' }
+            { text: 'Payments', link: '/api-reference/payments' }
           ]
         }
       ],
