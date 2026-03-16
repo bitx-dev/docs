@@ -41,14 +41,6 @@ X-Timestamp: UNIX_TIMESTAMP
 | `GET` | `/payments` | List all payments |
 | `POST` | `/payments/:id/cancel` | Cancel a payment |
 
-### Wallets
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/wallets` | List all wallets |
-| `GET` | `/wallets/:id` | Get wallet details |
-| `GET` | `/wallets/:id/balance` | Get wallet balance |
-| `GET` | `/wallets/:id/transactions` | List wallet transactions |
-
 ## Response Format
 
 All responses follow a consistent format:

@@ -179,23 +179,139 @@ Content-Type: application/json
 | `customer_email` | string | No | Customer email (valid email) | "john@example.com" |
 | `product_name` | string | No | Product name (1-200 chars) | "Course A" |
 | `product_description` | string | No | Product description (max 1000 chars) | "Art Course for Beginners" |
+| `cart` | object | No | Shopping cart details with items, subtotal, tax, and total | See cart object below |
+| `order_id` | string | No | Merchant's order ID (auto-generated if not provided) | "ORD-20260226-A1B2C3" |
+| `auto_fill` | boolean | No | Auto-fill customer information (default: true) | true |
 | `success_url` | string | No | Redirect URL after success (valid URL, max 500 chars) | "https://www.success.io/success.html" |
 | `cancel_url` | string | No | Redirect URL after cancellation (valid URL, max 500 chars) | "https://www.failure.io/cancel.html" |
-| `webhook_metadata` | object | No | Custom metadata for webhooks | {"order_id": "12345"} |
+| `webhook_metadata` | object | No | Custom metadata for webhooks | {"merchant_id": "M-10001"} |
+
+**Cart Object Structure:**
+
+```json
+{
+  "cart": {
+    "items": [
+      {
+        "name": "Course A",
+        "quantity": 1,
+        "price": 100.50
+      }
+    ],
+    "subtotal": 100.50,
+    "tax": 0,
+    "total": 100.50
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `items` | array | Yes | Array of cart items |
+| `items[].name` | string | Yes | Item name |
+| `items[].quantity` | integer | Yes | Item quantity (must be > 0) |
+| `items[].price` | float | Yes | Item price (must be > 0) |
+| `subtotal` | float | Yes | Subtotal amount |
+| `tax` | float | Yes | Tax amount |
+| `total` | float | Yes | Total amount (should match payment amount) |
+
+::: tip Response Variations
+The API returns different response structures based on the parameters you provide:
+- **Minimal Request** (only required fields) → Returns minimal response with auto-generated `customer_id` and `order_id`
+- **Full Request** (with optional fields like cart, customer details) → Returns complete response with all provided data
+:::
+
+#### Request Examples
+
+**Minimal Request:**
+```json
+{
+  "payment_name": "Invoice #12345",
+  "amount": 100.50,
+  "currency": "USDT"
+}
+```
+
+**Full Request:**
+```json
+{
+  "payment_name": "Invoice #12345",
+  "description": "Payment for Order #12345",
+  "amount": 100.50,
+  "currency": "USDT",
+  "expires_at": "2026-02-01T12:00:00Z",
+  "max_uses": 1,
+  "customer_id": "AB-001",
+  "customer_name": "John Doe",
+  "customer_email": "john@example.com",
+  "product_name": "Course A",
+  "product_description": "Art Course for Beginners",
+  "cart": {
+    "items": [
+      {
+        "name": "Course A",
+        "quantity": 1,
+        "price": 100.50
+      }
+    ],
+    "subtotal": 100.50,
+    "tax": 0,
+    "total": 100.50
+  },
+  "order_id": "ORD-20260226-A1B2C3",
+  "auto_fill": true,
+  "success_url": "https://www.success.io/success.html",
+  "cancel_url": "https://www.failure.io/cancel.html",
+  "webhook_metadata": {
+    "merchant_id": "M-10001",
+    "source": "payment_link",
+    "note": "Test payment"
+  }
+}
+```
 
 #### Response (201 Created)
+
+The response structure varies based on the request parameters provided.
+
+**Minimal Response** (when only required fields are provided):
 
 ```json
 {
   "message": "Payment link created successfully",
   "data": {
-    "id": "22222222-2222-2222-2222-222222222222",
+    "id": "f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_name": "Invoice #12345",
+    "amount": 100.5,
+    "currency": "USDT",
+    "payment_url": "http://localhost:3000/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_status": "processing",
+    "payment_type": "one_time",
+    "expires_at": "2026-03-13T15:21:12.988351519+05:00",
+    "max_uses": 1,
+    "current_uses": 0,
+    "is_active": true,
+    "customer_id": "CUST-20260312-96D009D4",
+    "order_id": "ORD-20260312-E29917C9",
+    "auto_fill": true,
+    "created_at": "2026-03-12T15:21:12.988356Z"
+  }
+}
+```
+
+**Full Response** (when optional fields like cart, customer details are provided):
+
+```json
+{
+  "message": "Payment link created successfully",
+  "data": {
+    "id": "fce13397-afb5-4093-84c0-b64178691dbd",
     "payment_name": "Invoice #12345",
     "description": "Payment for Order #12345",
-    "amount": 100.50,
-    "currency": "USD",
-    "payment_url": "https://pay.bitxpay.com/p/22222222-2222-2222-2222-222222222222",
-    "payment_status": "pending",
+    "amount": 100.5,
+    "currency": "USDT",
+    "payment_url": "http://localhost:3000/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+    "payment_status": "processing",
     "payment_type": "one_time",
     "expires_at": "2026-02-01T12:00:00Z",
     "max_uses": 1,
@@ -206,13 +322,60 @@ Content-Type: application/json
     "customer_email": "john@example.com",
     "product_name": "Course A",
     "product_description": "Art Course for Beginners",
+    "cart": {
+      "items": [
+        {
+          "name": "Course A",
+          "price": 100.5,
+          "quantity": 1
+        }
+      ],
+      "subtotal": 100.5,
+      "tax": 0,
+      "total": 100.5
+    },
+    "order_id": "ORD-20260226-A1B2C3",
+    "auto_fill": true,
     "success_url": "https://www.success.io/success.html",
     "cancel_url": "https://www.failure.io/cancel.html",
-    "webhook_metadata": {"order_id": "12345"},
-    "created_at": "2026-01-31T10:00:00Z"
+    "webhook_metadata": {
+      "merchant_id": "M-10001",
+      "note": "Test payment",
+      "source": "payment_link"
+    },
+    "created_at": "2026-03-12T15:23:32.084432Z"
   }
 }
 ```
+
+**Response Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string (UUID) | Unique payment link identifier |
+| `payment_name` | string | Payment link name |
+| `description` | string | Payment description (if provided) |
+| `amount` | float | Payment amount |
+| `currency` | string | Currency code |
+| `payment_url` | string | URL for customers to complete payment |
+| `payment_status` | string | Status: `processing`, `completed`, `expired`, `cancelled` |
+| `payment_type` | string | Payment type: `one_time`, `recurring` |
+| `expires_at` | timestamp | Expiration timestamp |
+| `max_uses` | integer | Maximum number of uses allowed |
+| `current_uses` | integer | Current number of uses |
+| `is_active` | boolean | Whether the payment link is active |
+| `customer_id` | string | Customer ID (auto-generated or provided) |
+| `customer_name` | string | Customer name (if provided) |
+| `customer_email` | string | Customer email (if provided) |
+| `product_name` | string | Product name (if provided) |
+| `product_description` | string | Product description (if provided) |
+| `cart` | object | Shopping cart details (if provided) |
+| `order_id` | string | Order ID (auto-generated or provided) |
+| `auto_fill` | boolean | Auto-fill setting |
+| `success_url` | string | Success redirect URL (if provided) |
+| `cancel_url` | string | Cancel redirect URL (if provided) |
+| `webhook_metadata` | object | Custom webhook metadata (if provided) |
+| `created_at` | timestamp | Creation timestamp |
 
 #### Error Responses
 
@@ -257,59 +420,95 @@ Retrieve all payment links for the authenticated merchant with filtering, search
 
 #### Response (200 OK)
 
+The response includes an array of payment links with varying detail levels based on how they were created.
+
 ```json
 {
   "message": "Payment links retrieved successfully",
   "data": {
     "data": [
       {
-        "id": "22222222-2222-2222-2222-222222222222",
+        "id": "fce13397-afb5-4093-84c0-b64178691dbd",
         "payment_name": "Invoice #12345",
         "description": "Payment for Order #12345",
-        "amount": 100.50,
-        "currency": "USD",
-        "payment_url": "https://pay.bitxpay.com/p/22222222-2222-2222-2222-222222222222",
-        "payment_status": "pending",
+        "amount": 100.5,
+        "currency": "USDT",
+        "payment_url": "http://localhost:3000/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+        "payment_status": "processing",
         "payment_type": "one_time",
         "expires_at": "2026-02-01T12:00:00Z",
         "max_uses": 1,
         "current_uses": 0,
         "is_active": true,
-        "is_expired": false,
+        "is_expired": true,
         "customer_id": "AB-001",
         "customer_name": "John Doe",
         "customer_email": "john@example.com",
         "product_name": "Course A",
         "product_description": "Art Course for Beginners",
+        "cart": {
+          "items": [
+            {
+              "name": "Course A",
+              "price": 100.5,
+              "quantity": 1
+            }
+          ],
+          "subtotal": 100.5,
+          "tax": 0,
+          "total": 100.5
+        },
+        "order_id": "ORD-20260226-A1B2C3",
+        "auto_fill": true,
         "success_url": "https://www.success.io/success.html",
         "cancel_url": "https://www.failure.io/cancel.html",
-        "webhook_metadata": {"order_id": "12345"},
-        "created_at": "2026-01-31T10:00:00Z"
+        "webhook_metadata": {
+          "merchant_id": "M-10001",
+          "note": "Test payment",
+          "source": "payment_link"
+        },
+        "created_at": "2026-03-12T15:23:32.084432Z"
+      },
+      {
+        "id": "f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+        "payment_name": "Invoice #12345",
+        "amount": 100.5,
+        "currency": "USDT",
+        "payment_url": "http://localhost:3000/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+        "payment_status": "processing",
+        "payment_type": "one_time",
+        "expires_at": "2026-03-13T15:21:12.988351Z",
+        "max_uses": 1,
+        "current_uses": 0,
+        "is_active": true,
+        "is_expired": false,
+        "customer_id": "CUST-20260312-96D009D4",
+        "order_id": "ORD-20260312-E29917C9",
+        "auto_fill": true,
+        "created_at": "2026-03-12T15:21:12.988356Z"
       }
     ],
     "pagination": {
       "current_page": 1,
       "per_page": 20,
-      "total_pages": 5,
-      "total_records": 95,
+      "total_pages": 2,
+      "total_records": 31,
       "has_next_page": true,
       "has_prev_page": false
     },
     "filters": {
-      "status": "pending",
-      "is_active": null,
-      "currency": "USD",
-      "min_amount": null,
-      "max_amount": null,
-      "created_from": null,
-      "created_to": null,
-      "search": null,
       "sort_by": "created_at",
       "sort_order": "desc"
     }
   }
 }
 ```
+
+::: tip Response Variations
+Payment links in the list may have different fields depending on how they were created:
+- Links created with minimal data will only show core fields
+- Links created with full details (cart, customer info) will include all those fields
+:::
 
 #### Error Responses
 
@@ -336,79 +535,143 @@ Retrieve a specific payment link with all related details including payers, tran
 
 #### Response (200 OK)
 
+The response structure varies based on how the payment link was created.
+
+**Full Response** (payment link created with complete details):
+
 ```json
 {
   "message": "Payment link retrieved successfully",
   "data": {
-    "id": "22222222-2222-2222-2222-222222222222",
+    "id": "fce13397-afb5-4093-84c0-b64178691dbd",
     "payment_name": "Invoice #12345",
     "description": "Payment for Order #12345",
-    "amount": 100.50,
-    "currency": "USD",
-    "payment_url": "https://pay.bitxpay.com/p/22222222-2222-2222-2222-222222222222",
-    "payment_status": "pending",
+    "amount": 100.5,
+    "currency": "USDT",
+    "payment_url": "http://localhost:3000/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+    "payment_status": "processing",
     "payment_type": "one_time",
     "expires_at": "2026-02-01T12:00:00Z",
     "max_uses": 1,
     "current_uses": 0,
     "is_active": true,
-    "is_expired": false,
-    "settlement_status": "pending",
-    "usd_value": 100.50,
+    "is_expired": true,
     "customer_id": "AB-001",
     "customer_name": "John Doe",
     "customer_email": "john@example.com",
     "product_name": "Course A",
     "product_description": "Art Course for Beginners",
+    "cart": {
+      "items": [
+        {
+          "name": "Course A",
+          "price": 100.5,
+          "quantity": 1
+        }
+      ],
+      "subtotal": 100.5,
+      "tax": 0,
+      "total": 100.5
+    },
+    "order_id": "ORD-20260226-A1B2C3",
+    "auto_fill": true,
     "success_url": "https://www.success.io/success.html",
     "cancel_url": "https://www.failure.io/cancel.html",
-    "webhook_metadata": {"order_id": "12345"},
-    "payers": [
-      {
-        "id": "33333333-3333-3333-3333-333333333333",
-        "name": "John Doe",
-        "email": "john@example.com",
-        "country": "United States",
-        "phone": "+1234567890",
-        "wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-        "ip_address": "192.168.1.1",
-        "region": "California",
-        "created_at": "2026-01-31T10:05:00Z"
-      }
-    ],
-    "transactions": [
-      {
-        "id": "44444444-4444-4444-4444-444444444444",
-        "total_amount_fiat": 100.50,
-        "total_amount_crypto": 0.0025,
-        "tx_hash": "0xabc123...",
-        "tx_hash_send_time": "2026-01-31T10:10:00Z",
-        "tx_confirmation_time": "2026-01-31T10:15:00Z",
-        "tx_block": 12345678,
-        "network_id": "ethereum",
-        "network_name": "Ethereum Mainnet",
-        "payment_currency": "USDT",
-        "contract_address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-        "payment_type": "crypto",
-        "status": "confirmed",
-        "payment_status": "completed",
-        "payment_wallet": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-        "created_at": "2026-01-31T10:10:00Z"
-      }
-    ],
+    "webhook_metadata": {
+      "merchant_id": "M-10001",
+      "note": "Test payment",
+      "source": "payment_link"
+    },
     "summary": {
-      "total_payers": 3,
-      "total_transactions": 3,
-      "total_amount_received": 100.50,
-      "total_amount_received_crypto": 0.0025,
+      "total_payers": 0,
+      "total_transactions": 0,
+      "total_amount_received": 0,
+      "total_amount_received_crypto": 0,
       "pending_transactions": 0,
-      "completed_transactions": 3,
+      "completed_transactions": 0,
       "failed_transactions": 0
     },
-    "created_at": "2026-01-31T10:00:00Z"
+    "created_at": "2026-03-12T15:23:32.084432Z"
   }
 }
 ```
+
+**Minimal Response** (payment link created with only required fields):
+
+```json
+{
+  "message": "Payment link retrieved successfully",
+  "data": {
+    "id": "f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_name": "Invoice #12345",
+    "amount": 100.5,
+    "currency": "USDT",
+    "payment_url": "http://localhost:3000/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_status": "processing",
+    "payment_type": "one_time",
+    "expires_at": "2026-03-13T15:21:12.988351Z",
+    "max_uses": 1,
+    "current_uses": 0,
+    "is_active": true,
+    "is_expired": false,
+    "customer_id": "CUST-20260312-96D009D4",
+    "order_id": "ORD-20260312-E29917C9",
+    "auto_fill": true,
+    "summary": {
+      "total_payers": 0,
+      "total_transactions": 0,
+      "total_amount_received": 0,
+      "total_amount_received_crypto": 0,
+      "pending_transactions": 0,
+      "completed_transactions": 0,
+      "failed_transactions": 0
+    },
+    "created_at": "2026-03-12T15:21:12.988356Z"
+  }
+}
+```
+
+**Response Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string (UUID) | Unique payment link identifier |
+| `payment_name` | string | Payment link name |
+| `description` | string | Payment description (if provided) |
+| `amount` | float | Payment amount |
+| `currency` | string | Currency code |
+| `payment_url` | string | URL for customers to complete payment |
+| `payment_status` | string | Status: `processing`, `completed`, `expired`, `cancelled` |
+| `payment_type` | string | Payment type: `one_time`, `recurring` |
+| `expires_at` | timestamp | Expiration timestamp |
+| `max_uses` | integer | Maximum number of uses allowed |
+| `current_uses` | integer | Current number of uses |
+| `is_active` | boolean | Whether the payment link is active |
+| `is_expired` | boolean | Whether the payment link has expired |
+| `customer_id` | string | Customer ID (auto-generated or provided) |
+| `customer_name` | string | Customer name (if provided) |
+| `customer_email` | string | Customer email (if provided) |
+| `product_name` | string | Product name (if provided) |
+| `product_description` | string | Product description (if provided) |
+| `cart` | object | Shopping cart details (if provided) |
+| `order_id` | string | Order ID (auto-generated or provided) |
+| `auto_fill` | boolean | Auto-fill setting |
+| `success_url` | string | Success redirect URL (if provided) |
+| `cancel_url` | string | Cancel redirect URL (if provided) |
+| `webhook_metadata` | object | Custom webhook metadata (if provided) |
+| `summary` | object | Transaction summary statistics |
+| `summary.total_payers` | integer | Total number of unique payers |
+| `summary.total_transactions` | integer | Total number of transactions |
+| `summary.total_amount_received` | float | Total amount received in fiat |
+| `summary.total_amount_received_crypto` | float | Total amount received in crypto |
+| `summary.pending_transactions` | integer | Number of pending transactions |
+| `summary.completed_transactions` | integer | Number of completed transactions |
+| `summary.failed_transactions` | integer | Number of failed transactions |
+| `created_at` | timestamp | Creation timestamp |
+
+::: tip Summary Field
+The `summary` object is always included in the response and provides real-time statistics about payments received for this payment link.
+:::
 
 #### Error Responses
 
