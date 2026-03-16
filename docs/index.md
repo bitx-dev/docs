@@ -51,7 +51,6 @@ features:
 ### API Reference
 - [Authentication](/api-reference/authentication) - Secure your API requests
 - [Payment Links API](/api-reference/payments) - Create and manage payment links
-- [Wallets API](/api-reference/wallets) - Wallet management endpoints
 
 ### Testing & Tools
 - [Testing Guide](/testing/) - Overview of API testing
