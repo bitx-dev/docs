@@ -1,0 +1,939 @@
+/**
+ * BITX UI Theme - Custom Styles
+ * Based on bitxsl.com design system
+ */
+
+:root {
+  /* Primary Brand Colors */
+  --bitx-primary: #1a1a2e;
+  --bitx-primary-light: #2d2d44;
+  --bitx-primary-dark: #0f0f1a;
+  
+  /* Accent Colors */
+  --bitx-accent: #3b82f6;
+  --bitx-accent-hover: #2563eb;
+  --bitx-accent-light: #60a5fa;
+  
+  /* Gold/Premium Accent */
+  --bitx-gold: #f59e0b;
+  --bitx-gold-light: #fbbf24;
+  
+  /* Neutral Colors */
+  --bitx-gray-50: #f9fafb;
+  --bitx-gray-100: #f3f4f6;
+  --bitx-gray-200: #e5e7eb;
+  --bitx-gray-300: #d1d5db;
+  --bitx-gray-600: #4b5563;
+  --bitx-gray-700: #374151;
+  --bitx-gray-800: #1f2937;
+  --bitx-gray-900: #111827;
+  
+  /* Semantic Colors */
+  --bitx-success: #10b981;
+  --bitx-warning: #f59e0b;
+  --bitx-error: #ef4444;
+  --bitx-info: #3b82f6;
+  
+  /* VitePress Theme Overrides */
+  --vp-c-brand-1: var(--bitx-accent);
+  --vp-c-brand-2: var(--bitx-accent-hover);
+  --vp-c-brand-3: var(--bitx-accent-light);
+  
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-soft: var(--bitx-gray-50);
+  --vp-c-bg-mute: var(--bitx-gray-100);
+  
+  --vp-c-text-1: var(--bitx-gray-900);
+  --vp-c-text-2: var(--bitx-gray-700);
+  --vp-c-text-3: var(--bitx-gray-600);
+  
+  /* Typography */
+  --vp-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+}
+
+/* Dark Mode */
+.dark {
+  --vp-c-bg: var(--bitx-primary);
+  --vp-c-bg-soft: var(--bitx-primary-light);
+  --vp-c-bg-mute: var(--bitx-primary-dark);
+  
+  --vp-c-text-1: var(--bitx-gray-50);
+  --vp-c-text-2: var(--bitx-gray-200);
+  --vp-c-text-3: var(--bitx-gray-300);
+  
+  --vp-c-brand-1: var(--bitx-accent-light);
+  --vp-c-brand-2: var(--bitx-accent);
+  --vp-c-brand-3: var(--bitx-accent-hover);
+}
+
+/* Hero Section Styling */
+.VPHero {
+  background: linear-gradient(135deg, var(--bitx-primary) 0%, var(--bitx-primary-light) 100%);
+  padding: 4rem 2rem;
+}
+
+.VPHero .name {
+  background: linear-gradient(120deg, var(--bitx-accent-light), var(--bitx-gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.VPHero .text {
+  color: var(--bitx-gray-100);
+}
+
+.VPHero .tagline {
+  color: var(--bitx-gray-300);
+}
+
+/* Button Styling */
+.VPButton.brand {
+  background: linear-gradient(135deg, var(--bitx-accent), var(--bitx-accent-hover));
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+}
+
+.VPButton.brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.4);
+}
+
+.VPButton.alt {
+  border: 2px solid var(--bitx-accent);
+  color: var(--bitx-accent);
+  background: transparent;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.VPButton.alt:hover {
+  background: var(--bitx-accent);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Feature Cards */
+.VPFeatures {
+  padding: 2rem 0;
+  margin-top: 4rem;
+}
+
+.VPFeature {
+  border: 1px solid var(--bitx-gray-200);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: var(--vp-c-bg);
+}
+
+.VPFeature:hover {
+  border-color: var(--bitx-accent);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+  transform: translateY(-4px);
+}
+
+.dark .VPFeature {
+  border-color: var(--bitx-primary-light);
+  background: var(--bitx-primary-light);
+}
+
+.dark .VPFeature:hover {
+  border-color: var(--bitx-accent);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+}
+
+.VPFeature .icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Navigation Bar */
+.VPNav {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--bitx-gray-200);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dark .VPNav {
+  background: rgba(26, 26, 46, 0.98);
+  border-bottom-color: var(--bitx-primary-light);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.VPNavBar {
+  padding: 0 24px;
+  height: 64px;
+}
+
+.VPNavBar .container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.VPNavBar .title {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--bitx-primary);
+  letter-spacing: -0.02em;
+}
+
+.dark .VPNavBar .title {
+  color: var(--bitx-gray-50);
+}
+
+/* Navigation Menu Items */
+.VPNavBarMenu {
+  gap: 0.5rem;
+}
+
+.VPNavBarMenuLink {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.VPNavBarMenuLink:hover {
+  background: var(--bitx-gray-100);
+  color: var(--bitx-accent);
+}
+
+.dark .VPNavBarMenuLink:hover {
+  background: var(--bitx-primary-light);
+  color: var(--bitx-accent-light);
+}
+
+/* Active nav item */
+.VPNavBarMenuLink.active {
+  color: var(--bitx-accent);
+  font-weight: 600;
+}
+
+.VPNavBarMenuLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 1rem;
+  right: 1rem;
+  height: 2px;
+  background: var(--bitx-accent);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Dropdown Menu Styling */
+.VPNavBarMenuGroup {
+  position: relative;
+}
+
+.VPNavBarMenuGroup .button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.VPNavBarMenuGroup .button:hover {
+  background: var(--bitx-gray-100);
+  color: var(--bitx-accent);
+}
+
+.dark .VPNavBarMenuGroup .button:hover {
+  background: var(--bitx-primary-light);
+  color: var(--bitx-accent-light);
+}
+
+/* Dropdown Content */
+.VPNavBarMenuGroup .items {
+  background: white;
+  border: 1px solid var(--bitx-gray-200);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 0.5rem;
+  min-width: 200px;
+  margin-top: 0.5rem;
+}
+
+.dark .VPNavBarMenuGroup .items {
+  background: var(--bitx-primary-light);
+  border-color: var(--bitx-primary-dark);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.VPNavBarMenuGroup .item {
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.VPNavBarMenuGroup .item:hover {
+  background: var(--bitx-gray-50);
+  color: var(--bitx-accent);
+  transform: translateX(4px);
+}
+
+.dark .VPNavBarMenuGroup .item:hover {
+  background: var(--bitx-primary-dark);
+  color: var(--bitx-accent-light);
+}
+
+/* Search Bar Styling */
+.VPNavBarSearch {
+  max-width: 500px;
+  flex: 1;
+}
+
+.VPNavBarSearch .DocSearch-Button {
+  background: var(--bitx-gray-50);
+  border: 1px solid var(--bitx-gray-200);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  height: 40px;
+}
+
+.VPNavBarSearch .DocSearch-Button:hover {
+  background: white;
+  border-color: var(--bitx-accent);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.dark .VPNavBarSearch .DocSearch-Button {
+  background: var(--bitx-primary-light);
+  border-color: var(--bitx-primary-light);
+}
+
+.dark .VPNavBarSearch .DocSearch-Button:hover {
+  background: var(--bitx-primary-dark);
+  border-color: var(--bitx-accent);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+/* Logo Styling */
+.VPNavBarTitle .logo {
+  display: inline-block;
+  margin-right: 0.625rem;
+  width: 28px;
+  height: 28px;
+  transition: transform 0.3s ease;
+  vertical-align: middle;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  shape-rendering: geometricPrecision;
+}
+
+.VPNavBarTitle:hover .logo {
+  transform: scale(1.05);
+}
+
+.VPNavBarTitle .title {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 28px;
+  margin-right: 2rem;
+}
+
+/* Ensure logo container has proper alignment */
+.VPNavBarTitle {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  gap: 0;
+}
+
+/* Adjust search field spacing */
+.VPNavBarSearch {
+  margin-left: 1.5rem;
+  max-width: 500px;
+  flex: 1;
+}
+
+/* Sidebar */
+.VPSidebar {
+  background: var(--vp-c-bg-soft);
+  border-right: 1px solid var(--bitx-gray-200);
+}
+
+.dark .VPSidebar {
+  border-right-color: var(--bitx-primary-light);
+}
+
+.VPSidebarItem.is-active .link {
+  color: var(--bitx-accent);
+  font-weight: 600;
+}
+
+.VPSidebarItem .link:hover {
+  color: var(--bitx-accent);
+}
+
+/* Code Blocks */
+.vp-code-group {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--bitx-gray-200);
+}
+
+.dark .vp-code-group {
+  border-color: var(--bitx-primary-light);
+}
+
+div[class*='language-'] {
+  border-radius: 8px;
+  background: var(--bitx-gray-900) !important;
+}
+
+div[class*='language-'] code {
+  font-family: var(--vp-font-family-mono);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Inline Code */
+.vp-doc code {
+  background: var(--bitx-gray-100);
+  color: var(--bitx-accent-hover);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.dark .vp-doc code {
+  background: var(--bitx-primary-light);
+  color: var(--bitx-accent-light);
+}
+
+/* Tables */
+.vp-doc table {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--bitx-gray-200);
+}
+
+.dark .vp-doc table {
+  border-color: var(--bitx-primary-light);
+}
+
+.vp-doc th {
+  background: var(--bitx-gray-100);
+  color: var(--bitx-gray-900);
+  font-weight: 600;
+}
+
+.dark .vp-doc th {
+  background: var(--bitx-primary-light);
+  color: var(--bitx-gray-50);
+}
+
+.vp-doc tr:hover {
+  background: var(--bitx-gray-50);
+}
+
+.dark .vp-doc tr:hover {
+  background: var(--bitx-primary-dark);
+}
+
+/* Custom Containers (Tips, Warnings, etc.) */
+.vp-doc .custom-block.tip {
+  border-color: var(--bitx-info);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.vp-doc .custom-block.warning {
+  border-color: var(--bitx-warning);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.vp-doc .custom-block.danger {
+  border-color: var(--bitx-error);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.vp-doc .custom-block.info {
+  border-color: var(--bitx-accent);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+/* Links */
+.vp-doc a {
+  color: var(--bitx-accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.vp-doc a:hover {
+  color: var(--bitx-accent-hover);
+  text-decoration: underline;
+}
+
+/* Headings */
+.vp-doc h1 {
+  color: var(--bitx-primary);
+  font-weight: 800;
+  border-bottom: 2px solid var(--bitx-accent);
+  padding-bottom: 0.5rem;
+}
+
+.dark .vp-doc h1 {
+  color: var(--bitx-gray-50);
+}
+
+.vp-doc h2 {
+  color: var(--bitx-gray-900);
+  font-weight: 700;
+  border-bottom: 1px solid var(--bitx-gray-200);
+  padding-bottom: 0.3rem;
+}
+
+.dark .vp-doc h2 {
+  color: var(--bitx-gray-100);
+  border-bottom-color: var(--bitx-primary-light);
+}
+
+.vp-doc h3 {
+  color: var(--bitx-gray-800);
+  font-weight: 600;
+}
+
+.dark .vp-doc h3 {
+  color: var(--bitx-gray-200);
+}
+
+/* Footer */
+.VPFooter {
+  background: var(--bitx-primary);
+  color: var(--bitx-gray-200);
+  border-top: 1px solid var(--bitx-primary-light);
+}
+
+.VPFooter a {
+  color: var(--bitx-accent-light);
+}
+
+.VPFooter a:hover {
+  color: var(--bitx-gold-light);
+}
+
+/* Search */
+.VPNavBarSearch {
+  border: 1px solid var(--bitx-gray-200);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.VPNavBarSearch:hover {
+  border-color: var(--bitx-accent);
+}
+
+.dark .VPNavBarSearch {
+  border-color: var(--bitx-primary-light);
+}
+
+/* Badge Styling */
+.vp-badge {
+  background: var(--bitx-accent);
+  color: white;
+  padding: 0.2em 0.6em;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.vp-badge.tip {
+  background: var(--bitx-info);
+}
+
+.vp-badge.warning {
+  background: var(--bitx-warning);
+}
+
+.vp-badge.danger {
+  background: var(--bitx-error);
+}
+
+/* Popular Resources Section */
+.popular-resources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0 3rem 0;
+}
+
+.resource-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--vp-c-bg);
+  border: 2px solid var(--bitx-gray-200);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.resource-card:hover {
+  border-color: var(--bitx-accent);
+  background: var(--bitx-gray-50);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+  text-decoration: none;
+}
+
+.dark .resource-card {
+  background: var(--bitx-primary-light);
+  border-color: var(--bitx-primary-light);
+}
+
+.dark .resource-card:hover {
+  border-color: var(--bitx-accent);
+  background: var(--bitx-primary-dark);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
+}
+
+.resource-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.resource-content {
+  flex: 1;
+}
+
+.resource-content h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--bitx-gray-900);
+}
+
+.dark .resource-content h4 {
+  color: var(--bitx-gray-50);
+}
+
+.resource-content p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--bitx-gray-600);
+  line-height: 1.4;
+}
+
+.dark .resource-content p {
+  color: var(--bitx-gray-300);
+}
+
+/* Documentation Sections Styling */
+.doc-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 3rem 0;
+}
+
+.doc-card {
+  background: var(--vp-c-bg);
+  border: 1px solid var(--bitx-gray-200);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.doc-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--bitx-accent), var(--bitx-accent-light));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.doc-card:hover {
+  border-color: var(--bitx-accent);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+  transform: translateY(-4px);
+}
+
+.doc-card:hover::before {
+  transform: scaleX(1);
+}
+
+.dark .doc-card {
+  background: var(--bitx-primary-light);
+  border-color: var(--bitx-primary-light);
+}
+
+.dark .doc-card:hover {
+  border-color: var(--bitx-accent);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+}
+
+.doc-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.doc-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.doc-card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--bitx-gray-900);
+}
+
+.dark .doc-card-header h3 {
+  color: var(--bitx-gray-50);
+}
+
+.doc-card-desc {
+  color: var(--bitx-gray-600);
+  font-size: 0.9rem;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.dark .doc-card-desc {
+  color: var(--bitx-gray-300);
+}
+
+.doc-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.doc-links li {
+  margin-bottom: 0.5rem;
+}
+
+.doc-links a {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  color: var(--bitx-gray-700);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.doc-links a::before {
+  content: '→';
+  position: absolute;
+  left: 0.25rem;
+  opacity: 0;
+  transition: all 0.2s ease;
+  color: var(--bitx-accent);
+}
+
+.doc-links a:hover {
+  background: var(--bitx-gray-50);
+  color: var(--bitx-accent);
+  padding-left: 1.5rem;
+  text-decoration: none;
+}
+
+.doc-links a:hover::before {
+  opacity: 1;
+  left: 0.5rem;
+}
+
+.dark .doc-links a {
+  color: var(--bitx-gray-200);
+}
+
+.dark .doc-links a:hover {
+  background: var(--bitx-primary-dark);
+  color: var(--bitx-accent-light);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bitx-gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bitx-gray-300);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bitx-accent);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--bitx-primary);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--bitx-primary-light);
+}
+
+/* Remove min-height from home page to prevent empty space */
+.VPHome {
+  min-height: auto !important;
+}
+
+.VPContent.is-home {
+  min-height: auto !important;
+}
+
+/* Footer Global Styles - Home Page Only */
+.bitxpay-footer {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
+  margin-top: 0;
+}
+
+.bitxpay-footer .footer-container {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
+}
+
+/* Responsive Design */
+@media (max-width: 960px) {
+  .doc-sections {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  .popular-resources {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .doc-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .popular-resources {
+    grid-template-columns: 1fr;
+  }
+  
+  .VPHero {
+    padding: 2rem 1rem;
+  }
+  
+  .resource-card {
+    padding: 1rem;
+  }
+  
+  .doc-card {
+    padding: 1.25rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.vp-doc > * {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.VPNavBarMenuGroup .items {
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Focus states for accessibility */
+.VPNavBarMenuLink:focus-visible,
+.VPNavBarMenuGroup .button:focus-visible,
+.VPNavBarMenuGroup .item:focus-visible {
+  outline: 2px solid var(--bitx-accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Loading shimmer effect */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bitx-gray-100) 0%,
+    var(--bitx-gray-200) 50%,
+    var(--bitx-gray-100) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}

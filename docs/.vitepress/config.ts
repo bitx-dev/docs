@@ -18,11 +18,18 @@ export default defineConfig({
 
   // Head tags for SEO
   head: [
-    ['meta', { name: 'theme-color', content: '#3c8cff' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/docs/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/docs/favicon-32x32.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/docs/favicon-16x16.png' }],
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/docs/apple-touch-icon.png' }],
+    ['meta', { name: 'theme-color', content: '#3b82f6' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'BitXPay Documentation' }],
-    ['meta', { property: 'og:image', content: 'https://docs.bitxpay.com/og-image.png' }],
+    ['meta', { property: 'og:image', content: 'https://docs.bitxpay.com/docs/og-image.png' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    ['link', { href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap', rel: 'stylesheet' }]
   ],
 
   themeConfig: {
@@ -32,20 +39,46 @@ export default defineConfig({
     // Navigation bar
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Getting Started', link: '/getting-started/' },
-      { text: 'API Reference', link: '/api-reference/' },
-      { text: 'Security', link: '/security/' }
+      { 
+        text: 'Documentation',
+        items: [
+          { text: 'Get Started', link: '/get-started/' },
+          { text: 'API Reference', link: '/api-reference/' },
+          { text: 'Integration', link: '/integration/' },
+          { text: 'Security', link: '/security/' }
+        ]
+      },
+      { 
+        text: 'Resources',
+        items: [
+          { text: 'SDKs & Libraries', link: '/get-started/sdks-libraries' },
+          { text: 'Testing Tools', link: '/testing/' },
+          { text: 'Webhooks', link: '/get-started/webhooks' }
+        ]
+      },
+      { 
+        text: 'Support',
+        items: [
+          { text: 'Troubleshooting', link: '/testing/troubleshooting' },
+          { text: 'Contribute', link: '/contribution/' },
+          { text: 'GitHub', link: 'https://github.com/bitxpay' },
+          { text: 'Discord', link: 'https://discord.gg/bitxpay' }
+        ]
+      }
     ],
 
     // Sidebar - auto-generated from folder structure
     sidebar: {
-      '/getting-started/': [
+      '/get-started/': [
         {
-          text: 'Getting Started',
+          text: 'Get Started',
           items: [
-            { text: 'Overview', link: '/getting-started/' },
-            { text: 'Quick Start', link: '/getting-started/quick-start' },
-            { text: 'Installation', link: '/getting-started/installation' }
+            { text: 'Introduction', link: '/get-started/' },
+            { text: 'Supported Networks', link: '/get-started/supported-networks' },
+            { text: 'Authentication', link: '/get-started/authentication' },
+            { text: 'Quick Start', link: '/get-started/quick-start' },
+            { text: 'SDKs and Libraries', link: '/get-started/sdks-libraries' },
+            { text: 'Webhooks', link: '/get-started/webhooks' }
           ]
         }
       ],
@@ -69,14 +102,25 @@ export default defineConfig({
           ]
         }
       ],
-      '/Contribution-Guidelines/': [
+      '/testing/': [
         {
-          text: 'Contribution Guidelines',
+          text: 'Testing & Tools',
           items: [
-            { text: 'Overview', link: '/contribution/' }        
+            { text: 'Overview', link: '/testing/' },
+            { text: 'Postman Setup', link: '/testing/postman-setup' },
+            { text: 'API Testing Tools', link: '/testing/api-testing-tools' },
+            { text: 'Troubleshooting', link: '/testing/troubleshooting' }
+          ]
+        }
+      ],
+      '/contribution/': [
+        {
+          text: 'Contribution',
+          items: [
+            { text: 'Guidelines', link: '/contribution/' }        
           ]
         }     
-          ],
+      ],
       '/security/': [
         {
           text: 'Security',
@@ -102,10 +146,10 @@ export default defineConfig({
       }
     },
 
-    // Footer
+    // Footer (using custom component)
     footer: {
-      message: 'BitXPay - Cryptocurrency Payment Gateway',
-      copyright: 'Copyright © 2024 BitXPay'
+      message: '',
+      copyright: ''
     },
 
     // Edit link
