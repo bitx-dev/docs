@@ -23,7 +23,7 @@ https://sandbox-api.bitxpay.com/v1
 
 ## Authentication
 
-All API requests must include authentication headers. See [Authentication](./authentication) for details.
+All API requests must include authentication headers. See [Authentication](/api-reference/authentication) for details.
 
 ```bash
 Authorization: Bearer YOUR_API_KEY

@@ -772,7 +772,7 @@ Content-Type: application/json
 
 3. **Include in request headers**
 
-For detailed implementation examples in various languages, see the [Merchant API Authentication Guide](./authentication.md).
+For detailed implementation examples in various languages, see the [Merchant API Authentication Guide](/api-reference/authentication).
 
 ---
 

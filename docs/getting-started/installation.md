@@ -109,5 +109,5 @@ Never commit your `.env` file or API credentials to version control!
 
 ## Next Steps
 
-- [Quick Start Guide](./quick-start) - Create your first payment
+- [Quick Start Guide](/getting-started/quick-start) - Create your first payment
 - [API Reference](/api-reference/) - Explore all available endpoints

@@ -9,10 +9,10 @@ This section covers advanced integration topics to help you build a robust payme
 
 ## Topics
 
-### [Webhooks](./webhooks)
+### [Webhooks](/integration/webhooks)
 Learn how to receive real-time payment notifications and handle payment status updates.
 
-### [Environments](./environments)
+### [Environments](/integration/environments)
 Understand the difference between sandbox and production environments.
 
 ## Integration Architecture

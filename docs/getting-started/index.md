@@ -286,9 +286,9 @@ Before you begin, make sure you have:
 
 <div class="tip custom-block" style="padding-top: 8px">
 
-Ready to dive in? Check out the [Quick Start Guide](./quick-start) to create your first payment in under 5 minutes.
+Ready to dive in? Check out the [Quick Start Guide](/getting-started/quick-start) to create your first payment in under 5 minutes.
 
 </div>
 
-- [Quick Start](./quick-start) - Create your first payment
-- [Installation](./installation) - SDK installation guide
+- [Quick Start](/getting-started/quick-start) - Create your first payment
+- [Installation](/getting-started/installation) - SDK installation guide

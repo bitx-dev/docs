@@ -9,10 +9,10 @@ Security is paramount when handling cryptocurrency payments. This section covers
 
 ## Topics
 
-### [Authentication Security](./authentication)
+### [Authentication Security](/security/authentication)
 Secure your API credentials and implement proper authentication.
 
-### [Best Practices](./best-practices)
+### [Best Practices](/security/best-practices)
 General security recommendations for your integration.
 
 ## Security Features
