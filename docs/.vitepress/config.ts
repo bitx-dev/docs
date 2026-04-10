@@ -5,9 +5,8 @@ export default defineConfig({
   title: "BitXPay Documentation",
   description: "Official API documentation for BitXPay - Cryptocurrency Payment Gateway",
 
-  // Base path for GitHub Pages (repo name)
-  // Empty for local dev, /docs/ for production
-  base: process.env.NODE_ENV === 'production' ? '/docs/' : '/',
+  // Base path for GitHub Pages deployment
+  base: '/docs/',
 
   // Clean URLs without .html extension
   cleanUrls: true,
