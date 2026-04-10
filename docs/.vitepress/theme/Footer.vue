@@ -30,11 +30,11 @@
       <div class="footer-section">
         <h4 class="footer-heading">Documentation</h4>
         <ul class="footer-links">
-          <li><a href="/docs/get-started/">Get Started</a></li>
-          <li><a href="/docs/get-started/quick-start">Quick Start</a></li>
-          <li><a href="/docs/get-started/authentication">Authentication</a></li>
-          <li><a href="/docs/get-started/supported-networks">Supported Networks</a></li>
-          <li><a href="/docs/api-reference/">API Reference</a></li>
+          <li><a href="/get-started/">Get Started</a></li>
+          <li><a href="/get-started/quick-start">Quick Start</a></li>
+          <li><a href="/get-started/authentication">Authentication</a></li>
+          <li><a href="/get-started/supported-networks">Supported Networks</a></li>
+          <li><a href="/api-reference/">API Reference</a></li>
         </ul>
       </div>
 
