@@ -36,10 +36,14 @@ features:
     details: RESTful APIs, comprehensive SDKs, and detailed documentation for rapid integration.
 ---
 
+<script setup>
+import { withBase } from 'vitepress'
+</script>
+
 ## Popular Resources
 
 <div class="popular-resources">
-  <a href="/get-started/quick-start" class="resource-card">
+  <a :href="withBase('/get-started/quick-start')" class="resource-card">
     <div class="resource-icon">⚡</div>
     <div class="resource-content">
       <h4>Quick Start</h4>
@@ -47,7 +51,7 @@ features:
     </div>
   </a>
   
-  <a href="/get-started/authentication" class="resource-card">
+  <a :href="withBase('/get-started/authentication')" class="resource-card">
     <div class="resource-icon">🔐</div>
     <div class="resource-content">
       <h4>Authentication</h4>
@@ -55,7 +59,7 @@ features:
     </div>
   </a>
   
-  <a href="/get-started/supported-networks" class="resource-card">
+  <a :href="withBase('/get-started/supported-networks')" class="resource-card">
     <div class="resource-icon">🌐</div>
     <div class="resource-content">
       <h4>Networks</h4>
@@ -63,7 +67,7 @@ features:
     </div>
   </a>
   
-  <a href="/api-reference/payments" class="resource-card">
+  <a :href="withBase('/api-reference/payments')" class="resource-card">
     <div class="resource-icon">💳</div>
     <div class="resource-content">
       <h4>Payment API</h4>
@@ -83,12 +87,12 @@ features:
   </div>
   <p class="doc-card-desc">Everything you need to integrate BitXPay into your application</p>
   <ul class="doc-links">
-    <li><a href="/get-started/">Introduction</a></li>
-    <li><a href="/get-started/supported-networks">Supported Networks</a></li>
-    <li><a href="/get-started/authentication">Authentication</a></li>
-    <li><a href="/get-started/quick-start">Quick Start Guide</a></li>
-    <li><a href="/get-started/sdks-libraries">SDKs & Libraries</a></li>
-    <li><a href="/get-started/webhooks">Webhooks</a></li>
+    <li><a :href="withBase('/get-started/')">Introduction</a></li>
+    <li><a :href="withBase('/get-started/supported-networks')">Supported Networks</a></li>
+    <li><a :href="withBase('/get-started/authentication')">Authentication</a></li>
+    <li><a :href="withBase('/get-started/quick-start')">Quick Start Guide</a></li>
+    <li><a :href="withBase('/get-started/sdks-libraries')">SDKs & Libraries</a></li>
+    <li><a :href="withBase('/get-started/webhooks')">Webhooks</a></li>
   </ul>
 </div>
 
@@ -99,9 +103,9 @@ features:
   </div>
   <p class="doc-card-desc">Complete API documentation and endpoint references</p>
   <ul class="doc-links">
-    <li><a href="/api-reference/">API Overview</a></li>
-    <li><a href="/api-reference/authentication">Authentication</a></li>
-    <li><a href="/api-reference/payments">Payment Links API</a></li>
+    <li><a :href="withBase('/api-reference/')">API Overview</a></li>
+    <li><a :href="withBase('/api-reference/authentication')">Authentication</a></li>
+    <li><a :href="withBase('/api-reference/payments')">Payment Links API</a></li>
   </ul>
 </div>
 
@@ -112,10 +116,10 @@ features:
   </div>
   <p class="doc-card-desc">Test your integration with our comprehensive tools</p>
   <ul class="doc-links">
-    <li><a href="/testing/">Testing Overview</a></li>
-    <li><a href="/testing/postman-setup">Postman Setup</a></li>
-    <li><a href="/testing/api-testing-tools">API Testing Tools</a></li>
-    <li><a href="/testing/troubleshooting">Troubleshooting</a></li>
+    <li><a :href="withBase('/testing/')">Testing Overview</a></li>
+    <li><a :href="withBase('/testing/postman-setup')">Postman Setup</a></li>
+    <li><a :href="withBase('/testing/api-testing-tools')">API Testing Tools</a></li>
+    <li><a :href="withBase('/testing/troubleshooting')">Troubleshooting</a></li>
   </ul>
 </div>
 
@@ -126,9 +130,9 @@ features:
   </div>
   <p class="doc-card-desc">Security best practices and guidelines</p>
   <ul class="doc-links">
-    <li><a href="/security/">Security Overview</a></li>
-    <li><a href="/security/authentication">Authentication Security</a></li>
-    <li><a href="/security/best-practices">Best Practices</a></li>
+    <li><a :href="withBase('/security/')">Security Overview</a></li>
+    <li><a :href="withBase('/security/authentication')">Authentication Security</a></li>
+    <li><a :href="withBase('/security/best-practices')">Best Practices</a></li>
   </ul>
 </div>
 
@@ -139,9 +143,9 @@ features:
   </div>
   <p class="doc-card-desc">Integration guides and environment setup</p>
   <ul class="doc-links">
-    <li><a href="/integration/">Integration Overview</a></li>
-    <li><a href="/integration/webhooks">Webhook Integration</a></li>
-    <li><a href="/integration/environments">Environments</a></li>
+    <li><a :href="withBase('/integration/')">Integration Overview</a></li>
+    <li><a :href="withBase('/integration/webhooks')">Webhook Integration</a></li>
+    <li><a :href="withBase('/integration/environments')">Environments</a></li>
   </ul>
 </div>
 
@@ -152,7 +156,7 @@ features:
   </div>
   <p class="doc-card-desc">Help us improve BitXPay documentation</p>
   <ul class="doc-links">
-    <li><a href="/contribution/">Contribution Guidelines</a></li>
+    <li><a :href="withBase('/contribution/')">Contribution Guidelines</a></li>
   </ul>
 </div>
 
