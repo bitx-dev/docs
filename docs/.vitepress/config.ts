@@ -5,9 +5,9 @@ export default defineConfig({
   title: "BitXPay Documentation",
   description: "Official API documentation for BitXPay - Cryptocurrency Payment Gateway",
 
-  // Base path for GitHub Pages deployment
-  // Must match GitHub Pages deployment path
-  base: '/docs/',
+  // Base path - using root for direct access
+  // Configure your web server/deployment to serve from root or adjust as needed
+  base: '/',
 
   // Clean URLs without .html extension
   cleanUrls: true,
@@ -19,10 +19,10 @@ export default defineConfig({
 
   // Head tags for SEO
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/docs/logo.svg' }],
-    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/docs/favicon-32x32.png' }],
-    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/docs/favicon-16x16.png' }],
-    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/docs/apple-touch-icon.png' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }],
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
     ['meta', { name: 'theme-color', content: '#3b82f6' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'BitXPay Documentation' }],
