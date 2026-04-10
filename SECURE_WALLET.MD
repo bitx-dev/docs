@@ -173,3 +173,4 @@ stateDiagram-v2
 ```
 
 > **Critical Design Note**: Private keys exist in plaintext **only** during signing operations (max 30s TTL enforced by enclave monotonic counter).
+
