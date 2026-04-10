@@ -69,8 +69,8 @@
           <li><a href="https://www.bitxsl.com" target="_blank">About BitX</a></li>
           <li><a href="https://www.bitxsl.com/contact-us" target="_blank">Contact Us</a></li>
           <li><a href="/security/">Security</a></li>
-          <li><a href="#" target="_blank">Privacy Policy</a></li>
-          <li><a href="#" target="_blank">Terms of Service</a></li>
+          <li><a href="https://bitx.es/privacy-policy" target="_blank">Privacy Policy</a></li>
+          <li><a href="https://bitx.es/terms-and-conditions" target="_blank">Terms of Service</a></li>
         </ul>
       </div>
     </div>
