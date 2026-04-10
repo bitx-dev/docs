@@ -30,11 +30,11 @@
       <div class="footer-section">
         <h4 class="footer-heading">Documentation</h4>
         <ul class="footer-links">
-          <li><a href="/docs/get-started/">Get Started</a></li>
-          <li><a href="/docs/get-started/quick-start">Quick Start</a></li>
-          <li><a href="/docs/get-started/authentication">Authentication</a></li>
-          <li><a href="/docs/get-started/supported-networks">Supported Networks</a></li>
-          <li><a href="/docs/api-reference/">API Reference</a></li>
+          <li><a href="/get-started/">Get Started</a></li>
+          <li><a href="/get-started/quick-start">Quick Start</a></li>
+          <li><a href="/get-started/authentication">Authentication</a></li>
+          <li><a href="/get-started/supported-networks">Supported Networks</a></li>
+          <li><a href="/api-reference/">API Reference</a></li>
         </ul>
       </div>
 
@@ -42,11 +42,11 @@
       <div class="footer-section">
         <h4 class="footer-heading">Resources</h4>
         <ul class="footer-links">
-          <li><a href="/docs/get-started/sdks-libraries">SDKs & Libraries</a></li>
-          <li><a href="/docs/get-started/webhooks">Webhooks</a></li>
-          <li><a href="/docs/testing/">Testing Tools</a></li>
-          <li><a href="/docs/integration/environments">Environments</a></li>
-          <li><a href="/docs/security/best-practices">Security</a></li>
+          <li><a href="/get-started/sdks-libraries">SDKs & Libraries</a></li>
+          <li><a href="/get-started/webhooks">Webhooks</a></li>
+          <li><a href="/testing/">Testing Tools</a></li>
+          <li><a href="/integration/environments">Environments</a></li>
+          <li><a href="/security/best-practices">Security</a></li>
         </ul>
       </div>
 
@@ -54,11 +54,11 @@
       <div class="footer-section">
         <h4 class="footer-heading">Support</h4>
         <ul class="footer-links">
-          <li><a href="/docs/testing/troubleshooting">Troubleshooting</a></li>
+          <li><a href="/testing/troubleshooting">Troubleshooting</a></li>
           <li><a href="https://github.com/bitxpay/issues" target="_blank">Report Issues</a></li>
           <li><a href="https://discord.gg/bitxpay" target="_blank">Discord Community</a></li>
           <li><a href="mailto:support@bitxpay.com">Email Support</a></li>
-          <li><a href="/docs/contribution/">Contribute</a></li>
+          <li><a href="/contribution/">Contribute</a></li>
         </ul>
       </div>
 
@@ -68,7 +68,7 @@
         <ul class="footer-links">
           <li><a href="https://www.bitxsl.com" target="_blank">About BitX</a></li>
           <li><a href="https://www.bitxsl.com/contact-us" target="_blank">Contact Us</a></li>
-          <li><a href="/docs/security/">Security</a></li>
+          <li><a href="/security/">Security</a></li>
           <li><a href="#" target="_blank">Privacy Policy</a></li>
           <li><a href="#" target="_blank">Terms of Service</a></li>
         </ul>
