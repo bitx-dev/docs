@@ -1,6 +1,6 @@
 # SDKs and Libraries
 
-BitXPay provides official SDKs and libraries to simplify integration across multiple programming languages. Use these SDKs to handle authentication, request signing, and API calls with minimal code.
+BITXpay provides official SDKs and libraries to simplify integration across multiple programming languages. Use these SDKs to handle authentication, request signing, and API calls with minimal code.
 
 ## Official SDKs
 
@@ -15,9 +15,9 @@ npm install @bitxpay/sdk
 **Quick start:**
 
 ```typescript
-import { BitXPay } from '@bitxpay/sdk';
+import { BITXpay } from '@bitxpay/sdk';
 
-const client = new BitXPay({
+const client = new BITXpay({
   apiKey: 'your-api-key',
   apiSecret: 'your-api-secret',
   environment: 'sandbox' // or 'production'
@@ -58,9 +58,9 @@ pip install bitxpay
 **Quick start:**
 
 ```python
-from bitxpay import BitXPay
+from bitxpay import BITXpay
 
-client = BitXPay(
+client = BITXpay(
     api_key='your-api-key',
     api_secret='your-api-secret',
     environment='sandbox'  # or 'production'
@@ -104,7 +104,7 @@ composer require bitxpay/bitxpay-php
 <?php
 require_once('vendor/autoload.php');
 
-use BitXPay\Client;
+use BITXpay\Client;
 
 $client = new Client([
     'api_key' => 'your-api-key',
@@ -149,7 +149,7 @@ gem install bitxpay
 ```ruby
 require 'bitxpay'
 
-client = BitXPay::Client.new(
+client = BITXpay::Client.new(
   api_key: 'your-api-key',
   api_secret: 'your-api-secret',
   environment: 'sandbox' # or 'production'
@@ -254,13 +254,13 @@ implementation 'com.bitxpay:bitxpay-java:1.0.0'
 **Quick start:**
 
 ```java
-import com.bitxpay.BitXPay;
+import com.bitxpay.BITXpay;
 import com.bitxpay.model.Payment;
 import com.bitxpay.model.PaymentRequest;
 
 public class Example {
     public static void main(String[] args) {
-        BitXPay client = new BitXPay.Builder()
+        BITXpay client = new BITXpay.Builder()
             .apiKey("your-api-key")
             .apiSecret("your-api-secret")
             .environment("sandbox") // or "production"
@@ -298,11 +298,11 @@ The following libraries are maintained by the community:
 
 - **C# / .NET**: [bitxpay-dotnet](https://github.com/community/bitxpay-dotnet)
 - **Rust**: [bitxpay-rs](https://github.com/community/bitxpay-rs)
-- **Swift**: [BitXPayKit](https://github.com/community/BitXPayKit)
+- **Swift**: [BITXpayKit](https://github.com/community/BITXpayKit)
 - **Kotlin**: [bitxpay-kotlin](https://github.com/community/bitxpay-kotlin)
 
 ::: info Community Support
-Community libraries are not officially supported by BitXPay. Use at your own discretion and verify the code before production use.
+Community libraries are not officially supported by BITXpay. Use at your own discretion and verify the code before production use.
 :::
 
 ## SDK Features Comparison

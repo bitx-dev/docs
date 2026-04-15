@@ -1,11 +1,11 @@
 ---
 title: Security Best Practices
-description: Security recommendations for your BitXPay integration.
+description: Security recommendations for your BITXpay integration.
 ---
 
 # Security Best Practices
 
-Follow these best practices to ensure a secure integration with BitXPay.
+Follow these best practices to ensure a secure integration with BITXpay.
 
 ## API Security
 

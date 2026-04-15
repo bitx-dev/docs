@@ -1,11 +1,11 @@
 ---
 title: Security
-description: Security best practices and guidelines for integrating BitXPay.
+description: Security best practices and guidelines for integrating BITXpay.
 ---
 
 # Security
 
-Security is paramount when handling cryptocurrency payments. This section covers security best practices and guidelines for your BitXPay integration.
+Security is paramount when handling cryptocurrency payments. This section covers security best practices and guidelines for your BITXpay integration.
 
 ## Topics
 
@@ -17,7 +17,7 @@ General security recommendations for your integration.
 
 ## Security Features
 
-BitXPay provides several security features out of the box:
+BITXpay provides several security features out of the box:
 
 | Feature | Description |
 |---------|-------------|
@@ -30,7 +30,7 @@ BitXPay provides several security features out of the box:
 
 ## Security Compliance
 
-BitXPay is compliant with:
+BITXpay is compliant with:
 
 - **PCI DSS** - Payment Card Industry Data Security Standard
 - **SOC 2 Type II** - Service Organization Control

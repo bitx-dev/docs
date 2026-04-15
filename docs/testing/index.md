@@ -1,11 +1,11 @@
 ---
 title: Testing Guide
-description: Learn how to test BitXPay APIs using various tools and methods.
+description: Learn how to test BITXpay APIs using various tools and methods.
 ---
 
 # API Testing Guide
 
-Welcome to the BitXPay API testing documentation. This guide will help you quickly set up and test our merchant-facing APIs using various tools.
+Welcome to the BITXpay API testing documentation. This guide will help you quickly set up and test our merchant-facing APIs using various tools.
 
 ## Quick Start
 
@@ -33,7 +33,7 @@ For testing, use the sandbox environment:
 
 To obtain your sandbox credentials:
 
-1. Log in to your [BitXPay Dashboard](https://dashboard.bitxpay.com)
+1. Log in to your [BITXpay Dashboard](https://dashboard.bitxpay.com)
 2. Navigate to **Settings** → **API Keys**
 3. Click **Generate Sandbox Keys**
 4. Save both your **API Key** and **Private Key** securely
@@ -54,7 +54,7 @@ Production keys are available after account verification:
 
 ## Authentication Overview
 
-BitXPay merchant APIs use **DSA signature authentication** for enhanced security:
+BITXpay merchant APIs use **DSA signature authentication** for enhanced security:
 
 1. Each request includes an API key, timestamp, and signature
 2. The signature is generated using DSA with SHA-256

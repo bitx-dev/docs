@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Learn how to integrate BitXPay into your application and start accepting cryptocurrency payments.
+description: Learn how to integrate BITXpay into your application and start accepting cryptocurrency payments.
 ---
 
 # Getting Started 
@@ -263,19 +263,19 @@ Because BitxPay uses a self-custody model, you are fully responsible for safegua
 
 ## Overview
 
-BitXPay provides a simple and secure way to accept cryptocurrency payments. Whether you're building an e-commerce platform, a SaaS application, or any other service that requires payment processing, BitXPay has you covered.
+BITXpay provides a simple and secure way to accept cryptocurrency payments. Whether you're building an e-commerce platform, a SaaS application, or any other service that requires payment processing, BITXpay has you covered.
 
 ## Prerequisites
 
 Before you begin, make sure you have:
 
-- A BitXPay merchant account ([Sign up here](https://bitxpay.com/signup))
+- A BITXpay merchant account ([Sign up here](https://bitxpay.com/signup))
 - API credentials (API Key and Secret Key)
 - Basic knowledge of REST APIs
 
 ## Integration Steps
 
-1. **Create an Account** - Sign up for a BitXPay merchant account
+1. **Create an Account** - Sign up for a BITXpay merchant account
 2. **Get API Keys** - Generate your API credentials from the dashboard
 3. **Install SDK** - Install our SDK for your preferred language
 4. **Configure** - Set up your environment variables

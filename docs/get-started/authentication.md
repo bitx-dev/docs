@@ -1,6 +1,6 @@
 # Authentication
 
-Securing your BitXPay API keys is critical. Exposed credentials can lead to compromised accounts and financial loss. BitXPay supports two authentication methods depending on which API you are using.
+Securing your BITXpay API keys is critical. Exposed credentials can lead to compromised accounts and financial loss. BITXpay supports two authentication methods depending on which API you are using.
 
 ## On this page
 - [Overview](#overview)
@@ -12,7 +12,7 @@ Securing your BitXPay API keys is critical. Exposed credentials can lead to comp
 
 ## Overview
 
-BitXPay supports two authentication methods depending on which API you're using. Merchant-facing APIs use DSA signature authentication. Standard payment APIs use HMAC-SHA256.
+BITXpay supports two authentication methods depending on which API you're using. Merchant-facing APIs use DSA signature authentication. Standard payment APIs use HMAC-SHA256.
 
 ### DSA Signature
 **Merchant APIs**  
@@ -234,7 +234,7 @@ When multiple APIs are enabled in your project, restrict JWT token usage to spec
 Remove API keys you no longer need to minimize the attack surface.
 
 ### 5. Rotate keys periodically
-Regular key rotation reduces the risk of long-term key compromise. Since BitXPay Developer Platform uses asymmetric cryptography, key rotation requires creating new keys and deleting old ones.
+Regular key rotation reduces the risk of long-term key compromise. Since BITXpay Developer Platform uses asymmetric cryptography, key rotation requires creating new keys and deleting old ones.
 
 ### Additional recommendations
 

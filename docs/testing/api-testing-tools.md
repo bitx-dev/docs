@@ -1,11 +1,11 @@
 ---
 title: API Testing Tools
-description: Test BitXPay APIs using various tools including cURL, Insomnia, HTTPie, and more.
+description: Test BITXpay APIs using various tools including cURL, Insomnia, HTTPie, and more.
 ---
 
 # API Testing Tools
 
-While Postman is our recommended tool, you can test BitXPay APIs using various other tools. This guide covers popular alternatives with DSA signature generation examples.
+While Postman is our recommended tool, you can test BITXpay APIs using various other tools. This guide covers popular alternatives with DSA signature generation examples.
 
 ## cURL
 
@@ -349,7 +349,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.backends import default_backend
 import requests
 
-class BitXPayClient:
+class BITXpayClient:
     def __init__(self, api_key, private_key_path, base_url=None):
         self.api_key = api_key
         self.base_url = base_url or 'https://sandboxapi.bitxpay.com/api/v1'
@@ -405,7 +405,7 @@ class BitXPayClient:
         return self.request('PATCH', f'/payments/links/{payment_id}', {'status': status})
 
 # Usage
-client = BitXPayClient(
+client = BITXpayClient(
     api_key=os.environ['MERCHANT_API_KEY'],
     private_key_path='private-key.pem'
 )
@@ -432,7 +432,7 @@ For PHP developers:
 ```php
 <?php
 
-class BitXPayClient {
+class BITXpayClient {
     private $apiKey;
     private $privateKey;
     private $baseUrl;
@@ -490,7 +490,7 @@ class BitXPayClient {
 }
 
 // Usage
-$client = new BitXPayClient(
+$client = new BITXpayClient(
     getenv('MERCHANT_API_KEY'),
     'private-key.pem'
 );

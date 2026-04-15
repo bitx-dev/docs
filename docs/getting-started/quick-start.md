@@ -1,15 +1,15 @@
 ---
 title: Quick Start
-description: Create your first cryptocurrency payment with BitXPay in under 5 minutes.
+description: Create your first cryptocurrency payment with BITXpay in under 5 minutes.
 ---
 
 # Quick Start
 
-This guide will walk you through creating your first payment with BitXPay.
+This guide will walk you through creating your first payment with BITXpay.
 
 ## Step 1: Get Your API Keys
 
-1. Log in to your [BitXPay Dashboard](https://dashboard.bitxpay.com)
+1. Log in to your [BITXpay Dashboard](https://dashboard.bitxpay.com)
 2. Navigate to **Settings** → **API Keys**
 3. Copy your **API Key** and **Secret Key**
 
@@ -38,9 +38,9 @@ pnpm add @bitxpay/sdk
 ## Step 3: Initialize the Client
 
 ```javascript
-import { BitXPay } from '@bitxpay/sdk';
+import { BITXpay } from '@bitxpay/sdk';
 
-const bitxpay = new BitXPay({
+const bitxpay = new BITXpay({
   apiKey: process.env.BITXPAY_API_KEY,
   secretKey: process.env.BITXPAY_SECRET_KEY,
   environment: 'sandbox' // Use 'production' for live payments

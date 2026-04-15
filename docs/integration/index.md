@@ -1,11 +1,11 @@
 ---
 title: Integration Guide
-description: Learn how to integrate BitXPay webhooks, handle environments, and build robust payment flows.
+description: Learn how to integrate BITXpay webhooks, handle environments, and build robust payment flows.
 ---
 
 # Integration Guide
 
-This section covers advanced integration topics to help you build a robust payment system with BitXPay.
+This section covers advanced integration topics to help you build a robust payment system with BITXpay.
 
 ## Topics
 
@@ -19,7 +19,7 @@ Understand the difference between sandbox and production environments.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Your App      │────▶│   BitXPay API   │────▶│   Blockchain    │
+│   Your App      │────▶│   BITXpay API   │────▶│   Blockchain    │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         ▲                       │
         │                       │

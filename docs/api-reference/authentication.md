@@ -1,11 +1,11 @@
 ---
 title: Authentication
-description: Learn how to authenticate API requests with BitXPay.
+description: Learn how to authenticate API requests with BITXpay.
 ---
 
 # Authentication
 
-BitXPay supports two authentication methods depending on the API you're using:
+BITXpay supports two authentication methods depending on the API you're using:
 
 1. **DSA Signature** - For merchant-facing APIs (Payment Links, etc.)
 2. **HMAC-SHA256** - For standard payment APIs
@@ -27,7 +27,7 @@ Merchant-facing APIs use DSA (Digital Signature Algorithm) for enhanced security
 
 ### Obtaining Your Keys
 
-1. Log in to your [BitXPay Dashboard](https://dashboard.bitxpay.com)
+1. Log in to your [BITXpay Dashboard](https://dashboard.bitxpay.com)
 2. Navigate to **Settings** → **API Keys**
 3. Generate your **Merchant API Key** and **Private Key**
 4. Store both securely - the private key is shown only once

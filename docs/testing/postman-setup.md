@@ -1,11 +1,11 @@
 ---
 title: Postman Setup Guide
-description: Complete guide to configure Postman for testing BitXPay merchant APIs with Ed25519 signature authentication.
+description: Complete guide to configure Postman for testing BITXpay merchant APIs with Ed25519 signature authentication.
 ---
 
 # Postman Setup Guide
 
-This guide will walk you through setting up Postman to test BitXPay merchant-facing APIs with automatic Ed25519 signature generation.
+This guide will walk you through setting up Postman to test BITXpay merchant-facing APIs with automatic Ed25519 signature generation.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ This guide will walk you through setting up Postman to test BitXPay merchant-fac
 1. Open Postman
 2. Click **Environments** in the left sidebar
 3. Click **Create Environment** (+ button)
-4. Name it `BitXPay Sandbox` or `BitXPay Production`
+4. Name it `BITXpay Sandbox` or `BITXpay Production`
 
 ### Step 2: Configure Environment Variables
 
@@ -51,7 +51,7 @@ Ed25519:MC4CAQAwBQYDK2VwBCIEIE8VdFJvfWXyGKm9...base64_encoded_pkcs8_key
 
 ### Step 3: Add Pre-Request Script
 
-1. Create a new **Collection** (e.g., "BitXPay Merchant APIs")
+1. Create a new **Collection** (e.g., "BITXpay Merchant APIs")
 2. Click on the collection name
 3. Go to the **Pre-request Script** tab
 4. Paste the following script:
@@ -367,11 +367,11 @@ Note: The List endpoint uses Bearer token authentication instead of X-API-Key.
 
 Create separate environments for different stages:
 
-1. **BitXPay Sandbox**
+1. **BITXpay Sandbox**
    - `BASE_URL`: `https://sandboxapi.bitxpay.com/api/v1`
    - Use sandbox API keys
 
-2. **BitXPay Production**
+2. **BITXpay Production**
    - `BASE_URL`: `https://api.bitxpay.com/api/v1`
    - Use production API keys
 
@@ -455,7 +455,7 @@ Ed25519:MC4CAQAwBQYDK2VwBCIEIE8VdFJvfWXyGKm9base64encodedkey
 
 Download our pre-configured Postman collection:
 
-[Download BitXPay Collection](./assets/bitxpay-collection.json) *(Coming soon)*
+[Download BITXpay Collection](./assets/bitxpay-collection.json) *(Coming soon)*
 
 ### Environment Template
 

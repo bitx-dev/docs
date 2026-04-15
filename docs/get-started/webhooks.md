@@ -1,6 +1,6 @@
 # Webhooks
 
-BitXPay Merchant Platform supports webhook subscriptions across several products, all using the same underlying API and authentication. Use webhooks to receive real-time HTTP notifications when events happen onchain, in your wallets, or across your BitXPay accounts.
+BITXpay Merchant Platform supports webhook subscriptions across several products, all using the same underlying API and authentication. Use webhooks to receive real-time HTTP notifications when events happen onchain, in your wallets, or across your BITXpay accounts.
 
 ## Getting started
 
@@ -22,9 +22,9 @@ You'll need an HTTPS URL to receive webhook events.
 - **For quick testing**: [webhook.site](https://webhook.site) gives free temporary URLs instantly
 - **For production**: Use your own HTTPS endpoint
 
-### BitXPay CLI (Optional)
+### BITXpay CLI (Optional)
 
-Install the BitXPay CLI to make authenticated requests to BitXPay APIs:
+Install the BITXpay CLI to make authenticated requests to BITXpay APIs:
 
 ```bash
 # With npm
@@ -36,7 +36,7 @@ pip install bitxpay-cli
 
 ## Webhook Events
 
-BitXPay sends webhook notifications for the following event types:
+BITXpay sends webhook notifications for the following event types:
 
 ### Payment Events
 
@@ -65,13 +65,13 @@ BitXPay sends webhook notifications for the following event types:
 
 ## Subscribe by product
 
-Webhook support is actively expanding across BitXPay products. Check back as more integrations are added.
+Webhook support is actively expanding across BITXpay products. Check back as more integrations are added.
 
 ### Onchain Data
 Monitor smart contract events and token transfers on supported networks.
 
 ### Server Wallets
-Track transfer activity in and out of your BitXPay Server Wallet addresses.
+Track transfer activity in and out of your BITXpay Server Wallet addresses.
 
 ### Embedded Wallets
 Track transfer activity on your users' wallets using Onchain Data Webhooks. Native Embedded Wallet webhook support is coming soon.
@@ -104,7 +104,7 @@ All webhooks follow a consistent structure:
 
 ## Verifying Webhook Signatures
 
-Always verify webhook signatures to ensure requests are from BitXPay:
+Always verify webhook signatures to ensure requests are from BITXpay:
 
 ::: code-group
 
@@ -252,7 +252,7 @@ app.post('/webhook', async (req, res) => {
 ```
 
 ### 2. Handle retries
-BitXPay will retry failed webhooks with exponential backoff. Implement idempotency to handle duplicate events.
+BITXpay will retry failed webhooks with exponential backoff. Implement idempotency to handle duplicate events.
 
 ### 3. Use HTTPS
 Webhook URLs must use HTTPS in production. HTTP is only allowed for local development.
@@ -265,7 +265,7 @@ Never hardcode webhook secrets. Use environment variables or secure secret manag
 
 ## Retry Policy
 
-BitXPay automatically retries failed webhook deliveries:
+BITXpay automatically retries failed webhook deliveries:
 
 - **Retry schedule**: 1min, 5min, 15min, 1hr, 6hr, 24hr
 - **Success criteria**: HTTP 200-299 response
@@ -287,7 +287,7 @@ node server.js
 ngrok http 3000
 ```
 
-Use the ngrok URL (e.g., `https://abc123.ngrok.io/webhook`) as your webhook URL in the BitXPay dashboard.
+Use the ngrok URL (e.g., `https://abc123.ngrok.io/webhook`) as your webhook URL in the BITXpay dashboard.
 
 ### Using webhook.site
 
@@ -298,7 +298,7 @@ Use the ngrok URL (e.g., `https://abc123.ngrok.io/webhook`) as your webhook URL 
 
 ## Monitoring Webhooks
 
-Monitor webhook delivery in your BitXPay dashboard:
+Monitor webhook delivery in your BITXpay dashboard:
 
 1. Navigate to **Developers** → **Webhooks**
 2. View delivery history, status codes, and response times
@@ -346,7 +346,7 @@ curl -X DELETE https://api.bitxpay.com/v1/webhook-endpoints/{endpoint_id} \
 
 1. **Check your endpoint is publicly accessible**: Test with `curl https://yoursite.com/webhook`
 2. **Verify HTTPS**: Production webhooks require HTTPS
-3. **Check firewall rules**: Ensure your server accepts requests from BitXPay IPs
+3. **Check firewall rules**: Ensure your server accepts requests from BITXpay IPs
 4. **Review response codes**: Must return 200-299 for success
 
 ### Signature verification failing

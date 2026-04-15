@@ -1,11 +1,11 @@
 ---
 title: Troubleshooting
-description: Common issues and solutions when testing BitXPay APIs.
+description: Common issues and solutions when testing BITXpay APIs.
 ---
 
 # Troubleshooting Guide
 
-This guide covers common issues you might encounter when testing BitXPay APIs and how to resolve them.
+This guide covers common issues you might encounter when testing BITXpay APIs and how to resolve them.
 
 ## Authentication Errors
 
@@ -341,7 +341,7 @@ Wrong: merchant_api_key, Merchant_Api_Key
 
 ✅ **Verify environment is selected:**
 - Click environment dropdown (top-right)
-- Select your BitXPay environment
+- Select your BITXpay environment
 
 ✅ **Check variable scope:**
 - Variables should be in **Environment**, not Collection

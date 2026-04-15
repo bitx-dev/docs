@@ -1,20 +1,20 @@
 ---
 title: Environments
-description: Understand BitXPay production environment and upcoming testnet support.
+description: Understand BITXpay production environment and upcoming testnet support.
 ---
 
 # Environments
 
-BitXPay currently operates exclusively on **mainnet** for production-grade applications. Testnet support is planned for future releases.
+BITXpay currently operates exclusively on **mainnet** for production-grade applications. Testnet support is planned for future releases.
 
 ## Current Environment: Production (Mainnet Only)
 
-BitXPay currently supports mainnet-only operations across all 16 supported blockchain networks. This means all transactions are real and involve actual cryptocurrency.
+BITXpay currently supports mainnet-only operations across all 16 supported blockchain networks. This means all transactions are real and involve actual cryptocurrency.
 
 ### Production Configuration
 
 ```javascript
-const bitxpay = new BitXPay({
+const bitxpay = new BITXpay({
   apiKey: process.env.BITXPAY_API_KEY,
   secretKey: process.env.BITXPAY_SECRET_KEY,
   environment: 'production'
@@ -36,7 +36,7 @@ All API keys are production keys and should be handled with maximum security:
 
 ## Development & Testing
 
-Since BitXPay currently operates on mainnet only, we recommend the following approaches for development and testing:
+Since BITXpay currently operates on mainnet only, we recommend the following approaches for development and testing:
 
 ### 1. Use Small Amounts for Testing
 
@@ -165,5 +165,5 @@ Since we're currently mainnet-only, we're here to help ensure your integration i
 - **GitHub Issues**: [github.com/bitxpay/issues](https://github.com/bitxpay/issues)
 
 ::: warning Important
-All transactions on BitXPay are currently real mainnet transactions. Always test with small amounts and implement proper security measures before going live with production volumes.
+All transactions on BITXpay are currently real mainnet transactions. Always test with small amounts and implement proper security measures before going live with production volumes.
 :::

@@ -2,8 +2,8 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "BitXPay Documentation",
-  description: "Official API documentation for BitXPay - Cryptocurrency Payment Gateway",
+  title: "BITXpay Documentation",
+  description: "Official API documentation for BITXpay - Cryptocurrency Payment Gateway",
 
   // Base path: root for local dev, /docs/ for production (GitHub Pages repository name)
   base: process.env.NODE_ENV === 'production' ? '/docs/' : '/',
@@ -24,7 +24,7 @@ export default defineConfig({
     ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
     ['meta', { name: 'theme-color', content: '#3b82f6' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:site_name', content: 'BitXPay Documentation' }],
+    ['meta', { property: 'og:site_name', content: 'BITXpay Documentation' }],
     ['meta', { property: 'og:image', content: 'https://docs.bitxpay.com/docs/og-image.png' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],

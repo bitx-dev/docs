@@ -1,28 +1,28 @@
 ---
 title: Webhooks
-description: Receive real-time payment notifications with BitXPay webhooks.
+description: Receive real-time payment notifications with BITXpay webhooks.
 ---
 
 # Webhooks
 
-Webhooks allow you to receive real-time notifications when payment events occur. Instead of polling the API, BitXPay will send HTTP POST requests to your specified endpoint.
+Webhooks allow you to receive real-time notifications when payment events occur. Instead of polling the API, BITXpay will send HTTP POST requests to your specified endpoint.
 
 ## Setting Up Webhooks
 
 ### 1. Configure Your Endpoint
 
-In your [BitXPay Dashboard](https://dashboard.bitxpay.com), navigate to **Settings** → **Webhooks** and add your endpoint URL.
+In your [BITXpay Dashboard](https://dashboard.bitxpay.com), navigate to **Settings** → **Webhooks** and add your endpoint URL.
 
 ### 2. Create a Webhook Handler
 
 ```javascript
 import express from 'express';
-import { BitXPay } from '@bitxpay/sdk';
+import { BITXpay } from '@bitxpay/sdk';
 
 const app = express();
 app.use(express.json());
 
-const bitxpay = new BitXPay({
+const bitxpay = new BITXpay({
   apiKey: process.env.BITXPAY_API_KEY,
   secretKey: process.env.BITXPAY_SECRET_KEY
 });
@@ -86,7 +86,7 @@ app.post('/webhooks/bitxpay', (req, res) => {
 ## Verifying Signatures
 
 ::: warning Important
-Always verify webhook signatures to ensure requests are from BitXPay.
+Always verify webhook signatures to ensure requests are from BITXpay.
 :::
 
 ```javascript
@@ -107,7 +107,7 @@ function verifyWebhook(payload, signature, secretKey) {
 
 ## Retry Policy
 
-BitXPay will retry failed webhook deliveries:
+BITXpay will retry failed webhook deliveries:
 
 - **Attempt 1**: Immediate
 - **Attempt 2**: After 5 minutes

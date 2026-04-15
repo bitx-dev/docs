@@ -1,6 +1,6 @@
 ---
 title: Merchant API - Payments
-description: Create and manage payment links for accepting cryptocurrency payments with the BitXPay Merchant API.
+description: Create and manage payment links for accepting cryptocurrency payments with the BITXpay Merchant API.
 ---
 
 # Merchant API - Payments
@@ -17,7 +17,7 @@ The Merchant API Payments endpoints allow you to create, manage, and retrieve pa
 
 ## Supported Cryptocurrencies
 
-BitXPay supports multiple cryptocurrencies across various blockchain networks. When creating a payment link, you must specify a valid currency code.
+BITXpay supports multiple cryptocurrencies across various blockchain networks. When creating a payment link, you must specify a valid currency code.
 
 ### Available Currencies
 

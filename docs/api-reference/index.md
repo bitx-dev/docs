@@ -1,11 +1,11 @@
 ---
 title: API Reference
-description: Complete API reference for BitXPay cryptocurrency payment gateway.
+description: Complete API reference for BITXpay cryptocurrency payment gateway.
 ---
 
 # API Reference
 
-This is the complete API reference for BitXPay. All endpoints use HTTPS and return JSON responses.
+This is the complete API reference for BITXpay. All endpoints use HTTPS and return JSON responses.
 
 ## Base URL
 

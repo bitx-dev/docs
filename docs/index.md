@@ -1,10 +1,10 @@
 ---
 layout: home
-title: BitXPay Documentation
+title: BITXpay Documentation
 titleTemplate: Cryptocurrency Payment Gateway
 
 hero:
-  name: BitXPay
+  name: BITXpay
   text: Global Payment Infrastructure
   tagline: Enterprise-grade cryptocurrency payment gateway. Move value globally with speed, security, and full compliance.
   actions:
@@ -85,7 +85,7 @@ import { withBase } from 'vitepress'
     <span class="doc-icon">🚀</span>
     <h3>Get Started</h3>
   </div>
-  <p class="doc-card-desc">Everything you need to integrate BitXPay into your application</p>
+  <p class="doc-card-desc">Everything you need to integrate BITXpay into your application</p>
   <ul class="doc-links">
     <li><a :href="withBase('/get-started/')">Introduction</a></li>
     <li><a :href="withBase('/get-started/supported-networks')">Supported Networks</a></li>
@@ -154,7 +154,7 @@ import { withBase } from 'vitepress'
     <span class="doc-icon">🤝</span>
     <h3>Contribute</h3>
   </div>
-  <p class="doc-card-desc">Help us improve BitXPay documentation</p>
+  <p class="doc-card-desc">Help us improve BITXpay documentation</p>
   <ul class="doc-links">
     <li><a :href="withBase('/contribution/')">Contribution Guidelines</a></li>
   </ul>

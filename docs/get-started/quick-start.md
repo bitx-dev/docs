@@ -1,19 +1,19 @@
 # Quick Start
 
-Get started with BitXPay in minutes. This guide will walk you through creating your first payment integration.
+Get started with BITXpay in minutes. This guide will walk you through creating your first payment integration.
 
 ## Prerequisites
 
 Before you begin, ensure you have:
 
-- A BitXPay account ([Sign up here](https://sandbox.bitxpay.com/auth/signup))
+- A BITXpay account ([Sign up here](https://sandbox.bitxpay.com/auth/signup))
 - API credentials (API Key and Secret)
 - Basic knowledge of REST APIs
 - A development environment with Node.js, Python, or your preferred language
 
 ## Step 1: Get your API credentials
 
-1. Log in to your BitXPay dashboard at [sandbox.bitxpay.com](https://sandbox.bitxpay.com)
+1. Log in to your BITXpay dashboard at [sandbox.bitxpay.com](https://sandbox.bitxpay.com)
 2. Navigate to **Settings** → **API Keys**
 3. Click **Create API Key**
 4. Save your API Key ID and Secret securely
@@ -270,7 +270,7 @@ if __name__ == '__main__':
 
 ## Step 5: Test in sandbox
 
-BitXPay provides a sandbox environment for testing:
+BITXpay provides a sandbox environment for testing:
 
 - **Sandbox API**: `https://sandbox-api.bitxpay.com`
 - **Sandbox Dashboard**: `https://sandbox.bitxpay.com`

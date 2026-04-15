@@ -1,11 +1,11 @@
 ---
 title: Authentication Security
-description: Secure your API credentials and implement proper authentication with BitXPay.
+description: Secure your API credentials and implement proper authentication with BITXpay.
 ---
 
 # Authentication Security
 
-Proper authentication is critical for securing your BitXPay integration. This guide covers how to securely manage your API credentials.
+Proper authentication is critical for securing your BITXpay integration. This guide covers how to securely manage your API credentials.
 
 ## API Key Management
 

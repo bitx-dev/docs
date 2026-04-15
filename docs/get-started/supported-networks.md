@@ -1,6 +1,6 @@
 # Supported Networks
 
-BitXPay supports 16 blockchain networks across both EVM and non-EVM ecosystems. All networks run on mainnet only. Choose the network that fits your assets, your users, and your fee requirements. This page provides an overview of the blockchain networks we currently support.
+BITXpay supports 16 blockchain networks across both EVM and non-EVM ecosystems. All networks run on mainnet only. Choose the network that fits your assets, your users, and your fee requirements. This page provides an overview of the blockchain networks we currently support.
 
 **Total Networks**: 16  
 **EVM networks**: 13  
@@ -43,13 +43,13 @@ Bitcoin, Solana, and Tron use their own address formats and transaction models. 
 
 ### Production-only environment
 
-Use mainnets when building production-grade applications and handling real-world transactions through BitXPay APIs. This includes:
+Use mainnets when building production-grade applications and handling real-world transactions through BITXpay APIs. This includes:
 
 - **Sending actual cryptocurrency** (such as withdrawals and payments)
 - **Interacting with live DeFi protocols** (for example, staking, lending, or yield farming)
 - **Reading real-time on-chain data** for dashboards, analytics, and reporting
 
-BitXPay APIs make production workflows significantly easier by allowing you to query account balances, transaction history, and blockchain events all without the need to run or maintain your own node.
+BITXpay APIs make production workflows significantly easier by allowing you to query account balances, transaction history, and blockchain events all without the need to run or maintain your own node.
 
 ### Real payments
 Sending actual cryptocurrency — withdrawals, payouts, invoice settlements
@@ -61,5 +61,5 @@ Reading live balances, transaction history, and blockchain events
 Staking, lending, yield farming, or any live protocol interaction
 
 ::: warning Important Note
-BitXPay currently operates exclusively on mainnets. We do not support testnets at this time.
+BITXpay currently operates exclusively on mainnets. We do not support testnets at this time.
 :::

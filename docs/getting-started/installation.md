@@ -1,11 +1,11 @@
 ---
 title: Installation
-description: Install and configure the BitXPay SDK for your preferred programming language.
+description: Install and configure the BITXpay SDK for your preferred programming language.
 ---
 
 # Installation
 
-BitXPay provides official SDKs for popular programming languages. Choose your preferred language below.
+BITXpay provides official SDKs for popular programming languages. Choose your preferred language below.
 
 ## JavaScript / Node.js
 
@@ -28,9 +28,9 @@ pnpm add @bitxpay/sdk
 ### Configuration
 
 ```javascript
-import { BitXPay } from '@bitxpay/sdk';
+import { BITXpay } from '@bitxpay/sdk';
 
-const bitxpay = new BitXPay({
+const bitxpay = new BITXpay({
   apiKey: process.env.BITXPAY_API_KEY,
   secretKey: process.env.BITXPAY_SECRET_KEY,
   environment: 'sandbox'
@@ -46,9 +46,9 @@ pip install bitxpay
 ### Configuration
 
 ```python
-from bitxpay import BitXPay
+from bitxpay import BITXpay
 
-bitxpay = BitXPay(
+bitxpay = BITXpay(
     api_key=os.environ.get('BITXPAY_API_KEY'),
     secret_key=os.environ.get('BITXPAY_SECRET_KEY'),
     environment='sandbox'
@@ -67,7 +67,7 @@ composer require bitxpay/bitxpay-php
 <?php
 require_once 'vendor/autoload.php';
 
-use BitXPay\Client;
+use BITXpay\Client;
 
 $bitxpay = new Client([
     'api_key' => getenv('BITXPAY_API_KEY'),

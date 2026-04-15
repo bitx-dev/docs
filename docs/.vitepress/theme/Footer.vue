@@ -7,7 +7,7 @@ import { withBase } from 'vitepress'
     <div class="footer-container">
       <!-- Company Section -->
       <div class="footer-section">
-        <h3 class="footer-title">BitXPay</h3>
+        <h3 class="footer-title">BITXpay</h3>
         <p class="footer-description">
           Enterprise-grade cryptocurrency payment gateway. Move value globally with speed, security, and full compliance.
         </p>
@@ -84,7 +84,7 @@ import { withBase } from 'vitepress'
       <div class="footer-container">
         <div class="footer-bottom-content">
           <p class="footer-copyright">
-            © {{ new Date().getFullYear() }} BitXPay. All rights reserved.
+            © {{ new Date().getFullYear() }} BITXpay. All rights reserved.
           </p>
           <div class="footer-bottom-links">
             <span class="footer-status">
