@@ -1,8 +1,8 @@
-# Welcome to BitXPay
+# Welcome to BITXpay
 
-BitXPay is a cryptocurrency payment gateway. Accept Bitcoin, Ethereum, stablecoins, and 14 other assets with a single API, no node infrastructure, and real-time webhooks.
+BITXpay is a cryptocurrency payment gateway. Accept Bitcoin, Ethereum, stablecoins, and 14 other assets with a single API, no node infrastructure, and real-time webhooks.
 
-## Why BitXPay
+## Why BITXpay
 
 ### Move money in minutes
 Send and receive payments 24/7 — no bank cut-off times, no weekends, no holidays.
