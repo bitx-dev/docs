@@ -1,6 +1,6 @@
 ---
 layout: home
-title: BITXpay Documentation
+title: BITXpay
 titleTemplate: Cryptocurrency Payment Gateway
 
 hero:

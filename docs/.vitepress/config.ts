@@ -38,8 +38,7 @@ export default defineConfig({
 
     // Navigation bar
     nav: [
-      { text: 'Home', link: '/' },
-      { 
+      {
         text: 'Documentation',
         items: [
           { text: 'Get Started', link: '/get-started/' },
@@ -48,7 +47,7 @@ export default defineConfig({
           { text: 'Security', link: '/security/' }
         ]
       },
-      { 
+      {
         text: 'Resources',
         items: [
           { text: 'SDKs & Libraries', link: '/get-started/sdks-libraries' },
@@ -56,12 +55,12 @@ export default defineConfig({
           { text: 'Webhooks', link: '/get-started/webhooks' }
         ]
       },
-      { 
+      {
         text: 'Support',
         items: [
           { text: 'Troubleshooting', link: '/testing/troubleshooting' },
           { text: 'Contribute', link: '/contribution/' },
-          { text: 'GitHub', link: 'https://github.com/bitxpay' },
+          { text: 'NPM Package', link: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTabt=readme' },
           { text: 'Discord', link: 'https://discord.gg/bitxpay' }
         ]
       }
@@ -135,14 +134,20 @@ export default defineConfig({
 
     // Social links
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/bitxpay' }
+      { icon: 'github', link: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTabt=readme' }
     ],
 
     // Search configuration (built-in local search)
     search: {
       provider: 'local',
       options: {
-        detailedView: true
+        detailedView: true,
+        translations: {
+          button: {
+            buttonText: 'Search docs...',
+            buttonAriaLabel: 'Search documentation'
+          }
+        }
       }
     },
 
@@ -154,8 +159,8 @@ export default defineConfig({
 
     // Edit link
     editLink: {
-      pattern: 'https://github.com/bitxpay/docs/edit/main/docs/:path',
-      text: 'Edit this page on GitHub'
+      pattern: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTabt=readme',
+      text: 'View on npm'
     },
 
     // Last updated
