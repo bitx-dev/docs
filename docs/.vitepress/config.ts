@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "BITXpay Documentation",
+  title: "BITXpay",
   description: "Official API documentation for BITXpay - Cryptocurrency Payment Gateway",
 
   // Base path: root for local dev, /docs/ for production (GitHub Pages repository name)

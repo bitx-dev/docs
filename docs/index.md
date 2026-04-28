@@ -9,10 +9,10 @@ hero:
   tagline: Enterprise-grade cryptocurrency payment gateway. Move value globally with speed, security, and full compliance.
   actions:
     - theme: brand
-      text: Get Started
+      text: "Get Started →"
       link: /get-started/
     - theme: alt
-      text: API Reference
+      text: API References
       link: /api-reference/
 
 features:

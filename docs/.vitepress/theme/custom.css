@@ -67,89 +67,188 @@
   --vp-c-brand-3: var(--bitx-accent-hover);
 }
 
-/* Hero Section Styling */
+/* Hero Section Styling - Figma gradient left-to-right */
 .VPHero {
-  background: linear-gradient(135deg, var(--bitx-primary) 0%, var(--bitx-primary-light) 100%);
-  padding: 4rem 2rem;
+  background: linear-gradient(90deg, #ffffff 0%, #f8f7ff 20%, #e8e4ff 40%, #c4b5fd 60%, #8b5cf6 80%, #06b6d4 100%);
+  padding: 6rem 2rem;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grid pattern overlay */
+.VPHero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+
+.VPHero .container {
+  max-width: 1280px !important;
+  margin: 0 auto !important;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .VPHero .name {
-  background: linear-gradient(120deg, var(--bitx-accent-light), var(--bitx-gold-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 800;
+  display: none;
 }
 
 .VPHero .text {
-  color: var(--bitx-gray-100);
+  color: #1a1a2e;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 1.5rem 0;
+  max-width: 600px;
 }
 
 .VPHero .tagline {
-  color: var(--bitx-gray-300);
+  color: #4b5563;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0 0 2rem 0;
+  max-width: 500px;
 }
 
-/* Button Styling */
+.VPHero .VPButton {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+/* Button Styling - Figma style */
 .VPButton.brand {
-  background: linear-gradient(135deg, var(--bitx-accent), var(--bitx-accent-hover));
+  background: #06b6d4;
   border: none;
   color: white;
   font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 14px 0 rgba(6, 182, 212, 0.3);
 }
 
 .VPButton.brand:hover {
+  background: #0891b2;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.4);
+  box-shadow: 0 6px 20px 0 rgba(6, 182, 212, 0.4);
 }
 
 .VPButton.alt {
-  border: 2px solid var(--bitx-accent);
-  color: var(--bitx-accent);
+  border: 1px solid #d1d5db;
+  color: #374151;
   background: transparent;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .VPButton.alt:hover {
-  background: var(--bitx-accent);
-  color: white;
+  border-color: #9ca3af;
+  background: #f9fafb;
   transform: translateY(-2px);
 }
 
-/* Feature Cards */
+/* Feature Cards - Dark section per Figma */
 .VPFeatures {
-  padding: 2rem 0;
-  margin-top: 4rem;
+  padding: 5rem 0;
+  margin-top: 0;
+  background: #0a0a0f;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+.VPFeatures .container {
+  max-width: 1280px !important;
+  margin: 0 auto !important;
+  padding: 100px 0 !important;
+}
+
+.VPFeatures .items {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 2rem !important;
+}
+
+.VPFeatures .item {
+  grid-column: auto !important;
+  width: auto !important;
+}
+
+/* Gradient border effect for cards */
 .VPFeature {
-  border: 1px solid var(--bitx-gray-200);
-  border-radius: 12px;
+  position: relative;
+  border-radius: 16px;
+  padding: 2px;
+  background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #10b981 100%);
   transition: all 0.3s ease;
-  background: var(--vp-c-bg);
+  border: 0px solid var(--vp-c-bg-soft) !important;
+}
+
+.VPFeature::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: #0f1419;
+  border-radius: 14px;
+  z-index: 0;
 }
 
 .VPFeature:hover {
-  border-color: var(--bitx-accent);
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
   transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(6, 182, 212, 0.15);
 }
 
-.dark .VPFeature {
-  border-color: var(--bitx-primary-light);
-  background: var(--bitx-primary-light);
-}
-
-.dark .VPFeature:hover {
-  border-color: var(--bitx-accent);
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+.VPFeature article {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
 }
 
 .VPFeature .icon {
-  font-size: 2rem;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  line-height: 1;
+  background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.3));
+}
+
+.VPFeature .title {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 1.2rem;
   margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.VPFeature .details {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  flex-grow: 1;
 }
 
 /* Navigation Bar - Clean white header per Figma */
@@ -164,23 +263,10 @@
   height: 64px;
 }
 
-/* Logo styling */
-.VPNavBarTitle .title {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: var(--bitx-primary);
-  letter-spacing: -0.02em;
-}
-
 .dark .VPNav {
   background: rgba(26, 26, 46, 0.98);
   border-bottom-color: var(--bitx-primary-light);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.VPNavBar .container {
-  max-width: 1440px;
-  margin: 0 auto;
 }
 
 .dark .VPNavBarTitle .title {
@@ -328,15 +414,10 @@
 
 /* Logo Styling */
 .VPNavBarTitle .logo {
-  display: inline-block;
-  margin-right: 0.625rem;
   width: 28px;
   height: 28px;
+  margin-right: 0.625rem;
   transition: transform 0.3s ease;
-  vertical-align: middle;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-  shape-rendering: geometricPrecision;
 }
 
 .VPNavBarTitle:hover .logo {
@@ -344,17 +425,17 @@
 }
 
 .VPNavBarTitle .title {
-  display: inline-block;
-  vertical-align: middle;
-  line-height: 28px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--bitx-primary);
+  letter-spacing: -0.02em;
   margin-right: 2rem;
 }
 
-/* Ensure logo container has proper alignment */
 .VPNavBarTitle {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 0.5rem;
 }
 
 /* Sidebar */
@@ -550,29 +631,34 @@ div[class*='language-'] code {
 /* Popular Resources Section */
 .popular-resources {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0 3rem 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  background: white;
+  max-width: 1280px;
+  box-sizing: border-box;
 }
 
 .resource-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 1.25rem;
-  background: var(--vp-c-bg);
-  border: 2px solid var(--bitx-gray-200);
-  border-radius: 10px;
+  padding: 2rem;
+  background: white;
+  border: 1px solid var(--bitx-gray-200);
+  border-radius: 12px;
   text-decoration: none;
   transition: all 0.3s ease;
   cursor: pointer;
+  text-align: center;
 }
 
 .resource-card:hover {
   border-color: var(--bitx-accent);
-  background: var(--bitx-gray-50);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+  transform: translateY(-4px);
   text-decoration: none;
 }
 
@@ -622,9 +708,13 @@ div[class*='language-'] code {
 /* Documentation Sections Styling */
 .doc-sections {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin: 3rem 0;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  background: white;
+  max-width: 1280px;
+  box-sizing: border-box;
 }
 
 .doc-card {
@@ -791,6 +881,33 @@ div[class*='language-'] code {
 
 .VPContent.is-home {
   min-height: auto !important;
+  max-width: 100% !important;
+}
+
+/* Override VitePress container for full-width sections */
+.VPContent {
+  max-width: 100% !important;
+}
+
+.VPDoc .container {
+  max-width: 100% !important;
+}
+
+/* Constrain section content width */
+.VPFeatures,
+.popular-resources,
+.doc-sections {
+  width: 100% !important;
+}
+
+/* Section headings */
+.vp-doc h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--bitx-gray-900);
+  margin: 3rem 0 2rem 0;
+  border-bottom: none;
 }
 
 /* Footer Global Styles - Home Page Only */
