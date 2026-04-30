@@ -8,16 +8,16 @@
   --bitx-primary: #1a1a2e;
   --bitx-primary-light: #2d2d44;
   --bitx-primary-dark: #0f0f1a;
-  
+
   /* Accent Colors */
   --bitx-accent: #3b82f6;
   --bitx-accent-hover: #2563eb;
   --bitx-accent-light: #60a5fa;
-  
+
   /* Gold/Premium Accent */
   --bitx-gold: #f59e0b;
   --bitx-gold-light: #fbbf24;
-  
+
   /* Neutral Colors */
   --bitx-gray-50: #f9fafb;
   --bitx-gray-100: #f3f4f6;
@@ -27,29 +27,32 @@
   --bitx-gray-700: #374151;
   --bitx-gray-800: #1f2937;
   --bitx-gray-900: #111827;
-  
+
   /* Semantic Colors */
   --bitx-success: #10b981;
   --bitx-warning: #f59e0b;
   --bitx-error: #ef4444;
   --bitx-info: #3b82f6;
-  
+
   /* VitePress Theme Overrides */
   --vp-c-brand-1: var(--bitx-accent);
   --vp-c-brand-2: var(--bitx-accent-hover);
   --vp-c-brand-3: var(--bitx-accent-light);
-  
+
   --vp-c-bg: #ffffff;
   --vp-c-bg-soft: var(--bitx-gray-50);
   --vp-c-bg-mute: var(--bitx-gray-100);
-  
+
   --vp-c-text-1: var(--bitx-gray-900);
   --vp-c-text-2: var(--bitx-gray-700);
   --vp-c-text-3: var(--bitx-gray-600);
-  
+
   /* Typography */
-  --vp-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --vp-font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+  --vp-font-family-base:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  --vp-font-family-mono:
+    "JetBrains Mono", "Fira Code", Consolas, Monaco, "Courier New", monospace;
 }
 
 /* Dark Mode */
@@ -57,11 +60,11 @@
   --vp-c-bg: var(--bitx-primary);
   --vp-c-bg-soft: var(--bitx-primary-light);
   --vp-c-bg-mute: var(--bitx-primary-dark);
-  
+
   --vp-c-text-1: var(--bitx-gray-50);
   --vp-c-text-2: var(--bitx-gray-200);
   --vp-c-text-3: var(--bitx-gray-300);
-  
+
   --vp-c-brand-1: var(--bitx-accent-light);
   --vp-c-brand-2: var(--bitx-accent);
   --vp-c-brand-3: var(--bitx-accent-hover);
@@ -69,7 +72,15 @@
 
 /* Hero Section Styling - Figma gradient left-to-right */
 .VPHero {
-  background: linear-gradient(90deg, #ffffff 0%, #f8f7ff 20%, #e8e4ff 40%, #c4b5fd 60%, #8b5cf6 80%, #06b6d4 100%);
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #f8f7ff 20%,
+    #e8e4ff 40%,
+    #c4b5fd 60%,
+    #8b5cf6 80%,
+    #06b6d4 100%
+  );
   padding: 6rem 2rem;
   min-height: 500px;
   display: flex;
@@ -81,13 +92,13 @@
 
 /* Grid pattern overlay */
 .VPHero::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
+  background-image:
     linear-gradient(rgba(147, 112, 219, 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(147, 112, 219, 0.08) 1px, transparent 1px);
   background-size: 60px 60px;
@@ -134,7 +145,7 @@
 .VPButton.medium.brand {
   background: #06b6d4 !important;
   border: none !important;
-  color: #040C17 !important;
+  color: #040c17 !important;
   font-weight: 600 !important;
   font-size: 0.9rem !important;
   /* padding: 0.5rem 1.2rem !important; */
@@ -157,7 +168,7 @@
 
 .VPButton.medium.alt {
   border: 1px solid #d1d5db !important;
-  color: #040C17 !important;
+  color: #040c17 !important;
   background: transparent !important;
   font-weight: 500 !important;
   font-size: 0.9rem !important;
@@ -189,7 +200,7 @@
 .VPFeatures .container {
   max-width: 1280px !important;
   margin: 0 auto !important;
-  padding: 100px 110px !important;
+  padding: 100px 90px !important;
 }
 
 .VPFeatures .items {
@@ -208,15 +219,15 @@
   position: relative;
   border-radius: 24px;
   padding: 2px;
-  background: linear-gradient(135deg, #BB32FF 0%, #0FD6F5 50%, #7CE314 100%);
+  background: linear-gradient(135deg, #bb32ff 0%, #0fd6f5 50%, #7ce314 100%);
   transition: all 0.3s ease;
   border: 0px solid var(--vp-c-bg-soft) !important;
 }
 
 .VPFeature::before {
-  content: '';
+  content: "";
   position: absolute;
-  inset: 2px;
+  inset: 1px;
   background: #0f1419;
   border-radius: 14px;
   z-index: 0;
@@ -233,12 +244,10 @@
   padding: 2.5rem;
   display: flex;
   flex-direction: column;
-  min-height: 280px;
 }
 
 .VPFeature .icon {
   font-size: 2.5rem;
-  margin-bottom: 1.5rem;
   line-height: 1;
   background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
   -webkit-background-clip: text;
@@ -248,15 +257,14 @@
 }
 
 .VPFeature .title {
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 1.2rem;
-  margin-bottom: 1rem;
   line-height: 1.3;
 }
 
 .VPFeature .details {
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 0.95rem;
   line-height: 1.7;
   flex-grow: 1;
@@ -299,7 +307,6 @@
 
 .VPNavBar .content {
   flex: 1 1 auto;
-
 }
 
 .VPNavBar .content-body {
@@ -383,7 +390,7 @@
 }
 
 .VPNavBarMenuLink.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1px;
   left: 1rem;
@@ -476,7 +483,7 @@
 }
 
 .VPNavBarSearch #docsearch {
-  width: 400px
+  width: 400px;
 }
 
 .VPNavBarSearch .DocSearch-Button {
@@ -486,7 +493,7 @@
   padding: 0 16px;
   transition: all 0.2s ease;
   width: 400px !important;
-  
+
   height: 44px;
   justify-content: flex-start;
   display: flex !important;
@@ -662,12 +669,12 @@
   border-color: var(--bitx-primary-light);
 }
 
-div[class*='language-'] {
+div[class*="language-"] {
   border-radius: 8px;
   background: var(--bitx-gray-900) !important;
 }
 
-div[class*='language-'] code {
+div[class*="language-"] code {
   font-family: var(--vp-font-family-mono);
   font-size: 14px;
   line-height: 1.6;
@@ -844,22 +851,26 @@ div[class*='language-'] code {
   height: 166px;
   padding: 46px 43px 21px 21px;
   background: white;
-  border: 1px solid #EBEEF1;
+  border: 2px solid #ebeef1;
   border-radius: 17px;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s ease,
+    box-shadow 0.35s ease,
+    color 0.25s ease;
   cursor: pointer;
   text-align: center;
   position: relative;
   box-shadow: 0 1px 1px rgba(15, 23, 42, 0.02);
   z-index: 1;
+  will-change: transform;
 }
 
 .resource-card:hover {
   border-color: #05c8f6;
-  border-width: 2px;
-  box-shadow: 0 28px 200px rgba(6, 182, 212, 0.18);
-  transform: translateY(-12px);
+  box-shadow: 0 24px 80px rgba(6, 182, 212, 0.18);
+  transform: translateY(-10px) scale(1.025);
   text-decoration: none;
 }
 
@@ -892,7 +903,10 @@ div[class*='language-'] code {
   line-height: 1;
   flex-shrink: 0;
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
-  transition: all 0.3s ease;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .resource-icon img {
@@ -900,18 +914,18 @@ div[class*='language-'] code {
   width: 20px;
   height: 20px;
   object-fit: contain;
-  transition: all 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .resource-card:hover .resource-icon {
   border-color: #05c8f6;
   background: #f6f8fb;
   box-shadow: 0 18px 46px rgba(6, 182, 212, 0.12);
+  transform: translateX(-50%) translateY(-4px);
 }
 
 .resource-card:hover .resource-icon img {
-  width: 20px;
-  height: 20px;
+  transform: scale(1.08);
 }
 
 .resource-content {
@@ -925,8 +939,8 @@ div[class*='language-'] code {
   margin: 0 0 16px 0;
   font-size: 24px;
   font-weight: 600;
-  color: #040C17;
-  transition: all 0.3s ease;
+  color: #040c17;
+  transition: color 0.25s ease;
   text-decoration: none;
 }
 
@@ -942,11 +956,10 @@ div[class*='language-'] code {
 .resource-content p {
   margin: 0;
   font-size: 17px;
-  color: #3C4257;
+  color: #3c4257;
   line-height: 1.18;
-  transition: all 0.3s ease;
+  transition: color 0.25s ease;
 }
-
 
 .dark .resource-content p {
   color: var(--bitx-gray-300);
@@ -975,13 +988,17 @@ div[class*='language-'] code {
 }
 
 .doc-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--bitx-accent), var(--bitx-accent-light));
+  background: linear-gradient(
+    90deg,
+    var(--bitx-accent),
+    var(--bitx-accent-light)
+  );
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;
@@ -1065,7 +1082,7 @@ div[class*='language-'] code {
 }
 
 .doc-links a::before {
-  content: '→';
+  content: "→";
   position: absolute;
   left: 0.25rem;
   opacity: 0;
@@ -1199,7 +1216,7 @@ div[class*='language-'] code {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.25rem;
   }
-  
+
   .popular-resources {
     grid-template-columns: repeat(2, 1fr);
     gap: 48px 24px;
@@ -1239,17 +1256,17 @@ div[class*='language-'] code {
   .doc-sections {
     grid-template-columns: 1fr;
   }
-  
+
   .popular-resources {
     grid-template-columns: 1fr;
     gap: 44px;
     padding: 44px 16px 72px;
   }
-  
+
   .VPHero {
     padding: 2rem 1rem;
   }
-  
+
   .resource-card {
     min-height: 140px;
     padding: 44px 20px 28px;
@@ -1285,7 +1302,7 @@ div[class*='language-'] code {
   .resource-card:hover .resource-content p {
     font-size: 23px;
   }
-  
+
   .doc-card {
     padding: 1.25rem;
   }
@@ -1333,7 +1350,9 @@ div[class*='language-'] code {
 
 /* Smooth transitions for all interactive elements */
 * {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-property:
+    background-color, border-color, color, fill, stroke, opacity, box-shadow,
+    transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
