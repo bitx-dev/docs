@@ -88,9 +88,9 @@
   right: 0;
   bottom: 0;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 50px 50px;
+    linear-gradient(rgba(147, 112, 219, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(147, 112, 219, 0.08) 1px, transparent 1px);
+  background-size: 60px 60px;
   pointer-events: none;
 }
 
@@ -123,47 +123,58 @@
   max-width: 500px;
 }
 
-.VPHero .VPButton {
-  margin-top: 1rem;
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-start;
+.VPHero .VPButtons {
+  display: flex !important;
+  gap: 1rem !important;
+  align-items: center !important;
+  margin-top: 1rem !important;
 }
 
 /* Button Styling - Figma style */
-.VPButton.brand {
-  background: #06b6d4;
-  border: none;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 14px 0 rgba(6, 182, 212, 0.3);
+.VPButton.medium.brand {
+  background: #06b6d4 !important;
+  border: none !important;
+  color: #040C17 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  /* padding: 0.5rem 1.2rem !important; */
+  height: auto !important;
+  min-height: 36px !important;
+  border-radius: 6px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 14px 0 rgba(6, 182, 212, 0.3) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
 }
 
-.VPButton.brand:hover {
-  background: #0891b2;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px 0 rgba(6, 182, 212, 0.4);
+.VPButton.medium.brand:hover {
+  background: #0891b2 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px 0 rgba(6, 182, 212, 0.4) !important;
 }
 
-.VPButton.alt {
-  border: 1px solid #d1d5db;
-  color: #374151;
-  background: transparent;
-  font-weight: 500;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+.VPButton.medium.alt {
+  border: 1px solid #d1d5db !important;
+  color: #040C17 !important;
+  background: transparent !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+  height: auto !important;
+  min-height: 36px !important;
+  border-radius: 6px !important;
+  transition: all 0.3s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
 }
 
-.VPButton.alt:hover {
-  border-color: #9ca3af;
-  background: #f9fafb;
-  transform: translateY(-2px);
+.VPButton.medium.alt:hover {
+  border-color: #9ca3af !important;
+  background: #f9fafb !important;
+  transform: translateY(-2px) !important;
 }
 
 /* Feature Cards - Dark section per Figma */
@@ -251,16 +262,73 @@
   flex-grow: 1;
 }
 
-/* Navigation Bar - Clean white header per Figma */
+/* Navigation Bar - Clean white header per reference */
 .VPNav {
   background: #ffffff;
-  border-bottom: 1px solid var(--bitx-gray-200);
+  border-bottom: 2px solid #14a8ff;
   box-shadow: none;
+  --vp-nav-height: 84px;
 }
 
 .VPNavBar {
-  padding: 0 24px;
-  height: 64px;
+  height: 84px;
+}
+
+.VPNavBar .wrapper {
+  padding: 0 56px;
+}
+
+.VPNavBar .container {
+  display: flex;
+  justify-content: flex-start;
+  max-width: none;
+  height: 84px;
+}
+
+.VPNavBar.has-sidebar .container > .title {
+  position: static;
+  width: auto;
+  height: 84px;
+  padding: 0;
+}
+
+.VPNavBar.has-sidebar .content {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.VPNavBar .content {
+  flex: 1 1 auto;
+
+}
+
+.VPNavBar .content-body {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  /* gap: 24px; */
+  height: 84px;
+}
+
+.VPNavBar .menu {
+  order: 1;
+}
+
+.VPNavBar .search {
+  order: 2;
+}
+
+.VPNavBar .appearance {
+  order: 3;
+}
+
+.VPNavBar .social-links {
+  order: 4;
+}
+
+.VPNavBar .extra,
+.VPNavBar .hamburger {
+  order: 5;
 }
 
 .dark .VPNav {
@@ -275,21 +343,32 @@
 
 /* Navigation Menu Items */
 .VPNavBarMenu {
-  gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  margin-left: 38px;
+  margin-right: auto;
+}
+
+.VPNavBarTitle {
+  height: 84px;
+  flex: 0 0 auto;
+  padding: 0;
 }
 
 .VPNavBarMenuLink {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.95rem;
+  padding: 0;
+  border-radius: 6px;
+  color: #09243b;
+  font-weight: 700;
+  font-size: 16px;
   transition: all 0.2s ease;
   position: relative;
 }
 
 .VPNavBarMenuLink:hover {
-  background: var(--bitx-gray-100);
-  color: var(--bitx-accent);
+  background: transparent;
+  color: #0ea5e9;
 }
 
 .dark .VPNavBarMenuLink:hover {
@@ -320,19 +399,21 @@
 }
 
 .VPNavBarMenuGroup .button {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.95rem;
+  padding: 0;
+  border-radius: 6px;
+  color: #09243b;
+  font-weight: 700;
+  font-size: 16px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 10px;
+  height: 84px;
 }
 
 .VPNavBarMenuGroup .button:hover {
-  background: var(--bitx-gray-100);
-  color: var(--bitx-accent);
+  background: transparent;
+  color: #0ea5e9;
 }
 
 .dark .VPNavBarMenuGroup .button:hover {
@@ -378,27 +459,66 @@
   color: var(--bitx-accent-light);
 }
 
-/* Search Bar Styling - Figma design */
-.VPNavBarSearch {
-  max-width: 240px;
+/* Navbar appearance toggle */
+.VPNavBarAppearance {
   flex: 0 0 auto;
+  margin-left: 0 !important;
+}
+
+/* Search Bar Styling - reference design */
+.VPNavBarSearch {
+  flex: 0 0 100px !important;
+  width: 400px !important;
+  max-width: 400px;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+.VPNavBarSearch #docsearch {
+  width: 400px
 }
 
 .VPNavBarSearch .DocSearch-Button {
-  background: #ffffff;
-  border: 1px solid var(--bitx-gray-200);
+  background: #f7f9fc;
+  border: 1px solid #c9effa;
   border-radius: 8px;
-  padding: 0.5rem 1rem;
+  padding: 0 16px;
   transition: all 0.2s ease;
-  width: 100%;
-  height: 40px;
+  width: 400px !important;
+  
+  height: 44px;
   justify-content: flex-start;
+  display: flex !important;
+  align-items: center !important;
+  box-shadow: none;
+}
+
+.VPNavBarSearch .DocSearch-Button-Container {
+  display: flex;
+  align-items: center;
+}
+
+.VPNavBarSearch .DocSearch-Button-Placeholder {
+  display: flex !important;
+  align-items: center !important;
+  color: #7a86a0 !important;
+  font-size: 16px !important;
+  font-weight: 400;
+}
+
+.VPNavBarSearch .DocSearch-Button-Keys {
+  display: none !important;
+}
+
+.VPNavBarSearch .DocSearch-Button-Placeholder::before {
+  content: none;
 }
 
 .VPNavBarSearch .DocSearch-Button:hover {
-  background: var(--bitx-gray-50);
-  border-color: var(--bitx-accent);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  background: #ffffff;
+  border-color: #7dd3fc;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
 }
 
 .dark .VPNavBarSearch .DocSearch-Button {
@@ -414,9 +534,9 @@
 
 /* Logo Styling */
 .VPNavBarTitle .logo {
-  width: 28px;
-  height: 28px;
-  margin-right: 0.625rem;
+  width: 42px;
+  height: 42px;
+  margin-right: 10px;
   transition: transform 0.3s ease;
 }
 
@@ -425,17 +545,91 @@
 }
 
 .VPNavBarTitle .title {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: var(--bitx-primary);
-  letter-spacing: -0.02em;
-  margin-right: 2rem;
+  font-weight: 800;
+  font-size: 24px;
+  color: #050b18;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+/* Show search field properly */
+.VPNavBarSearch .DocSearch-Button-Placeholder {
+  display: inline !important;
+  margin-left: 8px;
 }
 
 .VPNavBarTitle {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+@media (max-width: 960px) {
+  .VPNavBar {
+    height: 64px;
+    --vp-nav-height: 64px;
+  }
+
+  .VPNavBar .wrapper {
+    padding: 0 20px;
+  }
+
+  .VPNavBar .container,
+  .VPNavBar.has-sidebar .container > .title {
+    height: 64px;
+  }
+
+  .VPNavBarTitle {
+    height: 64px;
+  }
+
+  .VPNavBar .content-body {
+    height: 64px;
+    gap: 12px;
+  }
+
+  .VPNavBarMenu {
+    display: none;
+  }
+
+  .VPNavBarSearch {
+    flex-basis: 260px !important;
+    width: 260px !important;
+    min-width: 0;
+    max-width: 42vw;
+  }
+
+  .VPNavBarTitle .logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .VPNavBarTitle .title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .VPNavBar .wrapper {
+    padding: 0 16px;
+  }
+
+  .VPNavBarSearch {
+    width: auto !important;
+    min-width: 0;
+    flex-basis: auto !important;
+    max-width: none;
+  }
+
+  .VPNavBarSearch .DocSearch-Button {
+    width: 40px !important;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .VPNavBarSearch .DocSearch-Button-Placeholder {
+    display: none !important;
+  }
 }
 
 /* Sidebar */
