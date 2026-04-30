@@ -16,22 +16,52 @@ hero:
       link: /api-reference/
 
 features:
-  - icon: 🌐
+  - icon:
+      src: /icons/multi-network.svg
+      alt: Multi-network support
+      width: 30
+      height: 30
+      wrap: true
     title: Multi-Network Support
     details: Accept payments across 16 blockchain networks including Bitcoin, Ethereum, Solana, and 13 EVM-compatible chains.
-  - icon: 🔒
+  - icon:
+      src: /icons/security.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Enterprise Security
     details: Bank-grade security with DSA/HMAC authentication, encrypted communications, and regulatory compliance.
-  - icon: ⚡
+  - icon:
+      src: /icons/realtime-settlement.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Real-Time Settlement
     details: Process payments 24/7 with instant on-chain confirmations and real-time webhook notifications.
-  - icon: 🏦
+  - icon:
+      src: /icons/self-custodial.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Self-Custodial
     details: Full ownership and control of your funds. No third-party custody—your keys, your crypto.
-  - icon: 💱
+  - icon:
+      src: /icons/crypto-to-fiat-bridge.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Crypto-to-Fiat Bridge
     details: Seamless conversion between cryptocurrencies and 30+ local currencies for global settlement.
-  - icon: 🛠️
+  - icon:
+      src: /icons/developer-first-api.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Developer-First APIs
     details: RESTful APIs, comprehensive SDKs, and detailed documentation for rapid integration.
 ---
