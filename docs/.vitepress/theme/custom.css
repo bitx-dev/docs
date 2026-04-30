@@ -828,8 +828,8 @@ div[class*='language-'] code {
   grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
   margin: 0 auto;
-  padding: 4rem 2rem;
-  max-width: 1280px;
+  padding: 4rem 12rem;
+  /* max-width: 1280px; */
   box-sizing: border-box;
   align-items: center;
   overflow: visible;
