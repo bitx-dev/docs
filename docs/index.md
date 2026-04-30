@@ -74,7 +74,9 @@ import { withBase } from 'vitepress'
 
 <div class="popular-resources">
   <a :href="withBase('/get-started/quick-start')" class="resource-card">
-    <div class="resource-icon">⚡</div>
+    <div class="resource-icon">
+      <img :src="withBase('/icons/quick-start.svg')" alt="" />
+    </div>
     <div class="resource-content">
       <h4>Quick Start</h4>
       <p>Get up and running in 5 minutes</p>
@@ -82,7 +84,9 @@ import { withBase } from 'vitepress'
   </a>
   
   <a :href="withBase('/get-started/authentication')" class="resource-card">
-    <div class="resource-icon">🔐</div>
+    <div class="resource-icon">
+      <img :src="withBase('/icons/authentication.svg')" alt="" />
+    </div>
     <div class="resource-content">
       <h4>Authentication</h4>
       <p>Secure your API integration</p>
@@ -90,7 +94,9 @@ import { withBase } from 'vitepress'
   </a>
   
   <a :href="withBase('/get-started/supported-networks')" class="resource-card">
-    <div class="resource-icon">🌐</div>
+    <div class="resource-icon">
+      <img :src="withBase('/icons/network.svg')" alt="" />
+    </div>
     <div class="resource-content">
       <h4>Networks</h4>
       <p>16 supported blockchains</p>
@@ -98,7 +104,9 @@ import { withBase } from 'vitepress'
   </a>
   
   <a :href="withBase('/api-reference/payments')" class="resource-card">
-    <div class="resource-icon">💳</div>
+    <div class="resource-icon">
+      <img :src="withBase('/icons/payment-api.svg')" alt="" />
+    </div>
     <div class="resource-content">
       <h4>Payment API</h4>
       <p>Create and manage payments</p>
