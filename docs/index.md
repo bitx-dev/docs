@@ -72,8 +72,8 @@ import { withBase } from 'vitepress'
 
 <!-- ## Popular Resources -->
 
-<section>
-<h2 id="doc-overview-title" class="doc-overview-title">Popular Resources</h2>
+<section class="popular-resources-section">
+<h2  class="doc-resources-title">Popular Resources</h2>
 <div class="popular-resources">
   <a :href="withBase('/get-started/quick-start')" class="resource-card">
     <div class="resource-icon">
@@ -84,7 +84,6 @@ import { withBase } from 'vitepress'
       <p>Get up and running in 5 minutes</p>
     </div>
   </a>
-  
   <a :href="withBase('/get-started/authentication')" class="resource-card">
     <div class="resource-icon">
       <img :src="withBase('/icons/authentication.svg')" alt="" />
@@ -115,7 +114,6 @@ import { withBase } from 'vitepress'
     </div>
   </a>
 </div>
-
 </section>
 
 <!-- Documentation Overview -->
