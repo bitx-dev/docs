@@ -23,10 +23,78 @@
   --bitx-gray-100: #f3f4f6;
   --bitx-gray-200: #e5e7eb;
   --bitx-gray-300: #d1d5db;
+  --bitx-gray-400: #9ca3af;
   --bitx-gray-600: #4b5563;
   --bitx-gray-700: #374151;
   --bitx-gray-800: #1f2937;
   --bitx-gray-900: #111827;
+
+  /* UI Surface Colors */
+  --bitx-white: #ffffff;
+  --bitx-ink: #040c17;
+  --bitx-heading: #07111f;
+  --bitx-navy: #103149;
+  --bitx-muted-text: #3c4257;
+  --bitx-surface-subtle: #f6f8fb;
+  --bitx-surface-soft: #f4f7fb;
+  --bitx-surface-lavender: #f8f7ff;
+  --bitx-surface-lavender-strong: #e8e4ff;
+  --bitx-surface-violet: #c4b5fd;
+  --bitx-border-soft: #ebeef1;
+  --bitx-border-muted: #e3e8ef;
+  --bitx-border-control: #d1d5db;
+  --bitx-border-card: #e2e8f0;
+  --bitx-border-hover: #cfeef8;
+  --bitx-doc-link-hover-bg: #e8fbff;
+
+  /* Cyan Accent Colors */
+  --bitx-cyan: #06b6d4;
+  --bitx-cyan-deep: #0891b2;
+  --bitx-cyan-bright: #05c8f6;
+  --bitx-cyan-hover: #04abc8;
+  --bitx-cyan-dark: #009eb8;
+  --bitx-cyan-light: #67e8f9;
+  --bitx-cyan-stroke: #0093aa;
+  --bitx-nav-border: #14a8ff;
+  --bitx-nav-text: #09243b;
+  --bitx-nav-hover: #0ea5e9;
+  --bitx-search-border: #c9effa;
+  --bitx-search-hover-border: #7dd3fc;
+
+  /* Gradients */
+  --bitx-gradient-purple: #b94dff;
+  --bitx-gradient-cyan: #25c8ff;
+  --bitx-gradient-green: #80ef32;
+  --bitx-icon-gradient-purple: #8b5cf6;
+  --bitx-icon-gradient-blue: #3b82f6;
+  --bitx-icon-gradient-cyan: #06d6d9;
+  --bitx-feature-gradient-purple: #bb32ff;
+  --bitx-feature-gradient-cyan: #0fd6f5;
+  --bitx-feature-gradient-green: #7ce314;
+
+  /* Shadow RGB Values */
+  --bitx-shadow-rgb: 15, 23, 42;
+  --bitx-doc-shadow-rgb: 8, 26, 48;
+  --bitx-primary-rgb: 26, 26, 46;
+  --bitx-accent-rgb: 59, 130, 246;
+  --bitx-cyan-rgb: 6, 182, 212;
+  --bitx-nav-hover-rgb: 14, 165, 233;
+  --bitx-warning-rgb: 245, 158, 11;
+  --bitx-error-rgb: 239, 68, 68;
+  --bitx-grid-purple-rgb: 147, 112, 219;
+  --bitx-slate-rgb: 148, 163, 184;
+  --bitx-blue-rgb: 96, 165, 250;
+  --bitx-black-rgb: 0, 0, 0;
+
+  /* Dark Surfaces */
+  --bitx-section-dark: #0a0a0f;
+  --bitx-feature-card-dark: #0f1419;
+  --bitx-card-dark: #141b2b;
+
+  /* Navigation/Search */
+  --bitx-search-bg: #f7f9fc;
+  --bitx-search-placeholder: #7a86a0;
+  --bitx-logo-text: #050b18;
 
   /* Semantic Colors */
   --bitx-success: #10b981;
@@ -39,7 +107,7 @@
   --vp-c-brand-2: var(--bitx-accent-hover);
   --vp-c-brand-3: var(--bitx-accent-light);
 
-  --vp-c-bg: #ffffff;
+  --vp-c-bg: var(--bitx-white);
   --vp-c-bg-soft: var(--bitx-gray-50);
   --vp-c-bg-mute: var(--bitx-gray-100);
 
@@ -74,12 +142,12 @@
 .VPHero {
   background: linear-gradient(
     90deg,
-    #ffffff 0%,
-    #f8f7ff 20%,
-    #e8e4ff 40%,
-    #c4b5fd 60%,
-    #8b5cf6 80%,
-    #06b6d4 100%
+    var(--bitx-white) 0%,
+    var(--bitx-surface-lavender) 20%,
+    var(--bitx-surface-lavender-strong) 40%,
+    var(--bitx-surface-violet) 60%,
+    var(--bitx-icon-gradient-purple) 80%,
+    var(--bitx-cyan) 100%
   );
   padding: 6rem 2rem;
   min-height: 500px;
@@ -99,8 +167,8 @@
   right: 0;
   bottom: 0;
   background-image:
-    linear-gradient(rgba(147, 112, 219, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(147, 112, 219, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(var(--bitx-grid-purple-rgb), 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--bitx-grid-purple-rgb), 0.08) 1px, transparent 1px);
   background-size: 60px 60px;
   pointer-events: none;
 }
@@ -118,7 +186,7 @@
 }
 
 .VPHero .text {
-  color: #1a1a2e;
+  color: var(--bitx-primary);
   font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.1;
@@ -127,7 +195,7 @@
 }
 
 .VPHero .tagline {
-  color: #4b5563;
+  color: var(--bitx-gray-600);
   font-size: 1.1rem;
   line-height: 1.6;
   margin: 0 0 2rem 0;
@@ -143,9 +211,9 @@
 
 /* Button Styling - Figma style */
 .VPButton.medium.brand {
-  background: #06b6d4 !important;
+  background: var(--bitx-cyan) !important;
   border: none !important;
-  color: #040c17 !important;
+  color: var(--bitx-ink) !important;
   font-weight: 600 !important;
   font-size: 0.9rem !important;
   /* padding: 0.5rem 1.2rem !important; */
@@ -153,7 +221,7 @@
   min-height: 36px !important;
   border-radius: 6px !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 4px 14px 0 rgba(6, 182, 212, 0.3) !important;
+  box-shadow: 0 4px 14px 0 rgba(var(--bitx-cyan-rgb), 0.3) !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -161,14 +229,14 @@
 }
 
 .VPButton.medium.brand:hover {
-  background: #0891b2 !important;
+  background: var(--bitx-cyan-deep) !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 6px 20px 0 rgba(6, 182, 212, 0.4) !important;
+  box-shadow: 0 6px 20px 0 rgba(var(--bitx-cyan-rgb), 0.4) !important;
 }
 
 .VPButton.medium.alt {
-  border: 1px solid #d1d5db !important;
-  color: #040c17 !important;
+  border: 1px solid var(--bitx-border-control) !important;
+  color: var(--bitx-ink) !important;
   background: transparent !important;
   font-weight: 500 !important;
   font-size: 0.9rem !important;
@@ -183,8 +251,8 @@
 }
 
 .VPButton.medium.alt:hover {
-  border-color: #9ca3af !important;
-  background: #f9fafb !important;
+  border-color: var(--bitx-gray-400) !important;
+  background: var(--bitx-gray-50) !important;
   transform: translateY(-2px) !important;
 }
 
@@ -192,7 +260,7 @@
 .VPFeatures {
   padding: 5rem 0;
   margin-top: 0;
-  background: #0a0a0f;
+  background: var(--bitx-section-dark);
   width: 100%;
   box-sizing: border-box;
 }
@@ -219,7 +287,12 @@
   position: relative;
   border-radius: 24px;
   padding: 2px;
-  background: linear-gradient(135deg, #bb32ff 0%, #0fd6f5 50%, #7ce314 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bitx-feature-gradient-purple) 0%,
+    var(--bitx-feature-gradient-cyan) 50%,
+    var(--bitx-feature-gradient-green) 100%
+  );
   transition: all 0.3s ease;
   border: 0px solid var(--vp-c-bg-soft) !important;
 }
@@ -228,14 +301,14 @@
   content: "";
   position: absolute;
   inset: 1px;
-  background: #0f1419;
+  background: var(--bitx-feature-card-dark);
   border-radius: 14px;
   z-index: 0;
 }
 
 .VPFeature:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(6, 182, 212, 0.15);
+  box-shadow: 0 20px 40px rgba(var(--bitx-cyan-rgb), 0.15);
 }
 
 .VPFeature article {
@@ -249,22 +322,26 @@
 .VPFeature .icon {
   font-size: 2.5rem;
   line-height: 1;
-  background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bitx-cyan) 0%,
+    var(--bitx-icon-gradient-purple) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.3));
+  filter: drop-shadow(0 0 8px rgba(var(--bitx-cyan-rgb), 0.3));
 }
 
 .VPFeature .title {
-  color: #ffffff;
+  color: var(--bitx-white);
   font-weight: 600;
   font-size: 1.2rem;
   line-height: 1.3;
 }
 
 .VPFeature .details {
-  color: #ffffff;
+  color: var(--bitx-white);
   font-size: 0.95rem;
   line-height: 1.7;
   flex-grow: 1;
@@ -272,8 +349,8 @@
 
 /* Navigation Bar - Clean white header per reference */
 .VPNav {
-  background: #ffffff;
-  border-bottom: 2px solid #14a8ff;
+  background: var(--bitx-white);
+  border-bottom: 2px solid var(--bitx-nav-border);
   box-shadow: none;
   --vp-nav-height: 84px;
 }
@@ -339,9 +416,9 @@
 }
 
 .dark .VPNav {
-  background: rgba(26, 26, 46, 0.98);
+  background: rgba(var(--bitx-primary-rgb), 0.98);
   border-bottom-color: var(--bitx-primary-light);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(var(--bitx-black-rgb), 0.3);
 }
 
 .dark .VPNavBarTitle .title {
@@ -366,7 +443,7 @@
 .VPNavBarMenuLink {
   padding: 0;
   border-radius: 6px;
-  color: #09243b;
+  color: var(--bitx-nav-text);
   font-weight: 700;
   font-size: 16px;
   transition: all 0.2s ease;
@@ -375,7 +452,7 @@
 
 .VPNavBarMenuLink:hover {
   background: transparent;
-  color: #0ea5e9;
+  color: var(--bitx-nav-hover);
 }
 
 .dark .VPNavBarMenuLink:hover {
@@ -408,7 +485,7 @@
 .VPNavBarMenuGroup .button {
   padding: 0;
   border-radius: 6px;
-  color: #09243b;
+  color: var(--bitx-nav-text);
   font-weight: 700;
   font-size: 16px;
   transition: all 0.2s ease;
@@ -420,7 +497,7 @@
 
 .VPNavBarMenuGroup .button:hover {
   background: transparent;
-  color: #0ea5e9;
+  color: var(--bitx-nav-hover);
 }
 
 .dark .VPNavBarMenuGroup .button:hover {
@@ -430,10 +507,10 @@
 
 /* Dropdown Content */
 .VPNavBarMenuGroup .items {
-  background: white;
+  background: var(--bitx-white);
   border: 1px solid var(--bitx-gray-200);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(var(--bitx-black-rgb), 0.12);
   padding: 0.5rem;
   min-width: 200px;
   margin-top: 0.5rem;
@@ -442,7 +519,7 @@
 .dark .VPNavBarMenuGroup .items {
   background: var(--bitx-primary-light);
   border-color: var(--bitx-primary-dark);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(var(--bitx-black-rgb), 0.4);
 }
 
 .VPNavBarMenuGroup .item {
@@ -487,8 +564,8 @@
 }
 
 .VPNavBarSearch .DocSearch-Button {
-  background: #f7f9fc;
-  border: 1px solid #c9effa;
+  background: var(--bitx-search-bg);
+  border: 1px solid var(--bitx-search-border);
   border-radius: 8px;
   padding: 0 16px;
   transition: all 0.2s ease;
@@ -509,7 +586,7 @@
 .VPNavBarSearch .DocSearch-Button-Placeholder {
   display: flex !important;
   align-items: center !important;
-  color: #7a86a0 !important;
+  color: var(--bitx-search-placeholder) !important;
   font-size: 16px !important;
   font-weight: 400;
 }
@@ -523,9 +600,9 @@
 }
 
 .VPNavBarSearch .DocSearch-Button:hover {
-  background: #ffffff;
-  border-color: #7dd3fc;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+  background: var(--bitx-white);
+  border-color: var(--bitx-search-hover-border);
+  box-shadow: 0 0 0 3px rgba(var(--bitx-nav-hover-rgb), 0.12);
 }
 
 .dark .VPNavBarSearch .DocSearch-Button {
@@ -536,7 +613,7 @@
 .dark .VPNavBarSearch .DocSearch-Button:hover {
   background: var(--bitx-primary-dark);
   border-color: var(--bitx-accent);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 2px 8px rgba(var(--bitx-accent-rgb), 0.25);
 }
 
 /* Logo Styling */
@@ -554,7 +631,7 @@
 .VPNavBarTitle .title {
   font-weight: 800;
   font-size: 24px;
-  color: #050b18;
+  color: var(--bitx-logo-text);
   letter-spacing: 0;
   white-space: nowrap;
 }
@@ -728,22 +805,22 @@ div[class*="language-"] code {
 /* Custom Containers (Tips, Warnings, etc.) */
 .vp-doc .custom-block.tip {
   border-color: var(--bitx-info);
-  background: rgba(59, 130, 246, 0.05);
+  background: rgba(var(--bitx-accent-rgb), 0.05);
 }
 
 .vp-doc .custom-block.warning {
   border-color: var(--bitx-warning);
-  background: rgba(245, 158, 11, 0.05);
+  background: rgba(var(--bitx-warning-rgb), 0.05);
 }
 
 .vp-doc .custom-block.danger {
   border-color: var(--bitx-error);
-  background: rgba(239, 68, 68, 0.05);
+  background: rgba(var(--bitx-error-rgb), 0.05);
 }
 
 .vp-doc .custom-block.info {
   border-color: var(--bitx-accent);
-  background: rgba(59, 130, 246, 0.05);
+  background: rgba(var(--bitx-accent-rgb), 0.05);
 }
 
 /* Links */
@@ -810,7 +887,7 @@ div[class*="language-"] code {
 /* Badge Styling */
 .vp-badge {
   background: var(--bitx-accent);
-  color: white;
+  color: var(--bitx-white);
   padding: 0.2em 0.6em;
   border-radius: 12px;
   font-size: 0.85em;
@@ -850,14 +927,14 @@ div[class*="language-"] code {
   gap: 34px;
   height: 166px;
   padding: 46px 43px 21px 21px;
-  background: white;
-  border: 2px solid #ebeef1;
+  background: var(--bitx-white);
+  border: 2px solid var(--bitx-border-soft);
   border-radius: 17px;
   text-decoration: none;
   cursor: pointer;
   text-align: center;
   position: relative;
-  box-shadow: 0 1px 1px rgba(15, 23, 42, 0.02);
+  box-shadow: 0 1px 1px rgba(var(--bitx-shadow-rgb), 0.02);
   z-index: 1;
   will-change: transform;
   transition:
@@ -884,8 +961,8 @@ div[class*="language-"] code {
 }
 
 .resource-card:hover {
-  border-color: #05c8f6;
-  box-shadow: 0 24px 80px rgba(6, 182, 212, 0.18);
+  border-color: var(--bitx-cyan-bright);
+  box-shadow: 0 24px 80px rgba(var(--bitx-cyan-rgb), 0.18);
   transform: translateY(-10px) scale(1.025);
   text-decoration: none;
 }
@@ -898,7 +975,7 @@ div[class*="language-"] code {
 .dark .resource-card:hover {
   border-color: var(--bitx-accent);
   background: var(--bitx-primary-dark);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 6px 20px rgba(var(--bitx-blue-rgb), 0.25);
 }
 
 .resource-icon {
@@ -911,14 +988,14 @@ div[class*="language-"] code {
   justify-content: center;
   width: 64px;
   height: 64px;
-  border: 1px solid #e3e8ef;
+  border: 1px solid var(--bitx-border-muted);
   border-radius: 50%;
-  background: #f6f8fb;
-  color: #06b6d4;
+  background: var(--bitx-surface-subtle);
+  color: var(--bitx-cyan);
   font-size: 26px;
   line-height: 1;
   flex-shrink: 0;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 10px 24px rgba(var(--bitx-shadow-rgb), 0.04);
   transition:
     top 0.8s cubic-bezier(0.22, 1, 0.36, 1),
     width 0.8s cubic-bezier(0.22, 1, 0.36, 1),
@@ -937,9 +1014,9 @@ div[class*="language-"] code {
 }
 
 .resource-card:hover .resource-icon {
-  border-color: #05c8f6;
-  background: #f6f8fb;
-  box-shadow: 0 18px 46px rgba(6, 182, 212, 0.12);
+  border-color: var(--bitx-cyan-bright);
+  background: var(--bitx-surface-subtle);
+  box-shadow: 0 18px 46px rgba(var(--bitx-cyan-rgb), 0.12);
   transform: translateX(-50%) translateY(-4px);
 }
 
@@ -958,7 +1035,7 @@ div[class*="language-"] code {
   margin: 0 0 16px 0;
   font-size: 24px;
   font-weight: 600;
-  color: #040c17;
+  color: var(--bitx-ink);
   transition:
     color 0.55s ease,
     font-size 0.8s cubic-bezier(0.22, 1, 0.36, 1),
@@ -967,7 +1044,7 @@ div[class*="language-"] code {
 }
 
 .resource-card:hover .resource-content h4 {
-  color: #04abc8;
+  color: var(--bitx-cyan-hover);
   text-decoration: none;
 }
 
@@ -978,7 +1055,7 @@ div[class*="language-"] code {
 .resource-content p {
   margin: 0;
   font-size: 17px;
-  color: #3c4257;
+  color: var(--bitx-muted-text);
   line-height: 1.18;
   transition:
     color 0.55s ease,
@@ -1000,7 +1077,7 @@ div[class*="language-"] code {
   margin: 0 0 92px !important;
   padding: 0;
   border: 0;
-  color: #040c17 !important;
+  color: var(--bitx-ink) !important;
   font-size: 32px !important;
   font-weight: 600 !important;
   line-height: 1.15;
@@ -1023,10 +1100,10 @@ div[class*="language-"] code {
   min-width: 328px;
   padding: 32px;
   gap: 24px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bitx-white);
+  border: 1px solid var(--bitx-border-card);
   border-radius: 16px;
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 18px 48px rgba(var(--bitx-shadow-rgb), 0.03);
   transition:
     border-color 0.25s ease,
     box-shadow 0.25s ease,
@@ -1042,7 +1119,12 @@ div[class*="language-"] code {
   bottom: 0;
   left: 0;
   height: 5px;
-  background: linear-gradient(90deg, #b94dff 0%, #25c8ff 48%, #80ef32 100%);
+  background: linear-gradient(
+    90deg,
+    var(--bitx-gradient-purple) 0%,
+    var(--bitx-gradient-cyan) 48%,
+    var(--bitx-gradient-green) 100%
+  );
   opacity: 0;
   transform: scaleX(0);
   transform-origin: left;
@@ -1052,8 +1134,8 @@ div[class*="language-"] code {
 }
 
 .doc-card:hover {
-  border-color: #cfeef8;
-  box-shadow: 0 24px 70px rgba(8, 26, 48, 0.09);
+  border-color: var(--bitx-border-hover);
+  box-shadow: 0 24px 70px rgba(var(--bitx-doc-shadow-rgb), 0.09);
   transform: translateY(-5px);
 }
 
@@ -1071,14 +1153,14 @@ div[class*="language-"] code {
 }
 
 .dark .doc-card {
-  background: #141b2b;
-  border-color: rgba(148, 163, 184, 0.16);
+  background: var(--bitx-card-dark);
+  border-color: rgba(var(--bitx-slate-rgb), 0.16);
   box-shadow: none;
 }
 
 .dark .doc-card:hover {
-  border-color: rgba(96, 165, 250, 0.55);
-  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.32);
+  border-color: rgba(var(--bitx-blue-rgb), 0.55);
+  box-shadow: 0 20px 56px rgba(var(--bitx-black-rgb), 0.32);
 }
 
 .doc-card-header {
@@ -1095,7 +1177,7 @@ div[class*="language-"] code {
   width: 64px;
   height: 64px;
   border-radius: 8px;
-  background: #f4f7fb;
+  background: var(--bitx-surface-soft);
   color: transparent;
   font-size: 0;
   line-height: 1;
@@ -1104,7 +1186,12 @@ div[class*="language-"] code {
 
 .doc-icon::before {
   color: transparent;
-  background: linear-gradient(135deg, #8b5cf6 8%, #3b82f6 45%, #06d6d9 88%);
+  background: linear-gradient(
+    135deg,
+    var(--bitx-icon-gradient-purple) 8%,
+    var(--bitx-icon-gradient-blue) 45%,
+    var(--bitx-icon-gradient-cyan) 88%
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1115,7 +1202,7 @@ div[class*="language-"] code {
 .doc-card-header h3 {
   order: 1;
   margin: 0;
-  color: #040c17 !important;
+  color: var(--bitx-ink) !important;
   font-size: 24px !important;
   font-weight: 600 !important;
   letter-spacing: -4% !important;
@@ -1134,7 +1221,7 @@ div[class*="language-"] code {
   max-width: 90%;
   min-height: 64px;
   margin: 0 0 22px;
-  color: #3c4257;
+  color: var(--bitx-muted-text);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.45;
@@ -1175,7 +1262,7 @@ div[class*="language-"] code {
   padding: 0 15px 0 10px;
   width: 100%;
   border-radius: 8px;
-  color: #103149;
+  color: var(--bitx-navy);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.25;
@@ -1198,8 +1285,8 @@ div[class*="language-"] code {
 }
 
 .doc-links a:hover {
-  background: #e8fbff;
-  color: #009eb8;
+  background: var(--bitx-doc-link-hover-bg);
+  color: var(--bitx-cyan-dark);
   text-decoration: none;
 }
 
@@ -1216,8 +1303,8 @@ div[class*="language-"] code {
 }
 
 .dark .doc-links a:hover {
-  background: rgba(6, 182, 212, 0.14);
-  color: #67e8f9;
+  background: rgba(var(--bitx-cyan-rgb), 0.14);
+  color: var(--bitx-cyan-light);
 }
 
 .dark .doc-links a:hover::after {
@@ -1269,7 +1356,7 @@ div[class*="language-"] code {
 .VPContent.is-home .vp-doc {
   max-width: 100% !important;
   padding: 68px 0 0 !important;
-  background: #f6f8fb;
+  background: var(--bitx-surface-subtle);
   display: flow-root;
 }
 
@@ -1306,7 +1393,7 @@ div[class*="language-"] code {
   margin: 0 0 92px;
   padding: 0;
   border: 0;
-  color: #07111f;
+  color: var(--bitx-heading);
   font-size: 40px;
   line-height: 1.15;
 }
