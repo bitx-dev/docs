@@ -70,8 +70,10 @@ features:
 import { withBase } from 'vitepress'
 </script>
 
-## Popular Resources
+<!-- ## Popular Resources -->
 
+<section>
+<h2 id="doc-overview-title" class="doc-overview-title">Popular Resources</h2>
 <div class="popular-resources">
   <a :href="withBase('/get-started/quick-start')" class="resource-card">
     <div class="resource-icon">
@@ -113,6 +115,8 @@ import { withBase } from 'vitepress'
     </div>
   </a>
 </div>
+
+</section>
 
 <!-- Documentation Overview -->
 
