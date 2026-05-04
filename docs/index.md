@@ -96,7 +96,7 @@ import { withBase } from 'vitepress'
   
   <a :href="withBase('/get-started/supported-networks')" class="resource-card">
     <div class="resource-icon">
-      <img :src="withBase('/icons/network.svg')" alt="" />
+      <img :src="withBase('/icons/networks.svg')" alt="" />
     </div>
     <div class="resource-content">
       <h4>Networks</h4>
