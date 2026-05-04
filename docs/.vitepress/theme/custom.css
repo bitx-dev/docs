@@ -162,6 +162,10 @@ body {
   justify-content: flex-start; /* Forces content to start on the left */
 }
 
+.dark .VPHero {
+  background-image: url("/icons/header-dark.svg");
+}
+
 /* Grid pattern overlay */
 .VPHero::before {
   content: "";
@@ -834,6 +838,10 @@ div[class*="language-"] code {
   font-weight: 500;
 }
 
+.dark .vp-doc code {
+  background: #000000;
+}
+
 .vp-doc [class*="language-"] pre {
   position: relative;
   z-index: 1;
@@ -844,11 +852,19 @@ div[class*="language-"] code {
   overflow-x: auto;
 }
 
+.dark .vp-doc [class*="language-"] pre {
+  background-color: #000000;
+}
+
 .vp-doc div[class*="language-"],
 .vp-block {
   border-radius: 8px;
-  /* margin: 16px 0; */
   border: 1px solid #dbe0f0;
+}
+
+.dark .vp-doc div[class*="language-"],
+.vp-block {
+  border: 1px solid #103149;
 }
 
 .vp-doc div[class*="language-"].line-numbers-mode {
@@ -860,9 +876,19 @@ div[class*="language-"] code {
   border-right: 1px solid var(--vp-code-block-divider-color);
   background-color: #e6e7ea;
 }
+.dark .vp-doc .line-numbers-wrapper {
+  background-color: #091A26;
+  padding: 20px !important;
+  color: #6A7282;
+  font-size: 14px !important;
+  align-items: center;
+  text-align: center;
+  
+}
+
 
 .dark .vp-doc code {
-  background: #040c17;
+  background: #000000;
   color: var(--bitx-accent-light);
 }
 
