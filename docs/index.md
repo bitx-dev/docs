@@ -140,7 +140,6 @@ import { withBase } from 'vitepress'
     <li><a :href="withBase('/get-started/webhooks')">Webhooks</a></li>
   </ul>
   </div>
-
 </div>
 
 <div class="doc-card">

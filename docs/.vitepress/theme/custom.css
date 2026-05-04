@@ -138,24 +138,27 @@
   --vp-c-brand-3: var(--bitx-accent-hover);
 }
 
+html,
+body {
+  overflow-x: hidden;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+
 /* Hero Section Styling - Figma gradient left-to-right */
 .VPHero {
-  background: linear-gradient(
-    90deg,
-    var(--bitx-white) 0%,
-    var(--bitx-surface-lavender) 20%,
-    var(--bitx-surface-lavender-strong) 40%,
-    var(--bitx-surface-violet) 60%,
-    var(--bitx-icon-gradient-purple) 80%,
-    var(--bitx-cyan) 100%
-  );
-  padding: 6rem 2rem;
-  min-height: 500px;
+  /* 1. Background setup */
+  background-image: url("/icons/header.svg");
+  background-repeat: no-repeat;
+  background-position: right center; /* Keeps glow on the right */
+  background-size: contain; /* Prevents the 'zoomed in' look */
+
+  /* 2. Container setup */
+  height: 600px;
+  padding: 0 4rem; /* More horizontal breathing room */
   display: flex;
   align-items: center;
-  text-align: left;
-  position: relative;
-  overflow: hidden;
+  justify-content: flex-start; /* Forces content to start on the left */
 }
 
 /* Grid pattern overlay */
@@ -181,7 +184,7 @@
 }
 
 .VPHero .container {
-  max-width: 1280px !important;
+  padding: 40px 15px;
   margin: 0 auto !important;
   width: 100%;
   position: relative;
@@ -356,49 +359,57 @@
 
 /* Navigation Bar - Clean white header per reference */
 .VPNav {
-  background: var(--bitx-white);
+  background: var(--bitx-white) !important;
   border-bottom: 2px solid var(--bitx-nav-border);
-  box-shadow: none;
-  --vp-nav-height: 84px;
+  box-shadow: none !important;
+  --vp-nav-height: 84px !important;
+  position: fixed;
 }
 
 .VPNavBar {
-  height: 84px;
+  height: 84px !important;
 }
 
 .VPNavBar .wrapper {
-  padding: 0 56px;
+  padding: 0 56px !important;
 }
 
 .VPNavBar .container {
-  display: flex;
-  justify-content: flex-start;
-  max-width: none;
-  height: 84px;
+  display: flex !important;
+  justify-content: flex-start !important;
+  max-width: none !important;
+  height: 84px !important;
 }
 
+/* start when side bar */
 .VPNavBar.has-sidebar .container > .title {
   position: static;
   width: auto;
   height: 84px;
   padding: 0;
 }
-
+ 
+.VPNavBar.has-sidebar .container {
+  justify-content: space-between;
+  display: flex;
+}
 .VPNavBar.has-sidebar .content {
-  padding-left: 0;
-  padding-right: 0;
+  padding-right: 0px !important;
+  padding-left: 0px !important;
 }
 
+/* end with side bar */
+
 .VPNavBar .content {
-  flex: 1 1 auto;
+  flex: 1 1 auto !important;
 }
 
 .VPNavBar .content-body {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
   /* gap: 24px; */
-  height: 84px;
+  height: 84px !important;
 }
 
 .VPNavBar .menu {
@@ -434,11 +445,12 @@
 
 /* Navigation Menu Items */
 .VPNavBarMenu {
-  display: flex;
-  align-items: center;
-  gap: 34px;
-  margin-left: 38px;
-  margin-right: auto;
+  display: flex !important;
+  align-items: center !important;
+  gap: 34px !important;
+  margin-left: 38px !important;
+  margin-right: auto !important;
+  /* background-color: red; */
 }
 
 .VPNavBarTitle {
@@ -514,10 +526,6 @@
 
 /* Dropdown Content */
 .VPNavBarMenuGroup .items {
-  background: var(--bitx-white);
-  border: 1px solid var(--bitx-gray-200);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(var(--bitx-black-rgb), 0.12);
   padding: 0.5rem;
   min-width: 200px;
   margin-top: 0.5rem;
@@ -552,7 +560,7 @@
 
 /* Navbar appearance toggle */
 .VPNavBarAppearance {
-  flex: 0 0 auto;
+  flex: 0 0 auto !important;
   margin-left: 0 !important;
 }
 
@@ -567,7 +575,7 @@
 }
 
 .VPNavBarSearch #docsearch {
-  width: 400px;
+  width: 400px !important;
 }
 
 .VPNavBarSearch .DocSearch-Button {
@@ -625,10 +633,10 @@
 
 /* Logo Styling */
 .VPNavBarTitle .logo {
-  width: 42px;
-  height: 42px;
-  margin-right: 10px;
-  transition: transform 0.3s ease;
+  width: 42px !important;
+  height: 42px !important;
+  margin-right: 10px !important;
+  transition: transform 0.3s ease !important;
 }
 
 .VPNavBarTitle:hover .logo {
@@ -641,12 +649,13 @@
   color: var(--bitx-logo-text);
   letter-spacing: 0;
   white-space: nowrap;
+  /* background-color: red; */
 }
 
 /* Show search field properly */
 .VPNavBarSearch .DocSearch-Button-Placeholder {
   display: inline !important;
-  margin-left: 8px;
+  margin-left: 8px !important;
 }
 
 .VPNavBarTitle {
@@ -655,15 +664,20 @@
   gap: 0.5rem;
 }
 
+@media (min-width: 960px) {
+  .VPNav {
+    position: relative !important;
+  }
+}
 @media (max-width: 960px) {
   .VPNavBar {
     height: 64px;
     --vp-nav-height: 64px;
   }
 
-  .VPNavBar .wrapper {
+  /* .VPNavBar .wrapper {
     padding: 0 20px;
-  }
+  } */
 
   .VPNavBar .container,
   .VPNavBar.has-sidebar .container > .title {
@@ -702,7 +716,7 @@
 
 @media (max-width: 640px) {
   .VPNavBar .wrapper {
-    padding: 0 16px;
+    /* padding: 0 16px !important; */
   }
 
   .VPNavBarSearch {
@@ -727,6 +741,7 @@
 .VPSidebar {
   background: var(--vp-c-bg-soft);
   border-right: 1px solid var(--bitx-gray-200);
+  margin-top: 2%;
 }
 
 .dark .VPSidebar {
@@ -1419,6 +1434,7 @@ div[class*="language-"] code {
   position: relative;
   box-sizing: border-box;
   margin-top: 0;
+  overflow-x: hidden; /* belt & suspenders */
 }
 
 .bitxpay-footer .footer-container {
