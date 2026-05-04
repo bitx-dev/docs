@@ -163,7 +163,18 @@ body {
 }
 
 .dark .VPHero {
-  background-image: url("/icons/header-dark.svg");
+  background-image: url("/icons/header2.svg");
+    background-repeat: no-repeat;
+  background-position: right center; /* Keeps glow on the right */
+  background-size: contain; /* Prevents the 'zoomed in' look */
+
+  /* 2. Container setup */
+  height: 600px;
+  padding: 0 4rem; /* More horizontal breathing room */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Forces content to start on the left */
+
 }
 
 /* Grid pattern overlay */
