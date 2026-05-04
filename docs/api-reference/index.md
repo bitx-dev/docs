@@ -41,6 +41,16 @@ X-Timestamp: UNIX_TIMESTAMP
 | `GET` | `/payments` | List all payments |
 | `POST` | `/payments/:id/cancel` | Cancel a payment |
 
+### Subscriptions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/public/subscriptions/link/` | Create subscription link |
+| `GET` | `/public/subscriptions/link/{walletAddress}` | Get subscriptions by wallet |
+| `POST` | `/public/subscriptions/link/payment` | Record subscription payment |
+| `PUT` | `/public/subscriptions/link/{id}` | Update subscription link |
+| `GET` | `/public/subscriber/{id}` | Get subscriber details |
+| `PUT` | `/public/subscriber/{id}` | Update subscriber |
+
 ## Response Format
 
 All responses follow a consistent format:
