@@ -371,9 +371,9 @@ body {
 }
 
 .VPNavBarTitle .logo {
+  border-radius: 8px;
   width: 42px !important;
   height: 42px !important;
-  margin-right: 10px !important;
   transition: transform 0.3s ease !important;
 }
 
