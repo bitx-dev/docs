@@ -1,24 +1,31 @@
 /**
- * BITX UI Theme - Custom Styles
- * Based on bitxsl.com design system
+ * BITX UI Theme
+ * Variable-driven design system — no hardcoded colors anywhere.
+ * All dark-mode overrides live in the [data-theme="dark"] / .dark blocks.
  */
 
-:root {
-  /* Primary Brand Colors */
-  --bitx-primary: #040c17;
-  --bitx-primary-light: #040c17;
-  --bitx-primary-dark: #0f0f1a;
+/* ─────────────────────────────────────────────────────────
+   1. DESIGN TOKENS
+   ───────────────────────────────────────────────────────── */
 
-  /* Accent Colors */
+:root {
+  /* Brand */
   --bitx-accent: #00afca;
   --bitx-accent-hover: #2563eb;
   --bitx-accent-light: #60a5fa;
-
-  /* Gold/Premium Accent */
   --bitx-gold: #f59e0b;
   --bitx-gold-light: #fbbf24;
 
-  /* Neutral Colors */
+  /* Cyan scale */
+  --bitx-cyan: #06b6d4;
+  --bitx-cyan-deep: #0891b2;
+  --bitx-cyan-bright: #05c8f6;
+  --bitx-cyan-hover: #04abc8;
+  --bitx-cyan-dark: #009eb8;
+  --bitx-cyan-light: #67e8f9;
+  --bitx-cyan-stroke: #0093aa;
+
+  /* Neutral scale */
   --bitx-gray-50: #f9fafb;
   --bitx-gray-100: #f3f4f6;
   --bitx-gray-200: #e5e7eb;
@@ -29,92 +36,89 @@
   --bitx-gray-800: #1f2937;
   --bitx-gray-900: #111827;
 
-  /* UI Surface Colors */
-  --bitx-white: #ffffff;
-  --bitx-ink: #040c17;
-  --bitx-heading: #07111f;
-  --bitx-navy: #103149;
-  --bitx-muted-text: #3c4257;
-  --bitx-surface-subtle: #f6f8fb;
-  --bitx-surface-soft: #f4f7fb;
-  --bitx-surface-lavender: #f8f7ff;
-  --bitx-surface-lavender-strong: #e8e4ff;
-  --bitx-surface-violet: #c4b5fd;
-  --bitx-border-soft: #ebeef1;
-  --bitx-border-muted: #e3e8ef;
-  --bitx-border-control: #d1d5db;
-  --bitx-border-card: #e2e8f0;
-  --bitx-border-hover: #cfeef8;
-  --bitx-doc-link-hover-bg: #e8fbff;
-
-  /* Cyan Accent Colors */
-  --bitx-cyan: #06b6d4;
-  --bitx-cyan-deep: #0891b2;
-  --bitx-cyan-bright: #05c8f6;
-  --bitx-cyan-hover: #04abc8;
-  --bitx-cyan-dark: #009eb8;
-  --bitx-cyan-light: #67e8f9;
-  --bitx-cyan-stroke: #0093aa;
-  --bitx-nav-border: #14a8ff;
-  --bitx-nav-text: #09243b;
-  --bitx-nav-hover: #0ea5e9;
-  --bitx-search-border: #c9effa;
-  --bitx-search-hover-border: #7dd3fc;
-
-  /* Gradients */
-  --bitx-gradient-purple: #b94dff;
-  --bitx-gradient-cyan: #25c8ff;
-  --bitx-gradient-green: #80ef32;
-  --bitx-icon-gradient-purple: #8b5cf6;
-  --bitx-icon-gradient-blue: #3b82f6;
-  --bitx-icon-gradient-cyan: #06d6d9;
-  --bitx-feature-gradient-purple: #bb32ff;
-  --bitx-feature-gradient-cyan: #0fd6f5;
-  --bitx-feature-gradient-green: #7ce314;
-
-  /* Shadow RGB Values */
+  /* RGB channels (for rgba() usage only) */
+  --bitx-cyan-rgb: 6, 182, 212;
+  --bitx-accent-rgb: 59, 130, 246;
   --bitx-shadow-rgb: 15, 23, 42;
   --bitx-doc-shadow-rgb: 8, 26, 48;
-  --bitx-primary-rgb: 26, 26, 46;
-  --bitx-accent-rgb: 59, 130, 246;
-  --bitx-cyan-rgb: 6, 182, 212;
   --bitx-nav-hover-rgb: 14, 165, 233;
   --bitx-warning-rgb: 245, 158, 11;
   --bitx-error-rgb: 239, 68, 68;
-  --bitx-grid-purple-rgb: 147, 112, 219;
+  --bitx-grid-rgb: 147, 112, 219;
   --bitx-slate-rgb: 148, 163, 184;
   --bitx-blue-rgb: 96, 165, 250;
   --bitx-black-rgb: 0, 0, 0;
 
-  /* Dark Surfaces */
-  --bitx-section-dark: #0a0a0f;
-  --bitx-feature-card-dark: #0f1419;
-  --bitx-card-dark: #040c17;
-  --bitx-card-navbar: #040c17;
-
-  /* Navigation/Search */
-  --bitx-search-bg: #f7f9fc;
-  --bitx-search-placeholder: #7a86a0;
-  --bitx-logo-text: #050b18;
-
-  /* Semantic Colors */
+  /* Semantic */
   --bitx-success: #10b981;
   --bitx-warning: #f59e0b;
   --bitx-error: #ef4444;
   --bitx-info: #3b82f6;
 
-  /* VitePress Theme Overrides */
+  /* ── Semantic surface tokens (light mode) ── */
+  --bitx-bg: #ffffff;
+  --bitx-bg-soft: #f9fafb;
+  --bitx-bg-mute: #f3f4f6;
+  --bitx-bg-dark: #0a0a0f; /* feature sections */
+  --bitx-bg-feature-card: #0f1419;
+  --bitx-bg-card: #040c17;
+
+  --bitx-text-primary: #111827;
+  --bitx-text-secondary: #374151;
+  --bitx-text-muted: #4b5563;
+
+  --bitx-border: #ebeef1;
+  --bitx-border-muted: #e3e8ef;
+  --bitx-border-control: #d1d5db;
+  --bitx-border-card: #e2e8f0;
+  --bitx-border-hover: #cfeef8;
+
+  --bitx-nav-bg: #ffffff;
+  --bitx-nav-text: #09243b;
+  --bitx-nav-hover: #0ea5e9;
+  --bitx-nav-border: #14a8ff;
+
+  --bitx-search-bg: #f7f9fc;
+  --bitx-search-placeholder: #7a86a0;
+  --bitx-search-border: #c9effa;
+  --bitx-search-hover-border: #7dd3fc;
+
+  --bitx-sidebar-bg: var(--bitx-bg-soft);
+  --bitx-sidebar-border: var(--bitx-gray-200);
+
+  --bitx-footer-bg: #040c17;
+  --bitx-footer-text: #cbd6e2;
+  --bitx-footer-label: #909faf;
+  --bitx-footer-social: #103149;
+
+  --bitx-doc-link-hover-bg: #e8fbff;
+  --bitx-inline-code-bg: #ffffff;
+  --bitx-pre-bg: #ffffff;
+  --bitx-line-numbers-bg: #e6e7ea;
+  --bitx-line-numbers-color: inherit;
+  --bitx-pager-border: var(--bitx-border-card);
+
+  /* Gradient stops */
+  --bitx-grad-purple: #b94dff;
+  --bitx-grad-cyan: #25c8ff;
+  --bitx-grad-green: #80ef32;
+  --bitx-icon-grad-purple: #8b5cf6;
+  --bitx-icon-grad-blue: #3b82f6;
+  --bitx-icon-grad-cyan: #06d6d9;
+  --bitx-feat-grad-purple: #bb32ff;
+  --bitx-feat-grad-cyan: #0fd6f5;
+  --bitx-feat-grad-green: #7ce314;
+
+  /* ── VitePress overrides ── */
   --vp-c-brand-1: var(--bitx-accent);
   --vp-c-brand-2: var(--bitx-accent-hover);
   --vp-c-brand-3: var(--bitx-accent-light);
-
-  --vp-c-bg: var(--bitx-white);
-  --vp-c-bg-soft: var(--bitx-gray-50);
-  --vp-c-bg-mute: var(--bitx-gray-100);
-
-  --vp-c-text-1: var(--bitx-gray-900);
-  --vp-c-text-2: var(--bitx-gray-700);
-  --vp-c-text-3: var(--bitx-gray-600);
+  --vp-c-bg: var(--bitx-bg);
+  --vp-c-bg-soft: var(--bitx-bg-soft);
+  --vp-c-bg-mute: var(--bitx-bg-mute);
+  --vp-c-text-1: var(--bitx-text-primary);
+  --vp-c-text-2: var(--bitx-text-secondary);
+  --vp-c-text-3: var(--bitx-text-muted);
 
   /* Typography */
   --vp-font-family-base:
@@ -124,20 +128,56 @@
     "JetBrains Mono", "Fira Code", Consolas, Monaco, "Courier New", monospace;
 }
 
-/* Dark Mode */
+/* ─────────────────────────────────────────────────────────
+   2. DARK-MODE TOKEN OVERRIDES
+   ───────────────────────────────────────────────────────── */
+
 .dark {
-  --vp-c-bg: var(--bitx-primary);
-  --vp-c-bg-soft: var(--bitx-primary-light);
-  --vp-c-bg-mute: var(--bitx-primary-dark);
+  --bitx-bg: #040c17;
+  --bitx-bg-soft: #040c17;
+  --bitx-bg-mute: #0f0f1a;
 
-  --vp-c-text-1: var(--bitx-gray-50);
-  --vp-c-text-2: var(--bitx-gray-200);
-  --vp-c-text-3: var(--bitx-gray-300);
+  --bitx-text-primary: #f9fafb;
+  --bitx-text-secondary: #e5e7eb;
+  --bitx-text-muted: #d1d5db;
 
+  --bitx-border: #103149;
+  --bitx-border-muted: #103149;
+  --bitx-border-control: #103149;
+  --bitx-border-card: #103149;
+
+  --bitx-nav-bg: #040c17;
+  --bitx-nav-text: #f9fafb;
+
+  --bitx-search-bg: #091a26;
+  --bitx-search-placeholder: #7c8298;
+  --bitx-search-border: rgba(0, 217, 255, 0.15);
+  --bitx-search-hover-border: var(--bitx-accent);
+
+  --bitx-sidebar-bg: #040c17;
+  --bitx-sidebar-border: #103149;
+
+  --bitx-doc-link-hover-bg: rgba(var(--bitx-cyan-rgb), 0.14);
+  --bitx-inline-code-bg: #000000;
+  --bitx-pre-bg: #000000;
+  --bitx-line-numbers-bg: #091a26;
+  --bitx-line-numbers-color: #6a7282;
+  --bitx-pager-border: #103149;
+
+  --vp-c-bg: var(--bitx-bg);
+  --vp-c-bg-soft: var(--bitx-bg-soft);
+  --vp-c-bg-mute: var(--bitx-bg-mute);
+  --vp-c-text-1: var(--bitx-text-primary);
+  --vp-c-text-2: var(--bitx-text-secondary);
+  --vp-c-text-3: var(--bitx-text-muted);
   --vp-c-brand-1: var(--bitx-accent);
   --vp-c-brand-2: var(--bitx-accent);
   --vp-c-brand-3: var(--bitx-accent-hover);
 }
+
+/* ─────────────────────────────────────────────────────────
+   3. BASE
+   ───────────────────────────────────────────────────────── */
 
 html,
 body {
@@ -146,52 +186,445 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Hero Section Styling - Figma gradient left-to-right */
-.VPHero {
-  /* 1. Background setup */
-  background-image: url("/icons/header.svg");
-  background-repeat: no-repeat;
-  background-position: right center; /* Keeps glow on the right */
-  background-size: contain; /* Prevents the 'zoomed in' look */
+/* Smooth transitions on all interactive props */
+* {
+  transition-property:
+    background-color, border-color, color, fill, stroke, opacity, box-shadow,
+    transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
 
-  /* 2. Container setup */
-  height: 600px;
-  padding: 0 4rem; /* More horizontal breathing room */
+/* ─────────────────────────────────────────────────────────
+   4. SCROLLBAR
+   ───────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bitx-bg-soft);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bitx-gray-300);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bitx-accent);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--bitx-bg);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--bitx-border);
+}
+
+/* ─────────────────────────────────────────────────────────
+   5. LAYOUT RESETS
+   ───────────────────────────────────────────────────────── */
+
+.VPHome {
+  min-height: auto !important;
+}
+.VPContent.is-home {
+  min-height: auto !important;
+  max-width: 100% !important;
+}
+.VPContent {
+  max-width: 100% !important;
+  padding-top: 120px !important;
+}
+.VPDoc .container {
+  max-width: 100% !important;
+}
+.curtain {
+  height: 0 !important;
+  margin-top: 0 !important;
+}
+
+.VPContent.is-home .vp-doc {
+  max-width: 100% !important;
+  padding-top: 90px !important;
+  display: flow-root;
+}
+
+.VPContent.is-home .vp-doc > h2:first-of-type {
+  margin-top: 0;
+}
+
+.dark .VPContent.is-home .vp-doc {
+  background: #091a26;
+}
+
+.VPFeatures,
+.popular-resources,
+.doc-sections {
+  width: 100% !important;
+}
+
+/* ─────────────────────────────────────────────────────────
+   6. NAVIGATION
+   ───────────────────────────────────────────────────────── */
+
+.VPNav {
+  background: var(--bitx-nav-bg) !important;
+  border-bottom-color: var(--bitx-border);
+  box-shadow: 0 1px 3px rgba(var(--bitx-black-rgb), 0.3);
+  --vp-nav-height: 84px !important;
+}
+
+.VPNavBar {
+  height: 84px !important;
+}
+
+.VPNavBar .wrapper {
+  padding: 0 56px !important;
+}
+
+.VPNavBar .container {
+  display: flex !important;
+  justify-content: flex-start !important;
+  max-width: none !important;
+  height: 84px !important;
+}
+
+.VPNavBar.has-sidebar .container > .title {
+  position: static;
+  width: auto;
+  height: 84px;
+  padding: 0;
+}
+
+.VPNavBar.has-sidebar .container {
+  justify-content: space-between;
+  display: flex;
+}
+
+.VPNavBar.has-sidebar .content {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+.dark .VPContent.has-sidebar {
+  background: #091a26;
+}
+
+.VPNavBar .content {
+  flex: 1 1 auto !important;
+}
+.VPNavBar .content-body {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  height: 84px !important;
+}
+
+/* Item ordering */
+.VPNavBar .menu {
+  order: 1;
+}
+.VPNavBar .search {
+  order: 2;
+}
+.VPNavBar .appearance {
+  order: 3;
+}
+.VPNavBar .social-links {
+  order: 4;
+}
+.VPNavBar .extra,
+.VPNavBar .hamburger {
+  order: 5;
+}
+
+/* Logo */
+.VPNavBarTitle {
+  height: 84px;
+  flex: 0 0 auto;
+  padding: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Forces content to start on the left */
+  gap: 0.5rem;
+}
+
+.VPNavBarTitle .logo {
+  width: 42px !important;
+  height: 42px !important;
+  margin-right: 10px !important;
+  transition: transform 0.3s ease !important;
+}
+
+.VPNavBarTitle:hover .logo {
+  transform: scale(1.05);
+}
+
+.VPNavBarTitle .title {
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--bitx-nav-text);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.dark .VPNavBarTitle .title {
+  color: var(--bitx-text-primary);
+}
+
+/* Menu links */
+.VPNavBarMenu {
+  display: flex !important;
+  align-items: center !important;
+  gap: 34px !important;
+  margin-left: 38px !important;
+  margin-right: auto !important;
+}
+
+.VPNavBarMenuLink {
+  padding: 0;
+  border-radius: 6px;
+  color: var(--bitx-nav-text);
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.dark .VPNavBarMenuLink {
+  color: var(--bitx-text-primary);
+}
+
+.VPNavBarMenuLink:hover {
+  background: transparent;
+  color: var(--bitx-nav-hover);
+}
+.dark .VPNavBarMenuLink:hover {
+  background: var(--bitx-bg-soft);
+  color: var(--bitx-accent-light);
+}
+
+.VPNavBarMenuLink.active {
+  color: var(--bitx-accent);
+  font-weight: 600;
+}
+.VPNavBarMenuLink.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 1rem;
+  right: 1rem;
+  height: 2px;
+  background: var(--bitx-accent);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Dropdown */
+.VPNavBarMenuGroup {
+  position: relative;
+}
+
+.VPNavBarMenuGroup .button {
+  padding: 0;
+  border-radius: 6px;
+  color: var(--bitx-nav-text);
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 84px;
+}
+
+.dark .VPNavBarMenuGroup .button {
+  color: var(--bitx-text-primary);
+}
+
+.VPNavBarMenuGroup .button:hover {
+  background: transparent;
+  color: var(--bitx-nav-hover);
+}
+.dark .VPNavBarMenuGroup .button:hover {
+  background: var(--bitx-bg-soft);
+  color: var(--bitx-accent-light);
+}
+
+.VPNavBarMenuGroup .items {
+  padding: 0.5rem;
+  min-width: 200px;
+  margin-top: 0.5rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+.dark .VPNavBarMenuGroup .items {
+  background: var(--bitx-bg-soft);
+}
+
+.VPNavBarMenuGroup .item {
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.VPNavBarMenuGroup .item:hover {
+  background: var(--bitx-bg-soft);
+  color: var(--bitx-accent);
+  transform: translateX(4px);
+}
+.dark .VPNavBarMenuGroup .item:hover {
+  background: var(--bitx-bg-mute);
+  color: var(--bitx-accent-light);
+}
+
+.dark .VPMenu {
+  border: 1px solid var(--bitx-border);
+  background-color: var(--bitx-bg);
+  box-shadow: var(--vp-shadow-3);
+  max-height: calc(100vh - var(--vp-nav-height));
+  overflow-y: auto;
+}
+
+/* Search */
+.VPNavBarSearch {
+  flex: 0 0 100px !important;
+  width: 400px !important;
+  max-width: 400px;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+.VPNavBarSearch #docsearch {
+  width: 400px !important;
+}
+
+.VPNavBarSearch .DocSearch-Button {
+  background: var(--bitx-search-bg);
+  border: 1px solid var(--bitx-search-border);
+  border-radius: 8px;
+  padding: 0 16px;
+  transition: all 0.2s ease;
+  width: 400px !important;
+  height: 44px;
+  justify-content: flex-start;
+  display: flex !important;
+  align-items: center !important;
+  box-shadow: none;
+}
+
+.VPNavBarSearch .DocSearch-Button-Container {
+  display: flex;
+  align-items: center;
+}
+
+.VPNavBarSearch .DocSearch-Button-Placeholder {
+  display: flex !important;
+  align-items: center !important;
+  color: var(--bitx-search-placeholder) !important;
+  font-size: 16px !important;
+  font-weight: 400;
+  margin-left: 8px !important;
+}
+
+.VPNavBarSearch .DocSearch-Button-Placeholder::before {
+  content: none;
+}
+.VPNavBarSearch .DocSearch-Button-Keys {
+  display: none !important;
+}
+
+.VPNavBarSearch .DocSearch-Button:hover {
+  background: var(--bitx-bg);
+  border-color: var(--bitx-search-hover-border);
+  box-shadow: 0 0 0 3px rgba(var(--bitx-nav-hover-rgb), 0.12);
+}
+
+.dark .VPNavBarSearch .DocSearch-Button .DocSearch-Search-Icon {
+  color: var(--bitx-search-placeholder) !important;
+}
+
+.dark .VPNavBarSearch .DocSearch-Button:hover {
+  background: var(--bitx-bg-mute);
+  border-color: var(--bitx-accent);
+  box-shadow: 0 2px 8px rgba(var(--bitx-accent-rgb), 0.25);
+}
+
+/* Theme toggle */
+.dark .VPSwitch {
+  border-radius: 11px;
+  display: block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+  border: 1px solid var(--bitx-border);
+  background-color: var(--bitx-search-bg);
+  transition: border-color 0.25s !important;
+}
+
+.dark .check {
+  background: var(--bitx-border);
+}
+
+.VPNavBarAppearance {
+  flex: 0 0 auto !important;
+  margin-left: 0 !important;
+}
+
+/* ─────────────────────────────────────────────────────────
+   7. SIDEBAR
+   ───────────────────────────────────────────────────────── */
+
+.VPSidebar {
+  background: var(--bitx-sidebar-bg);
+  border-right: 1px solid var(--bitx-sidebar-border);
+  margin-top: 2%;
+}
+
+.VPSidebarItem.is-active .link {
+  color: var(--bitx-accent);
+  font-weight: 600;
+}
+.VPSidebarItem .link:hover {
+  color: var(--bitx-accent);
+}
+.dark .VPSidebar {
+  background: var(--bitx-bg-card);
+}
+
+/* ─────────────────────────────────────────────────────────
+   8. HERO
+   ───────────────────────────────────────────────────────── */
+
+.VPHero {
+  background-image: url("/icons/header.svg");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain;
+  height: 600px;
+  padding: 0 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .dark .VPHero {
   background-image: url("/icons/header2.svg");
-  background-repeat: no-repeat;
-  background-position: right center; /* Keeps glow on the right */
-  background-size: contain; /* Prevents the 'zoomed in' look */
-
-  /* 2. Container setup */
-  height: 600px;
-  padding: 0 4rem; /* More horizontal breathing room */
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* Forces content to start on the left */
 }
 
-/* Grid pattern overlay */
 .VPHero::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-image:
-    linear-gradient(
-      rgba(var(--bitx-grid-purple-rgb), 0.08) 1px,
-      transparent 1px
-    ),
+    linear-gradient(rgba(var(--bitx-grid-rgb), 0.08) 1px, transparent 1px),
     linear-gradient(
       90deg,
-      rgba(var(--bitx-grid-purple-rgb), 0.08) 1px,
+      rgba(var(--bitx-grid-rgb), 0.08) 1px,
       transparent 1px
     );
   background-size: 60px 60px;
@@ -211,28 +644,24 @@ body {
 }
 
 .VPHero .text {
-  color: var(--bitx-primary);
+  color: var(--bitx-text-primary);
   font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.1;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.5rem;
   max-width: 600px;
 }
 
-.dark .VPHero .text {
-  color: var(--bitx-white);
-}
-
 .VPHero .tagline {
-  color: var(--bitx-gray-600);
+  color: var(--bitx-text-muted);
   font-size: 1.1rem;
   line-height: 1.6;
-  margin: 0 0 2rem 0;
+  margin: 0 0 2rem;
   max-width: 500px;
 }
 
 .dark .VPHero .tagline {
-  color: var(--bitx-white);
+  color: var(--bitx-text-primary);
 }
 
 .VPHero .VPButtons {
@@ -242,14 +671,13 @@ body {
   margin-top: 1rem !important;
 }
 
-/* Button Styling - Figma style */
+/* Primary button */
 .VPButton.medium.brand {
   background: var(--bitx-cyan) !important;
   border: none !important;
-  color: var(--bitx-ink) !important;
+  color: var(--bitx-bg-card) !important;
   font-weight: 600 !important;
   font-size: 0.9rem !important;
-  /* padding: 0.5rem 1.2rem !important; */
   height: auto !important;
   min-height: 36px !important;
   border-radius: 6px !important;
@@ -267,12 +695,12 @@ body {
   box-shadow: 0 6px 20px 0 rgba(var(--bitx-cyan-rgb), 0.4) !important;
 }
 
+/* Secondary button */
 .VPButton.medium.alt {
   border: 1px solid var(--bitx-border-control) !important;
-  color: var(--bitx-ink) !important;
+  color: var(--bitx-text-primary) !important;
   background: transparent !important;
   font-weight: 600 !important;
-  font-size: 16 !important;
   height: auto !important;
   min-height: 36px !important;
   border-radius: 6px !important;
@@ -284,9 +712,7 @@ body {
 }
 
 .dark .VPButton.medium.alt {
-  border: 1px solid #103149 !important;
-  color: var(--bitx-white) !important;
-  background: transparent !important;
+  border-color: var(--bitx-border) !important;
 }
 
 .VPButton.medium.alt:hover {
@@ -294,11 +720,13 @@ body {
   transform: translateY(-2px) !important;
 }
 
-/* Feature Cards - Dark section per Figma */
+/* ─────────────────────────────────────────────────────────
+   9. FEATURE CARDS
+   ───────────────────────────────────────────────────────── */
+
 .VPFeatures {
   padding: 5rem 0;
-  margin-top: 0;
-  background: var(--bitx-card-dark);
+  background: var(--bitx-bg-dark);
   width: 100%;
   box-sizing: border-box;
 }
@@ -320,26 +748,25 @@ body {
   width: auto !important;
 }
 
-/* Gradient border effect for cards */
 .VPFeature {
   position: relative;
   border-radius: 24px;
   padding: 2px;
   background: linear-gradient(
     135deg,
-    var(--bitx-feature-gradient-purple) 0%,
-    var(--bitx-feature-gradient-cyan) 50%,
-    var(--bitx-feature-gradient-green) 100%
+    var(--bitx-feat-grad-purple) 0%,
+    var(--bitx-feat-grad-cyan) 50%,
+    var(--bitx-feat-grad-green) 100%
   );
   transition: all 0.3s ease;
-  border: 0px solid var(--vp-c-bg-soft) !important;
+  border: 0 solid transparent !important;
 }
 
 .VPFeature::before {
   content: "";
   position: absolute;
   inset: 1px;
-  background: var(--bitx-feature-card-dark);
+  background: var(--bitx-bg-feature-card);
   border-radius: 14px;
   z-index: 0;
 }
@@ -363,7 +790,7 @@ body {
   background: linear-gradient(
     135deg,
     var(--bitx-cyan) 0%,
-    var(--bitx-icon-gradient-purple) 100%
+    var(--bitx-icon-grad-purple) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -372,463 +799,31 @@ body {
 }
 
 .VPFeature .title {
-  color: var(--bitx-white);
+  color: var(--bitx-gray-50);
   font-weight: 600;
   font-size: 1.2rem;
   line-height: 1.3;
 }
-
 .VPFeature .details {
-  color: var(--bitx-white);
+  color: var(--bitx-gray-50);
   font-size: 0.95rem;
   line-height: 1.7;
   flex-grow: 1;
 }
 
-/* Navigation Bar - Clean white header per reference */
-.VPNav {
-  background: var(--bitx-white) !important;
-  border-bottom-color: var(--bitx-primary-light);
-  box-shadow: 0 1px 3px rgba(var(--bitx-black-rgb), 0.3);
-  --vp-nav-height: 84px !important;
-}
+/* ─────────────────────────────────────────────────────────
+   10. CODE BLOCKS
+   ───────────────────────────────────────────────────────── */
 
-.dark .VPNav {
-  background: #040c17 !important;
-  border-bottom-color: var(--bitx-primary-light);
-  box-shadow: 0 1px 3px rgba(var(--bitx-black-rgb), 0.3);
-}
-
-.VPNavBar {
-  height: 84px !important;
-}
-
-.VPNavBar .wrapper {
-  padding: 0 56px !important;
-}
-
-.VPNavBar .container {
-  display: flex !important;
-  justify-content: flex-start !important;
-  max-width: none !important;
-  height: 84px !important;
-  /* background: #091A26 !important; */
-}
-
-/* start when side bar */
-.VPNavBar.has-sidebar .container > .title {
-  position: static;
-  width: auto;
-  height: 84px;
-  padding: 0;
-}
-
-.VPNavBar.has-sidebar .container {
-  justify-content: space-between;
-  display: flex;
-}
-.VPNavBar.has-sidebar .content {
-  padding-right: 0px !important;
-  padding-left: 0px !important;
-}
-
-.dark .VPContent.has-sidebar {
-  background: #091a26;
-}
-
-/* end with side bar */
-
-.VPNavBar .content {
-  flex: 1 1 auto !important;
-}
-
-.VPNavBar .content-body {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  /* gap: 24px; */
-  height: 84px !important;
-}
-
-.VPNavBar .menu {
-  order: 1;
-}
-
-.VPNavBar .search {
-  order: 2;
-}
-
-.VPNavBar .appearance {
-  order: 3;
-}
-
-.VPNavBar .social-links {
-  order: 4;
-}
-
-.VPNavBar .extra,
-.VPNavBar .hamburger {
-  order: 5;
-}
-
-.dark .VPNavBarTitle .title {
-  color: var(--bitx-gray-50);
-}
-
-/* Navigation Menu Items */
-.VPNavBarMenu {
-  display: flex !important;
-  align-items: center !important;
-  gap: 34px !important;
-  margin-left: 38px !important;
-  margin-right: auto !important;
-}
-
-.VPNavBarTitle {
-  height: 84px;
-  flex: 0 0 auto;
-  padding: 0;
-}
-
-.VPNavBarMenuLink {
-  padding: 0;
-  border-radius: 6px;
-  color: var(--bitx-nav-text);
-  font-weight: 700;
-  font-size: 16px;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.VPNavBarMenuLink:hover {
-  background: transparent;
-  color: var(--bitx-nav-hover);
-}
-
-.dark .VPNavBarMenuLink:hover {
-  background: var(--bitx-primary-light);
-  color: var(--bitx-accent-light);
-}
-
-/* Active nav item */
-.VPNavBarMenuLink.active {
-  color: var(--bitx-accent);
-  font-weight: 600;
-}
-
-.VPNavBarMenuLink.active::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 1rem;
-  right: 1rem;
-  height: 2px;
-  background: var(--bitx-accent);
-  border-radius: 2px 2px 0 0;
-}
-
-/* Dropdown Menu Styling */
-.VPNavBarMenuGroup {
-  position: relative;
-}
-
-.VPNavBarMenuGroup .button {
-  padding: 0;
-  border-radius: 6px;
-  color: var(--bitx-nav-text);
-  font-weight: 700;
-  font-size: 16px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 84px;
-}
-
-.VPNavBarMenuGroup .button:hover {
-  background: transparent;
-  color: var(--bitx-nav-hover);
-}
-
-.dark .VPNavBarMenuGroup .button:hover {
-  background: var(--bitx-primary-light);
-  color: var(--bitx-accent-light);
-}
-
-/* Dropdown Content */
-.VPNavBarMenuGroup .items {
-  padding: 0.5rem;
-  min-width: 200px;
-  margin-top: 0.5rem;
-}
-
-.dark .VPNavBarMenuGroup .items {
-  background: var(--bitx-primary-light);
-  /* border-color: var(--bitx-primary-dark); */
-}
-
-.VPNavBarMenuGroup .item {
-  padding: 0.625rem 1rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.VPNavBarMenuGroup .item:hover {
-  background: var(--bitx-gray-50);
-  color: var(--bitx-accent);
-  transform: translateX(4px);
-}
-
-.dark .VPNavBarMenuGroup .item:hover {
-  background: var(--bitx-primary-dark);
-  color: var(--bitx-accent-light);
-}
-
-/* Navbar appearance toggle */
-.VPNavBarAppearance {
-  flex: 0 0 auto !important;
-  margin-left: 0 !important;
-}
-
-/* Search Bar Styling - reference design */
-.VPNavBarSearch {
-  flex: 0 0 100px !important;
-  width: 400px !important;
-  max-width: 400px;
-  margin-left: auto !important;
-  margin-right: 0 !important;
-  padding-left: 0 !important;
-}
-
-.VPNavBarSearch #docsearch {
-  width: 400px !important;
-}
-
-.VPNavBarSearch .DocSearch-Button {
-  background: var(--bitx-search-bg);
-  border: 1px solid var(--bitx-search-border);
-  border-radius: 8px;
-  padding: 0 16px;
-  transition: all 0.2s ease;
-  width: 400px !important;
-
-  height: 44px;
-  justify-content: flex-start;
-  display: flex !important;
-  align-items: center !important;
-  box-shadow: none;
-}
-
-.VPNavBarSearch .DocSearch-Button-Container {
-  display: flex;
-  align-items: center;
-}
-
-.VPNavBarSearch .DocSearch-Button-Placeholder {
-  display: flex !important;
-  align-items: center !important;
-  color: var(--bitx-search-placeholder) !important;
-  font-size: 16px !important;
-  font-weight: 400;
-}
-
-.VPNavBarSearch .DocSearch-Button-Keys {
-  display: none !important;
-}
-
-.VPNavBarSearch .DocSearch-Button-Placeholder::before {
-  content: none;
-}
-
-.VPNavBarSearch .DocSearch-Button:hover {
-  background: var(--bitx-white);
-  border-color: var(--bitx-search-hover-border);
-  box-shadow: 0 0 0 3px rgba(var(--bitx-nav-hover-rgb), 0.12);
-}
-
-.dark .VPNavBarSearch .DocSearch-Button {
-  background: #091a26;
-  border-color: #00d9ff26;
-}
-
-.dark .VPNavBarSearch .DocSearch-Button .DocSearch-Search-Icon {
-  color: #7c8298 !important;
-}
-
-.dark .VPNavBarSearch .DocSearch-Button-Placeholder {
-  color: #7c8298 !important;
-}
-
-.dark .VPNavBarSearch .DocSearch-Button:hover {
-  background: var(--bitx-primary-dark);
-  border-color: var(--bitx-accent);
-  box-shadow: 0 2px 8px rgba(var(--bitx-accent-rgb), 0.25);
-}
-
-/* Theme toggle */
-.dark .VPSwitch {
-  position: relative;
-  border-radius: 11px;
-  display: block;
-  width: 40px;
-  height: 22px;
-  flex-shrink: 0;
-  border: 1px solid #00d9ff26;
-  background-color: #091a26;
-  transition: border-color 0.25s !important;
-}
-.dark .check {
-  background: #00d9ff26;
-}
-
-/* Pager link */
-
-.dark .pager-link {
-  border: 1px solid #103149;
-  border-radius: 8px;
-}
-.dark .prev-next {
-  border-top: 1px solid #103149;
-}
-
-/* Logo Styling */
-.VPNavBarTitle .logo {
-  width: 42px !important;
-  height: 42px !important;
-  margin-right: 10px !important;
-  transition: transform 0.3s ease !important;
-}
-
-.VPNavBarTitle:hover .logo {
-  transform: scale(1.05);
-}
-
-.VPNavBarTitle .title {
-  font-weight: 800;
-  font-size: 24px;
-  color: var(--bitx-logo-text);
-  letter-spacing: 0;
-  white-space: nowrap;
-}
-
-/* Show search field properly */
-.VPNavBarSearch .DocSearch-Button-Placeholder {
-  display: inline !important;
-  margin-left: 8px !important;
-}
-
-.VPNavBarTitle {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-@media (max-width: 960px) {
-  .VPNavBar {
-    height: 64px;
-    --vp-nav-height: 64px;
-  }
-
-  /* .VPNavBar .wrapper {
-    padding: 0 20px;
-  } */
-
-  .VPNavBar .container,
-  .VPNavBar.has-sidebar .container > .title {
-    height: 64px;
-  }
-
-  .VPNavBarTitle {
-    height: 64px;
-  }
-
-  .VPNavBar .content-body {
-    height: 64px;
-    gap: 12px;
-  }
-
-  .VPNavBarMenu {
-    display: none;
-  }
-
-  .VPNavBarSearch {
-    flex-basis: 260px !important;
-    width: 260px !important;
-    min-width: 0;
-    max-width: 42vw;
-  }
-
-  .VPNavBarTitle .logo {
-    width: 34px;
-    height: 34px;
-  }
-
-  .VPNavBarTitle .title {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 640px) {
-  .VPNavBar .wrapper {
-    /* padding: 0 16px !important; */
-  }
-
-  .VPNavBarSearch {
-    width: auto !important;
-    min-width: 0;
-    flex-basis: auto !important;
-    max-width: none;
-  }
-
-  .VPNavBarSearch .DocSearch-Button {
-    width: 40px !important;
-    padding: 0;
-    justify-content: center;
-  }
-
-  .VPNavBarSearch .DocSearch-Button-Placeholder {
-    display: none !important;
-  }
-}
-
-/* Sidebar */
-.VPSidebar {
-  background: var(--vp-c-bg-soft);
-  border-right: 1px solid var(--bitx-gray-200);
-  margin-top: 2%;
-}
-
-.dark .VPSidebar {
-  border-right-color: #103149;
-  background: #040c17;
-}
-
-.VPSidebarItem.is-active .link {
-  color: var(--bitx-accent);
-  font-weight: 600;
-}
-
-.VPSidebarItem .link:hover {
-  color: var(--bitx-accent);
-}
-
-/* Code Blocks */
 .vp-code-group {
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--bitx-gray-200);
-}
-.dark .vp-code-group .tabs {
-  background: #103149;
-  border-color: #103149;
+  border: 1px solid var(--bitx-border);
 }
 
-.dark .vp-code-group {
-  border-color: var(--bitx-primary-light);
+.dark .vp-code-group .tabs {
+  background: var(--bitx-border);
+  border-color: var(--bitx-border);
 }
 
 div[class*="language-"] {
@@ -842,10 +837,8 @@ div[class*="language-"] code {
   line-height: 1.6;
 }
 
-/* Inline Code */
 .vp-doc code {
-  background: #ffffff;
-  /* color: #3b82f6 !important; */
+  background: var(--bitx-inline-code-bg);
   padding: 0.2em 0.4em;
   border-radius: 4px;
   font-size: 0.9em;
@@ -853,7 +846,7 @@ div[class*="language-"] code {
 }
 
 .dark .vp-doc code {
-  background: #000000;
+  color: var(--bitx-accent-light);
 }
 
 .vp-doc [class*="language-"] pre {
@@ -862,23 +855,14 @@ div[class*="language-"] code {
   margin: 0;
   padding: 20px 0;
   background: transparent;
-  background-color: #ffffff;
+  background-color: var(--bitx-pre-bg);
   overflow-x: auto;
-}
-
-.dark .vp-doc [class*="language-"] pre {
-  background-color: #000000;
 }
 
 .vp-doc div[class*="language-"],
 .vp-block {
   border-radius: 8px;
-  border: 1px solid #dbe0f0;
-}
-
-.dark .vp-doc div[class*="language-"],
-.vp-block {
-  border: 1px solid #103149;
+  border: 1px solid var(--bitx-border);
 }
 
 .vp-doc div[class*="language-"].line-numbers-mode {
@@ -888,164 +872,157 @@ div[class*="language-"] code {
 
 .vp-doc .line-numbers-wrapper {
   border-right: 1px solid var(--vp-code-block-divider-color);
-  background-color: #e6e7ea;
+  background-color: var(--bitx-line-numbers-bg);
 }
+
 .dark .vp-doc .line-numbers-wrapper {
-  background-color: #091a26;
   padding: 20px !important;
-  color: #6a7282;
+  color: var(--bitx-line-numbers-color);
   font-size: 14px !important;
   align-items: center;
   text-align: center;
 }
 
-.dark .vp-doc code {
-  background: #000000;
-  color: var(--bitx-accent-light);
-}
+/* ─────────────────────────────────────────────────────────
+   11. TABLES
+   ───────────────────────────────────────────────────────── */
 
-/* Tables */
 table {
   width: 100%;
 }
+
 .vp-doc table {
   display: inline-table;
   border-radius: 8px;
   overflow: hidden;
   margin: 20px 0;
   width: 100% !important;
-}
-
-.dark .vp-doc table {
-  border-color: var(--bitx-primary-light);
+  border-color: var(--bitx-border);
 }
 
 .vp-doc th {
-  background: var(--bitx-gray-100);
-  color: var(--bitx-gray-900);
+  background: var(--bitx-bg-mute);
+  color: var(--bitx-text-primary);
   font-weight: 600;
 }
 
-.dark .vp-doc th {
-  background: var(--bitx-primary-light);
-  color: var(--bitx-gray-50);
-}
-
 .vp-doc tr:hover {
-  background: var(--bitx-gray-50);
+  background: var(--bitx-bg-soft);
 }
 
-.dark .vp-doc tr:hover {
-  background: var(--bitx-primary-dark);
-}
+/* ─────────────────────────────────────────────────────────
+   12. CUSTOM CONTAINERS
+   ───────────────────────────────────────────────────────── */
 
-/* Custom Containers (Tips, Warnings, etc.) */
 .vp-doc .custom-block.tip {
   border-color: var(--bitx-info);
   background: rgba(var(--bitx-accent-rgb), 0.05);
 }
-
 .vp-doc .custom-block.warning {
   border-color: var(--bitx-warning);
   background: rgba(var(--bitx-warning-rgb), 0.05);
 }
-
 .vp-doc .custom-block.danger {
   border-color: var(--bitx-error);
   background: rgba(var(--bitx-error-rgb), 0.05);
 }
-
 .vp-doc .custom-block.info {
   border-color: var(--bitx-accent);
   background: rgba(var(--bitx-accent-rgb), 0.05);
 }
 
-/* Links */
+/* ─────────────────────────────────────────────────────────
+   13. TYPOGRAPHY (doc pages)
+   ───────────────────────────────────────────────────────── */
+
 .vp-doc a {
   color: var(--bitx-accent);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
-
 .vp-doc a:hover {
   color: var(--bitx-accent-hover);
   text-decoration: underline;
 }
 
-/* Headings */
 .vp-doc h1 {
-  color: var(--bitx-primary);
+  color: var(--bitx-text-primary);
   font-weight: 800;
   border-bottom: 2px solid var(--bitx-accent);
   padding-bottom: 0.5rem;
 }
 
-.dark .vp-doc h1 {
-  color: var(--bitx-gray-50);
-}
-
 .vp-doc h2 {
-  color: var(--bitx-gray-900);
+  color: var(--bitx-text-primary);
   font-weight: 700;
-  border-bottom: 1px solid var(--bitx-gray-200);
+  /* border-bottom: 1px solid var(--bitx-border); */
   padding-bottom: 0.3rem;
   font-size: 24px !important;
-}
-
-.dark .vp-doc h2 {
-  color: var(--bitx-gray-100);
-  border-bottom-color: var(--bitx-primary-light);
+  margin: 68px 0 8px;
+  border-top: none !important;
+  padding-top: 0;
 }
 
 .vp-doc h3 {
-  color: var(--bitx-gray-800);
+  color: var(--bitx-text-secondary);
   font-weight: 600;
 }
 
-.dark .vp-doc h3 {
-  color: var(--bitx-gray-200);
+/* Home page h2 overrides */
+.VPContent.is-home .vp-doc h2 {
+  font-size: 38px !important;
+  line-height: 1.2;
+  font-weight: 800;
 }
 
-/* Footer */
-.VPFooter {
-  background: var(--bitx-primary);
-  color: var(--bitx-gray-200);
-  border-top: 1px solid var(--bitx-primary-light);
-  padding: 0 !important;
+.VPContent.is-home .vp-doc .doc-overview h2 {
+  margin: 0 0 92px;
+  padding: 0;
+  border: 0;
+  color: var(--bitx-text-primary);
+  font-size: 40px !important;
+  line-height: 1.15;
 }
 
-.VPFooter a {
-  color: var(--bitx-accent-light);
+/* ─────────────────────────────────────────────────────────
+   14. PAGER / PREV-NEXT
+   ───────────────────────────────────────────────────────── */
+
+.dark .pager-link {
+  border: 1px solid var(--bitx-pager-border);
+  border-radius: 8px;
+}
+.dark .prev-next {
+  border-top: 1px solid var(--bitx-pager-border);
 }
 
-.VPFooter a:hover {
-  color: var(--bitx-gold-light);
-}
+/* ─────────────────────────────────────────────────────────
+   15. BADGES
+   ───────────────────────────────────────────────────────── */
 
-/* Badge Styling */
 .vp-badge {
   background: var(--bitx-accent);
-  color: var(--bitx-white);
+  color: var(--bitx-bg);
   padding: 0.2em 0.6em;
   border-radius: 12px;
   font-size: 0.85em;
   font-weight: 600;
 }
-
 .vp-badge.tip {
   background: var(--bitx-info);
 }
-
 .vp-badge.warning {
   background: var(--bitx-warning);
 }
-
 .vp-badge.danger {
   background: var(--bitx-error);
 }
 
-/* Popular Resources Section */
+/* ─────────────────────────────────────────────────────────
+   16. POPULAR RESOURCES
+   ───────────────────────────────────────────────────────── */
+
 .popular-resources-section {
   gap: 20px !important;
 }
@@ -1055,15 +1032,11 @@ table {
 
 .doc-resources-title {
   margin: 0 !important;
-  color: var(--bitx-ink) !important;
+  color: var(--bitx-text-primary) !important;
   font-size: 32px !important;
   font-weight: 600 !important;
   line-height: 1.15;
   text-align: center;
-}
-
-.dark .doc-resources-title {
-  color: var(--bitx-white) !important;
 }
 
 .popular-resources {
@@ -1086,12 +1059,11 @@ table {
   gap: 34px;
   height: 166px;
   padding: 46px 43px 21px 21px;
-  background: var(--bitx-white);
-  border: 2px solid var(--bitx-border-soft);
+  background: var(--bitx-bg);
+  border: 2px solid var(--bitx-border);
   border-radius: 17px;
   text-decoration: none;
   cursor: pointer;
-  text-align: center;
   position: relative;
   box-shadow: 0 1px 1px rgba(var(--bitx-shadow-rgb), 0.02);
   z-index: 1;
@@ -1101,49 +1073,31 @@ table {
     border-color 0.55s ease,
     box-shadow 0.8s ease,
     background-color 0.55s ease,
-    color 0.55s ease,
     padding 0.8s cubic-bezier(0.22, 1, 0.36, 1),
     min-height 0.8s cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.dark .resource-card {
-  background: #040c17 !important;
-  box-shadow: 0 1px 1px rgba(#00afca, 0.02) !important;
-  border: 1px solid #103149 !important;
 }
 
 .vp-doc .resource-card,
 .vp-doc .resource-card:hover,
 .vp-doc .resource-card:focus,
-.vp-doc .resource-card:focus-visible {
-  text-decoration: none;
-}
-
+.vp-doc .resource-card:focus-visible,
 .vp-doc .resource-card *,
 .vp-doc .resource-card:hover * {
   text-decoration: none;
 }
 
 .resource-card:hover {
-  border-color: #00afca;
+  border-color: var(--bitx-accent);
   box-shadow: 0 24px 80px rgba(var(--bitx-cyan-rgb), 0.18);
   transform: translateY(-10px) scale(1.025);
-  text-decoration: none;
 }
 
 .dark .resource-card:hover {
-  border-color: #103149 !important;
+  border-color: var(--bitx-accent) !important;
   box-shadow:
-    0 0 27.87px #12658040,
-    0 0 195px #12658040,
-    0 0 25px #12658040;
-  border: 1px solid #00afca !important;
-  transform: translateY(-10px) scale(1.025);
-  text-decoration: none;
-}
-
-.dark .resource-card {
-  background: #040c17 !important;
+    0 0 28px rgba(18, 101, 128, 0.25),
+    0 0 195px rgba(18, 101, 128, 0.25);
 }
 
 .resource-icon {
@@ -1158,7 +1112,7 @@ table {
   height: 64px;
   border: 1px solid var(--bitx-border-muted);
   border-radius: 50%;
-  background: var(--bitx-surface-subtle);
+  background: var(--bitx-bg-soft);
   color: var(--bitx-cyan);
   font-size: 26px;
   line-height: 1;
@@ -1172,20 +1126,10 @@ table {
     box-shadow 0.8s ease,
     transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .dark .resource-icon {
-  position: absolute;
-  top: -32px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border: 2px solid #040c17 !important;
-  border-radius: 50%;
-  background: #040c17;
-  box-shadow: 0 10px 24px rgba(var(--bitx-shadow-rgb), 0.04);
+  border: 2px solid var(--bitx-border) !important;
+  background: var(--bitx-bg);
 }
 
 .resource-icon img {
@@ -1197,7 +1141,7 @@ table {
 }
 
 .resource-card:hover .resource-icon {
-  border: 1px solid #00afca !important;
+  border: 1px solid var(--bitx-accent) !important;
   box-shadow: 0 18px 46px rgba(var(--bitx-cyan-rgb), 0.12);
   transform: translateX(-50%) translateY(-4px);
 }
@@ -1215,30 +1159,25 @@ table {
 }
 
 .resource-content h4 {
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
   font-size: 24px;
   font-weight: 600;
-  color: var(--bitx-ink);
+  color: var(--bitx-text-primary);
+  text-decoration: none;
   transition:
     color 0.55s ease,
     font-size 0.8s cubic-bezier(0.22, 1, 0.36, 1),
     margin 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-  text-decoration: none;
 }
 
 .resource-card:hover .resource-content h4 {
   color: var(--bitx-cyan-hover);
-  text-decoration: none;
-}
-
-.dark .resource-content h4 {
-  color: var(--bitx-gray-50);
 }
 
 .resource-content p {
   margin: 0;
   font-size: 17px;
-  color: var(--bitx-muted-text);
+  color: var(--bitx-text-muted);
   line-height: 1.18;
   transition:
     color 0.55s ease,
@@ -1246,19 +1185,28 @@ table {
 }
 
 .dark .resource-content p {
-  color: var(--bitx-gray-300);
+  color: var(--bitx-text-secondary);
 }
 
-/* Documentation Overview */
+/* ─────────────────────────────────────────────────────────
+   17. DOCUMENTATION OVERVIEW
+   ───────────────────────────────────────────────────────── */
+
 .doc-overview {
   width: 100%;
   padding: 3rem 12rem;
   box-sizing: border-box;
 }
 
+.dark .doc-overview {
+  background: #091a26 !important;
+}
+.dark .doc-overview h2 {
+  color: var(--bitx-text-primary) !important;
+}
+
 .doc-overview-title {
-  /* margin: 0 0 92px !important; */
-  color: var(--bitx-ink) !important;
+  color: var(--bitx-text-primary) !important;
   font-size: 32px !important;
   font-weight: 600 !important;
   line-height: 1.15;
@@ -1277,7 +1225,7 @@ table {
 .doc-card {
   padding: 32px;
   gap: 24px;
-  background: var(--bitx-white);
+  background: var(--bitx-bg);
   border: 1px solid var(--bitx-border-card);
   border-radius: 16px;
   box-shadow: 0 18px 48px rgba(var(--bitx-shadow-rgb), 0.03);
@@ -1298,9 +1246,9 @@ table {
   height: 5px;
   background: linear-gradient(
     90deg,
-    var(--bitx-gradient-purple) 0%,
-    var(--bitx-gradient-cyan) 48%,
-    var(--bitx-gradient-green) 100%
+    var(--bitx-grad-purple) 0%,
+    var(--bitx-grad-cyan) 48%,
+    var(--bitx-grad-green) 100%
   );
   opacity: 0;
   transform: scaleX(0);
@@ -1321,16 +1269,8 @@ table {
   transform: scaleX(1);
 }
 
-.dark .doc-overview {
-  background: #091a26 !important;
-}
-
-.dark .doc-overview h2 {
-  color: var(--bitx-white) !important;
-}
-
 .dark .doc-card {
-  background: var(--bitx-card-dark);
+  background: var(--bitx-bg-card);
   border-color: rgba(var(--bitx-slate-rgb), 0.16);
   box-shadow: none;
 }
@@ -1354,20 +1294,16 @@ table {
   width: 64px;
   height: 64px;
   border-radius: 8px;
-  background: var(--bitx-surface-soft);
-  color: transparent;
-  font-size: 0;
-  line-height: 1;
+  background: var(--bitx-bg-soft);
   flex: 0 0 auto;
 }
 
 .doc-icon::before {
-  color: transparent;
   background: linear-gradient(
     135deg,
-    var(--bitx-icon-gradient-purple) 8%,
-    var(--bitx-icon-gradient-blue) 45%,
-    var(--bitx-icon-gradient-cyan) 88%
+    var(--bitx-icon-grad-purple) 8%,
+    var(--bitx-icon-grad-blue) 45%,
+    var(--bitx-icon-grad-cyan) 88%
   );
   background-clip: text;
   -webkit-background-clip: text;
@@ -1377,57 +1313,36 @@ table {
 }
 
 .dark .doc-icon {
-  order: 2;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 8px;
-  background: #000000;
-  color: transparent;
-  font-size: 0;
-  line-height: 1;
-  flex: 0 0 auto;
+  background: var(--bitx-bg-dark);
 }
 
 .doc-card-header h3 {
   order: 1;
   margin: 0;
-  color: var(--bitx-ink) !important;
+  color: var(--bitx-text-primary) !important;
   font-size: 24px !important;
   font-weight: 600 !important;
-  letter-spacing: -4% !important;
   line-height: 1.15 !important;
-}
-
-.dark .doc-card-header h3 {
-  color: var(--bitx-white);
-}
-
-.doc-card-desc-container {
-  gap: 24px !important;
 }
 
 .doc-card-desc {
   max-width: 90%;
   min-height: 64px;
   margin: 0 0 22px;
-  color: var(--bitx-muted-text);
+  color: var(--bitx-text-muted);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.45;
 }
 
 .dark .doc-card-desc {
-  color: var(--bitx-white);
+  color: var(--bitx-text-primary);
 }
 
 .doc-links {
   display: grid;
   gap: 8px;
   list-style: none;
-  list-style-type: none;
   padding: 0;
   margin: 0;
 }
@@ -1441,7 +1356,6 @@ table {
   margin: 0;
   padding: 0;
 }
-
 .doc-links li::marker {
   content: "";
 }
@@ -1454,7 +1368,7 @@ table {
   padding: 0 15px 0 10px;
   width: 100%;
   border-radius: 8px;
-  color: var(--bitx-navy);
+  color: var(--bitx-text-secondary);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.25;
@@ -1480,9 +1394,6 @@ table {
   background: var(--bitx-doc-link-hover-bg);
   color: var(--bitx-cyan-dark);
   text-decoration: none;
-}
-
-.doc-links a:hover {
   transform: translateX(3px);
 }
 
@@ -1491,7 +1402,7 @@ table {
 }
 
 .dark .doc-links a {
-  color: var(--bitx-gray-100);
+  color: var(--bitx-text-primary);
 }
 
 .dark .doc-links a:hover {
@@ -1499,156 +1410,68 @@ table {
   color: var(--bitx-cyan-light);
 }
 
-.dark .doc-links a:hover::after {
-  transform: translateX(2px);
+/* ─────────────────────────────────────────────────────────
+   18. FOOTER
+   ───────────────────────────────────────────────────────── */
+
+.VPFooter {
+  background: var(--bitx-footer-bg);
+  color: var(--bitx-footer-text);
+  border-top: 1px solid var(--bitx-border);
+  padding: 0 !important;
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+.VPFooter a {
+  color: var(--bitx-accent-light);
+}
+.VPFooter a:hover {
+  color: var(--bitx-gold-light);
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bitx-gray-100);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--bitx-gray-300);
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--bitx-accent);
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: var(--bitx-primary);
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: var(--bitx-primary-light);
-}
-
-/* Remove min-height from home page to prevent empty space */
-.VPHome {
-  min-height: auto !important;
-}
-
-.VPContent.is-home {
-  min-height: auto !important;
-  max-width: 100% !important;
-}
-
-/* Override VitePress container for full-width sections */
-.VPContent {
-  max-width: 100% !important;
-  padding-top: 120px !important;
-}
-
-.VPContent.is-home .vp-doc {
-  max-width: 100% !important;
-  /* padding: 68px 0 0 !important; */
-  padding-top: 90px !important;
-  /* padding-bottom: 0px !important; */
-  display: flow-root;
-}
-
-.dark .VPContent.is-home .vp-doc {
-  background: #091a26 !important;
-}
-
-.VPContent.is-home .vp-doc > h2:first-of-type {
-  margin-top: 0;
-}
-
-.VPDoc .container {
-  max-width: 100% !important;
-}
-
-/* Constrain section content width */
-.VPFeatures,
-.popular-resources,
-.doc-sections {
-  width: 100% !important;
-}
-
-/* Section headings */
-.vp-doc h2 {
-  font-size: 38px;
-  line-height: 1.2;
-  font-weight: 800;
-  color: var(--bitx-gray-900);
-  margin: 68px 0 8px 0;
-  border-top: none !important;
-  border-bottom: none !important;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.VPContent.is-home .vp-doc .doc-overview h2 {
-  margin: 0 0 92px;
-  padding: 0;
-  border: 0;
-  color: var(--bitx-heading);
-  font-size: 40px;
-  line-height: 1.15;
-}
-
-/* Footer Global Styles - Home Page Only */
 .bitxpay-footer {
   width: 100vw;
   position: relative;
   box-sizing: border-box;
-  margin-top: 0;
-  overflow-x: hidden; /* belt & suspenders */
+  overflow-x: hidden;
 }
 
 .bitxpay-footer .footer-container {
   max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 4rem;
-  padding-right: 4rem;
+  margin: 0 auto;
+  padding: 0 4rem;
   box-sizing: border-box;
   justify-content: space-between;
 }
 
-/* Left: brand block */
 .footer-left {
   flex: 0 0 280px;
   max-width: 280px;
 }
+
 .footer-logo-container {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
 .footer-logo-container .footer-logo {
   margin-bottom: 2rem;
-}
-
-.footer-logo-container .footer-logo-img {
-  display: block;
 }
 
 .footer-left .footer-title {
   font-size: 28px;
   font-weight: 800;
-  color: #ffffff;
-  margin: 0 0 2rem 0;
+  color: var(--bitx-gray-50);
+  margin: 0 0 2rem;
 }
 
 .footer-description {
   font-size: 14px;
   font-weight: 400;
   line-height: 1.6;
-  color: #cbd6e2;
-  margin: 0 0 1.5rem 0;
+  color: var(--bitx-footer-text);
+  margin: 0 0 1.5rem;
 }
 
-/* Right: four link columns */
 .footer-right {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1660,30 +1483,20 @@ table {
 .bitxpay-footer .footer-heading {
   font-size: 14px;
   font-weight: 600;
-  color: #909faf;
-  margin: 0 0 1rem 0;
+  color: var(--bitx-footer-label);
+  margin: 0 0 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.bitxpay-footer .footer-links {
-  list-style: none;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 0;
-  margin: 0;
-}
-
-.footer-links a:hover {
-  color: #00afca;
-  padding-left: 4px;
-}
-
+.bitxpay-footer .footer-links,
 .footer-links {
   list-style: none;
   padding: 0;
   margin: 0;
+  color: var(--bitx-gray-50);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .footer-links li {
@@ -1691,11 +1504,18 @@ table {
 }
 
 .footer-links a {
-  color: #ffffff;
+  color: var(--bitx-gray-50);
   text-decoration: none;
   font-size: 0.9rem;
-  transition: color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    padding-left 0.2s ease;
   display: inline-block;
+}
+
+.footer-links a:hover {
+  color: var(--bitx-accent);
+  padding-left: 4px;
 }
 
 .footer-social a {
@@ -1705,171 +1525,20 @@ table {
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: #103149;
-  color: #ffffff;
+  background: var(--bitx-footer-social);
+  color: var(--bitx-gray-50);
   transition: all 0.3s ease;
 }
 
 .footer-social a:hover {
-  background: #00afca;
-  color: white;
+  background: var(--bitx-accent);
   transform: translateY(-2px);
 }
 
-/* Responsive Design */
-@media (max-width: 960px) {
-  .doc-sections {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px;
-  }
+/* ─────────────────────────────────────────────────────────
+   19. ANIMATIONS
+   ───────────────────────────────────────────────────────── */
 
-  .doc-overview {
-    padding: 58px 20px 88px;
-  }
-
-  .VPContent.is-home .vp-doc .doc-overview h2 {
-    margin-bottom: 52px;
-    font-size: 34px;
-  }
-
-  .doc-card {
-    min-height: 0;
-    padding: 32px 28px 30px;
-  }
-
-  .doc-card-header h3 {
-    font-size: 24px;
-  }
-
-  .doc-card-desc,
-  .doc-links a {
-    font-size: 15.5px;
-  }
-
-  .popular-resources {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 48px 24px;
-    padding-bottom: 88px;
-  }
-
-  .resource-content h4 {
-    font-size: 22px;
-  }
-
-  .resource-content p {
-    font-size: 18px;
-  }
-
-  .resource-card:hover {
-    min-height: 236px;
-    padding: 78px 24px 36px;
-  }
-
-  .resource-card:hover .resource-icon {
-    top: -52px;
-    width: 104px;
-    height: 104px;
-    font-size: 40px;
-  }
-
-  .resource-card:hover .resource-content h4 {
-    font-size: 34px;
-  }
-
-  .resource-card:hover .resource-content p {
-    font-size: 26px;
-  }
-}
-
-@media (max-width: 640px) {
-  .doc-sections {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-
-  .doc-overview {
-    padding: 44px 16px 68px;
-  }
-
-  .VPContent.is-home .vp-doc .doc-overview h2 {
-    margin-bottom: 34px;
-    font-size: 29px;
-  }
-
-  .popular-resources {
-    grid-template-columns: 1fr;
-    gap: 44px;
-    padding: 44px 16px 72px;
-  }
-
-  .VPHero {
-    padding: 2rem 1rem;
-  }
-
-  .resource-card {
-    min-height: 140px;
-    padding: 44px 20px 28px;
-  }
-
-  .resource-content h4 {
-    font-size: 21px;
-  }
-
-  .resource-content p {
-    font-size: 17px;
-  }
-
-  .resource-card:hover {
-    border-radius: 28px;
-    min-height: 220px;
-    padding: 72px 20px 34px;
-    transform: translateY(-8px);
-  }
-
-  .resource-card:hover .resource-icon {
-    top: -48px;
-    width: 96px;
-    height: 96px;
-    font-size: 36px;
-  }
-
-  .resource-card:hover .resource-content h4 {
-    margin-bottom: 18px;
-    font-size: 30px;
-  }
-
-  .resource-card:hover .resource-content p {
-    font-size: 23px;
-  }
-
-  .doc-card {
-    padding: 26px 22px 28px;
-  }
-
-  .doc-card-header {
-    margin-bottom: 22px;
-  }
-
-  .doc-icon {
-    width: 54px;
-    height: 54px;
-  }
-
-  .doc-icon::before {
-    font-size: 27px;
-  }
-
-  .doc-card-header h3 {
-    font-size: 22px;
-  }
-
-  .doc-card-desc {
-    min-height: 0;
-    margin-bottom: 18px;
-  }
-}
-
-/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -1905,34 +1574,21 @@ table {
   animation: fadeInUp 0.5s ease-out;
 }
 
-.VPNavBarMenuGroup .items {
-  animation: slideDown 0.2s ease-out;
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bitx-bg-soft) 0%,
+    var(--bitx-bg-mute) 50%,
+    var(--bitx-bg-soft) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
 }
 
-.dark .VPMenu {
-  border: 1px solid #103149;
-  background-color: #040c17;
-  box-shadow: var(--vp-shadow-3);
-  transition: background-color 0.5s;
-  max-height: calc(100vh - var(--vp-nav-height));
-  overflow-y: auto;
-}
+/* ─────────────────────────────────────────────────────────
+   20. FOCUS / ACCESSIBILITY
+   ───────────────────────────────────────────────────────── */
 
-.curtain {
-  height: 0px !important;
-  margin-top: 0px !important;
-}
-
-/* Smooth transitions for all interactive elements */
-* {
-  transition-property:
-    background-color, border-color, color, fill, stroke, opacity, box-shadow,
-    transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-/* Focus states for accessibility */
 .VPNavBarMenuLink:focus-visible,
 .VPNavBarMenuGroup .button:focus-visible,
 .VPNavBarMenuGroup .item:focus-visible {
@@ -1941,14 +1597,191 @@ table {
   border-radius: 8px;
 }
 
-/* Loading shimmer effect */
-.loading-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--bitx-gray-100) 0%,
-    var(--bitx-gray-200) 50%,
-    var(--bitx-gray-100) 100%
-  );
-  background-size: 1000px 100%;
-  animation: shimmer 2s infinite;
+/* ─────────────────────────────────────────────────────────
+   21. RESPONSIVE
+   ───────────────────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  .VPNav,
+  .VPNavBar,
+  .VPNavBar .container,
+  .VPNavBar.has-sidebar .container > .title,
+  .VPNavBarTitle,
+  .VPNavBar .content-body {
+    height: 64px;
+    --vp-nav-height: 64px;
+  }
+
+  .VPNavBarMenu {
+    display: none;
+  }
+
+  .VPNavBarSearch {
+    flex-basis: 260px !important;
+    width: 260px !important;
+    min-width: 0;
+    max-width: 42vw;
+  }
+
+  .VPNavBarTitle .logo {
+    width: 34px;
+    height: 34px;
+  }
+  .VPNavBarTitle .title {
+    font-size: 20px;
+  }
+
+  .doc-sections {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .doc-overview {
+    padding: 58px 20px 88px;
+  }
+
+  .VPContent.is-home .vp-doc .doc-overview h2 {
+    margin-bottom: 52px;
+    font-size: 34px !important;
+  }
+
+  .doc-card {
+    min-height: 0;
+    padding: 32px 28px 30px;
+  }
+  .doc-card-header h3 {
+    font-size: 24px;
+  }
+  .doc-card-desc,
+  .doc-links a {
+    font-size: 15.5px;
+  }
+
+  .popular-resources {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 24px;
+    padding-bottom: 88px;
+  }
+
+  .resource-content h4 {
+    font-size: 22px;
+  }
+  .resource-content p {
+    font-size: 18px;
+  }
+
+  .resource-card:hover {
+    min-height: 236px;
+    padding: 78px 24px 36px;
+  }
+
+  .resource-card:hover .resource-icon {
+    top: -52px;
+    width: 104px;
+    height: 104px;
+    font-size: 40px;
+  }
+
+  .resource-card:hover .resource-content h4 {
+    font-size: 34px;
+  }
+  .resource-card:hover .resource-content p {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 640px) {
+  .VPNavBarSearch {
+    width: auto !important;
+    min-width: 0;
+    flex-basis: auto !important;
+    max-width: none;
+  }
+
+  .VPNavBarSearch .DocSearch-Button {
+    width: 40px !important;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .VPNavBarSearch .DocSearch-Button-Placeholder {
+    display: none !important;
+  }
+
+  .doc-sections {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .doc-overview {
+    padding: 44px 16px 68px;
+  }
+
+  .VPContent.is-home .vp-doc .doc-overview h2 {
+    margin-bottom: 34px;
+    font-size: 29px !important;
+  }
+
+  .popular-resources {
+    grid-template-columns: 1fr;
+    gap: 44px;
+    padding: 44px 16px 72px;
+  }
+
+  .VPHero {
+    padding: 2rem 1rem;
+  }
+
+  .resource-card {
+    min-height: 140px;
+    padding: 44px 20px 28px;
+  }
+  .resource-content h4 {
+    font-size: 21px;
+  }
+  .resource-content p {
+    font-size: 17px;
+  }
+
+  .resource-card:hover {
+    border-radius: 28px;
+    min-height: 220px;
+    padding: 72px 20px 34px;
+    transform: translateY(-8px);
+  }
+
+  .resource-card:hover .resource-icon {
+    top: -48px;
+    width: 96px;
+    height: 96px;
+    font-size: 36px;
+  }
+
+  .resource-card:hover .resource-content h4 {
+    margin-bottom: 18px;
+    font-size: 30px;
+  }
+  .resource-card:hover .resource-content p {
+    font-size: 23px;
+  }
+
+  .doc-card {
+    padding: 26px 22px 28px;
+  }
+  .doc-card-header {
+    margin-bottom: 22px;
+  }
+  .doc-icon {
+    width: 54px;
+    height: 54px;
+  }
+  .doc-icon::before {
+    font-size: 27px;
+  }
+  .doc-card-header h3 {
+    font-size: 22px;
+  }
+  .doc-card-desc {
+    min-height: 0;
+    margin-bottom: 18px;
+  }
 }
