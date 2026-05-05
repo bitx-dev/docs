@@ -623,6 +623,13 @@ body {
 
 .dark .VPHero {
   background-image: url("/icons/header2.svg");
+  background-color: var(--bitx-bg-card);
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .VPHero::before {
