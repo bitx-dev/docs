@@ -1209,6 +1209,7 @@ table {
 
 .dark .doc-overview {
   background: #091a26 !important;
+  padding-bottom: 12rem;
 }
 .dark .doc-overview h2 {
   color: var(--bitx-text-primary) !important;
