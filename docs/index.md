@@ -16,22 +16,52 @@ hero:
       link: /api-reference/
 
 features:
-  - icon: 🌐
+  - icon:
+      src: /icons/multi-network.svg
+      alt: Multi-network support
+      width: 30
+      height: 30
+      wrap: true
     title: Multi-Network Support
     details: Accept payments across 16 blockchain networks including Bitcoin, Ethereum, Solana, and 13 EVM-compatible chains.
-  - icon: 🔒
+  - icon:
+      src: /icons/security.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Enterprise Security
     details: Bank-grade security with DSA/HMAC authentication, encrypted communications, and regulatory compliance.
-  - icon: ⚡
+  - icon:
+      src: /icons/realtime-settlement.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Real-Time Settlement
     details: Process payments 24/7 with instant on-chain confirmations and real-time webhook notifications.
-  - icon: 🏦
+  - icon:
+      src: /icons/self-custodial.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Self-Custodial
     details: Full ownership and control of your funds. No third-party custody—your keys, your crypto.
-  - icon: 💱
+  - icon:
+      src: /icons/crypto-to-fiat-bridge.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Crypto-to-Fiat Bridge
     details: Seamless conversion between cryptocurrencies and 30+ local currencies for global settlement.
-  - icon: 🛠️
+  - icon:
+      src: /icons/developer-first-api.svg
+      alt: Enterprise Security
+      width: 30
+      height: 30
+      wrap: true
     title: Developer-First APIs
     details: RESTful APIs, comprehensive SDKs, and detailed documentation for rapid integration.
 ---
@@ -40,19 +70,24 @@ features:
 import { withBase } from 'vitepress'
 </script>
 
-## Popular Resources
+<!-- ## Popular Resources -->
 
+<section class="popular-resources-section">
+<h2  class="doc-resources-title">Popular Resources</h2>
 <div class="popular-resources">
   <a :href="withBase('/get-started/quick-start')" class="resource-card">
-    <div class="resource-icon">⚡</div>
+    <div class="resource-icon">
+      <img :src="withBase('/icons/quick-start.svg')" alt="" />
+    </div>
     <div class="resource-content">
       <h4>Quick Start</h4>
       <p>Get up and running in 5 minutes</p>
     </div>
   </a>
-  
   <a :href="withBase('/get-started/authentication')" class="resource-card">
-    <div class="resource-icon">🔐</div>
+    <div class="resource-icon">
+      <img :src="withBase('/icons/authentication.svg')" alt="" />
+    </div>
     <div class="resource-content">
       <h4>Authentication</h4>
       <p>Secure your API integration</p>
@@ -60,7 +95,9 @@ import { withBase } from 'vitepress'
   </a>
   
   <a :href="withBase('/get-started/supported-networks')" class="resource-card">
-    <div class="resource-icon">🌐</div>
+    <div class="resource-icon">
+      <img :src="withBase('/icons/networks.svg')" alt="" />
+    </div>
     <div class="resource-content">
       <h4>Networks</h4>
       <p>16 supported blockchains</p>
@@ -68,23 +105,31 @@ import { withBase } from 'vitepress'
   </a>
   
   <a :href="withBase('/api-reference/payments')" class="resource-card">
-    <div class="resource-icon">💳</div>
+    <div class="resource-icon">
+      <img :src="withBase('/icons/payment-api.svg')" alt="" />
+    </div>
     <div class="resource-content">
       <h4>Payment API</h4>
       <p>Create and manage payments</p>
     </div>
   </a>
 </div>
+</section>
 
-## Documentation Overview
+<!-- Documentation Overview -->
+
+<section class="doc-overview" aria-labelledby="doc-overview-title">
+<h2 id="doc-overview-title" class="doc-overview-title">Documentation Overview</h2>
 
 <div class="doc-sections">
-
 <div class="doc-card">
   <div class="doc-card-header">
-    <span class="doc-icon">🚀</span>
+    <div class="doc-icon">
+      <img :src="withBase('/icons/introduction.svg')" alt="" />
+    </div>
     <h3>Get Started</h3>
   </div>
+  <div class="doc-card-desc-container">
   <p class="doc-card-desc">Everything you need to integrate BITXpay into your application</p>
   <ul class="doc-links">
     <li><a :href="withBase('/get-started/')">Introduction</a></li>
@@ -94,70 +139,93 @@ import { withBase } from 'vitepress'
     <li><a :href="withBase('/get-started/sdks-libraries')">SDKs & Libraries</a></li>
     <li><a :href="withBase('/get-started/webhooks')">Webhooks</a></li>
   </ul>
+  </div>
 </div>
 
 <div class="doc-card">
   <div class="doc-card-header">
-    <span class="doc-icon">📖</span>
+    <div class="doc-icon">
+      <img :src="withBase('/icons/api-reference.svg')" alt="" />
+    </div>
     <h3>API Reference</h3>
   </div>
-  <p class="doc-card-desc">Complete API documentation and endpoint references</p>
-  <ul class="doc-links">
-    <li><a :href="withBase('/api-reference/')">API Overview</a></li>
-    <li><a :href="withBase('/api-reference/authentication')">Authentication</a></li>
-    <li><a :href="withBase('/api-reference/payments')">Payment Links API</a></li>
-  </ul>
+  <div class="doc-card-desc-container">
+    <p class="doc-card-desc">Complete API documentation and endpoint references</p>
+    <ul class="doc-links">
+      <li><a :href="withBase('/api-reference/')">API Overview</a></li>
+      <li><a :href="withBase('/api-reference/authentication')">Authentication</a></li>
+      <li><a :href="withBase('/api-reference/payments')">Payment Links API</a></li>
+    </ul>
+  </div>
 </div>
 
 <div class="doc-card">
   <div class="doc-card-header">
-    <span class="doc-icon">🧪</span>
+    <div class="doc-icon">
+      <img :src="withBase('/icons/tools.svg')" alt="" />
+    </div>
     <h3>Testing & Tools</h3>
   </div>
-  <p class="doc-card-desc">Test your integration with our comprehensive tools</p>
-  <ul class="doc-links">
-    <li><a :href="withBase('/testing/')">Testing Overview</a></li>
-    <li><a :href="withBase('/testing/postman-setup')">Postman Setup</a></li>
-    <li><a :href="withBase('/testing/api-testing-tools')">API Testing Tools</a></li>
-    <li><a :href="withBase('/testing/troubleshooting')">Troubleshooting</a></li>
-  </ul>
+   <div class="doc-card-desc-container">
+      <p class="doc-card-desc">Test your integration with our comprehensive tools</p>
+      <ul class="doc-links">
+        <li><a :href="withBase('/testing/')">Testing Overview</a></li>
+        <li><a :href="withBase('/testing/postman-setup')">Postman Setup</a></li>
+        <li><a :href="withBase('/testing/api-testing-tools')">API Testing Tools</a></li>
+        <li><a :href="withBase('/testing/troubleshooting')">Troubleshooting</a></li>
+      </ul>
+   </div>
 </div>
 
 <div class="doc-card">
   <div class="doc-card-header">
-    <span class="doc-icon">🔒</span>
+    <div class="doc-icon">
+      <img :src="withBase('/icons/security-v2.svg')" alt="" />
+    </div>
     <h3>Security</h3>
   </div>
-  <p class="doc-card-desc">Security best practices and guidelines</p>
-  <ul class="doc-links">
-    <li><a :href="withBase('/security/')">Security Overview</a></li>
-    <li><a :href="withBase('/security/authentication')">Authentication Security</a></li>
-    <li><a :href="withBase('/security/best-practices')">Best Practices</a></li>
-  </ul>
+   <div class="doc-card-desc-container">
+      <p class="doc-card-desc">Security best practices and guidelines</p>
+      <ul class="doc-links">
+        <li><a :href="withBase('/security/')">Security Overview</a></li>
+        <li><a :href="withBase('/security/authentication')">Authentication Security</a></li>
+        <li><a :href="withBase('/security/best-practices')">Best Practices</a></li>
+      </ul>
+   </div>
 </div>
 
 <div class="doc-card">
   <div class="doc-card-header">
-    <span class="doc-icon">🔧</span>
+     <div class="doc-icon">
+      <img :src="withBase('/icons/integration.svg')" alt="" />
+    </div>
     <h3>Integration</h3>
   </div>
-  <p class="doc-card-desc">Integration guides and environment setup</p>
-  <ul class="doc-links">
-    <li><a :href="withBase('/integration/')">Integration Overview</a></li>
-    <li><a :href="withBase('/integration/webhooks')">Webhook Integration</a></li>
-    <li><a :href="withBase('/integration/environments')">Environments</a></li>
-  </ul>
+   <div class="doc-card-desc-container">
+     <p class="doc-card-desc">Integration guides and environment setup</p>
+    <ul class="doc-links">
+      <li><a :href="withBase('/integration/')">Integration Overview</a></li>
+      <li><a :href="withBase('/integration/webhooks')">Webhook Integration</a></li>
+      <li><a :href="withBase('/integration/environments')">Environments</a></li>
+    </ul>
+  </div>
 </div>
 
 <div class="doc-card">
   <div class="doc-card-header">
-    <span class="doc-icon">🤝</span>
+     <div class="doc-icon">
+      <img :src="withBase('/icons/contribute.svg')" alt="" />
+    </div>
     <h3>Contribute</h3>
   </div>
-  <p class="doc-card-desc">Help us improve BITXpay documentation</p>
-  <ul class="doc-links">
-    <li><a :href="withBase('/contribution/')">Contribution Guidelines</a></li>
-  </ul>
+ <div class="doc-card-desc-container">
+    <p class="doc-card-desc">Help us improve BITXpay documentation</p>
+    <ul class="doc-links">
+     <li><a :href="withBase('/contribution/')">Contribution Guidelines</a></li>
+   </ul>
+  </div>
 </div>
 
 </div>
+
+</section>
