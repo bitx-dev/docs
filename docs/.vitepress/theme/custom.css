@@ -254,6 +254,10 @@ body {
   padding-top: 90px !important;
   display: flow-root;
 }
+.vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code {
+  font-size: var(--vp-code-font-size);
+  color: var(--bitx-info);
+}
 
 .VPContent.is-home .vp-doc > h2:first-of-type {
   margin-top: 0;
@@ -1452,14 +1456,12 @@ table {
   overflow-x: hidden;
 }
 
-
 .bitxpay-footer .footer-container {
   max-width: 100%;
   margin: 0 auto;
   padding: 4rem 4rem;
   box-sizing: border-box;
   justify-content: space-between;
-
 }
 
 .footer-left {
