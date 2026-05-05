@@ -256,7 +256,15 @@ body {
 }
 .vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code {
   font-size: var(--vp-code-font-size);
+  background-color: #F5F7FA;
   color: var(--bitx-info);
+  font-size: 14px;
+}
+
+.dark .vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code {
+  font-size: var(--vp-code-font-size);
+  background-color: #091A26;
+  font-size: 14px;
 }
 
 .VPContent.is-home .vp-doc > h2:first-of-type {
