@@ -164,7 +164,7 @@ body {
 
 .dark .VPHero {
   background-image: url("/icons/header2.svg");
-    background-repeat: no-repeat;
+  background-repeat: no-repeat;
   background-position: right center; /* Keeps glow on the right */
   background-size: contain; /* Prevents the 'zoomed in' look */
 
@@ -174,7 +174,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-start; /* Forces content to start on the left */
-
 }
 
 /* Grid pattern overlay */
@@ -823,9 +822,15 @@ body {
   overflow: hidden;
   border: 1px solid var(--bitx-gray-200);
 }
+.dark .vp-code-group .tabs {
+  background: #103149;
+  border-color: #103149;
+
+}
 
 .dark .vp-code-group {
   border-color: var(--bitx-primary-light);
+
 }
 
 div[class*="language-"] {
@@ -888,15 +893,13 @@ div[class*="language-"] code {
   background-color: #e6e7ea;
 }
 .dark .vp-doc .line-numbers-wrapper {
-  background-color: #091A26;
+  background-color: #091a26;
   padding: 20px !important;
-  color: #6A7282;
+  color: #6a7282;
   font-size: 14px !important;
   align-items: center;
   text-align: center;
-  
 }
-
 
 .dark .vp-doc code {
   background: #000000;
@@ -989,6 +992,7 @@ table {
   font-weight: 700;
   border-bottom: 1px solid var(--bitx-gray-200);
   padding-bottom: 0.3rem;
+  font-size: 24px !important;
 }
 
 .dark .vp-doc h2 {
