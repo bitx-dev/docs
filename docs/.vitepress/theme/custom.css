@@ -254,6 +254,18 @@ body {
   padding-top: 90px !important;
   display: flow-root;
 }
+.vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code {
+  font-size: var(--vp-code-font-size);
+  background-color: #F5F7FA;
+  color: var(--bitx-info);
+  font-size: 14px;
+}
+
+.dark .vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code {
+  font-size: var(--vp-code-font-size);
+  background-color: #091A26;
+  font-size: 14px;
+}
 
 .VPContent.is-home .vp-doc > h2:first-of-type {
   margin-top: 0;
@@ -623,6 +635,13 @@ body {
 
 .dark .VPHero {
   background-image: url("/icons/header2.svg");
+  background-color: var(--bitx-bg-card);
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .VPHero::before {
@@ -1209,6 +1228,7 @@ table {
 
 .dark .doc-overview {
   background: #091a26 !important;
+  padding-bottom: 12rem;
 }
 .dark .doc-overview h2 {
   color: var(--bitx-text-primary) !important;
@@ -1444,14 +1464,12 @@ table {
   overflow-x: hidden;
 }
 
-
 .bitxpay-footer .footer-container {
   max-width: 100%;
   margin: 0 auto;
   padding: 4rem 4rem;
   box-sizing: border-box;
   justify-content: space-between;
-
 }
 
 .footer-left {

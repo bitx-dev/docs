@@ -61,7 +61,7 @@ export default defineConfig({
           { text: 'Troubleshooting', link: '/testing/troubleshooting' },
           { text: 'Contribute', link: '/contribution/' },
           { text: 'NPM Package', link: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTabt=readme' },
-          { text: 'Discord', link: 'https://discord.gg/bitxpay' }
+          { text: 'Telegram', link: 'https://telegram.me/bitxes' }
         ]
       }
     ],
