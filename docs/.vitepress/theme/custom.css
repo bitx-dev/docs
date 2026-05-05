@@ -228,6 +228,11 @@ body {
 .VPHome {
   min-height: auto !important;
 }
+.dark .VPHome {
+  background: #091a26 !important;
+  margin-bottom: 0px;
+}
+
 .VPContent.is-home {
   min-height: auto !important;
   max-width: 100% !important;
