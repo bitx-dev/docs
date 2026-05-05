@@ -1439,12 +1439,14 @@ table {
   overflow-x: hidden;
 }
 
+
 .bitxpay-footer .footer-container {
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 4rem;
+  padding: 30px 4rem;
   box-sizing: border-box;
   justify-content: space-between;
+
 }
 
 .footer-left {
