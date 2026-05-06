@@ -729,7 +729,7 @@ body {
     height: 34px !important;
   }
 
-  .VPNavBar .hamburger  .container {
+  .VPNavBar .hamburger .container {
     top: 22px;
     display: flex !important;
     justify-content: flex-start !important;
@@ -753,7 +753,7 @@ body {
     order: 5;
   }
 
-  .VPNavBar .hamburger  .container {
+  .VPNavBar .hamburger .container {
     top: 22px;
     display: flex !important;
     justify-content: flex-start !important;
@@ -872,6 +872,24 @@ body {
     background-position: right bottom;
     background-size: 50%;
     margin-top: 0px !important;
+
+    background-image: url("/icons/header.svg");
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: cover !important;
+  }
+
+  .dark .VPHero {
+    height: auto;
+    min-height: 480px;
+    padding: 0 2.5rem !important;
+    margin-top: 0px !important;
+
+    background-image: url("/icons/header2.svg") !important;
+    background-color: var(--bitx-bg-card) !important;
+    background-repeat: no-repeat !important;
+    background-position: right center !important;
+    background-size: cover !important;
   }
 
   .VPContent {
@@ -895,15 +913,22 @@ body {
     min-height: 420px;
     padding: 3rem 1.5rem;
     /* Push the illustration behind the text so it doesn't clash */
-    background-position: center bottom;
     background-size: 70%;
     align-items: flex-start;
     margin-top: 0px !important;
+
+    background-image: url("/icons/header.svg");
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: cover !important;
   }
 
   .dark .VPHero {
-    background-position: center bottom;
-    background-size: 70%;
+    background-image: url("/icons/header2.svg") !important;
+    background-color: var(--bitx-bg-card) !important;
+    background-repeat: no-repeat !important;
+    background-position: right center !important;
+    background-size: cover !important;
   }
 
   .VPHero .container {
@@ -912,7 +937,7 @@ body {
 
   .VPHero .text {
     font-size: 2.25rem;
-    max-width: 100%;
+    max-width: 70%;
     margin-bottom: 1rem;
   }
 
@@ -933,7 +958,22 @@ body {
     min-height: 360px;
     padding: 2rem 1rem;
     /* Hide the illustration at very small sizes to avoid overlap */
-    background-image: none;
+
+    background-image: url("/icons/header.svg");
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: cover !important;
+  }
+
+  .dark .VPHero {
+    min-height: 360px;
+    padding: 2rem 1rem;
+
+    background-image: url("/icons/header2.svg") !important;
+    background-color: var(--bitx-bg-card) !important;
+    background-repeat: no-repeat !important;
+    background-position: right center !important;
+    background-size: cover !important;
   }
 
   .VPHero .container {
@@ -947,6 +987,7 @@ body {
   .VPHero .text {
     font-size: 1.875rem;
     line-height: 1.2;
+    max-width: 100%;
   }
 
   .VPHero .tagline {
