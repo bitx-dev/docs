@@ -256,14 +256,14 @@ body {
 }
 .vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code {
   font-size: var(--vp-code-font-size);
-  background-color: #F5F7FA;
+  background-color: #f5f7fa;
   color: var(--bitx-info);
   font-size: 14px;
 }
 
 .dark .vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code {
   font-size: var(--vp-code-font-size);
-  background-color: #091A26;
+  background-color: #091a26;
   font-size: 14px;
 }
 
@@ -596,6 +596,171 @@ body {
   margin-left: 0 !important;
 }
 
+/* ── Tablet: 768px – 1023px ─────────────────────────── */
+@media (max-width: 1024px) {
+  .VPNav,
+  .VPNavBar,
+  .VPNavBar .container,
+  .VPNavBar.has-sidebar .container,
+  .VPNavBarTitle,
+  .VPNavBar .content-body,
+  .VPNavBarMenuGroup .button {
+    height: 64px !important;
+  }
+
+  .VPNavBar .wrapper {
+    padding: 0 24px !important;
+  }
+
+  .VPNavBarMenu {
+    gap: 20px !important;
+    margin-left: 20px !important;
+  }
+
+  .VPNavBarMenuLink,
+  .VPNavBarMenuGroup .button {
+    font-size: 14px;
+  }
+
+  /* Shrink search */
+  .VPNavBarSearch .DocSearch-Button-Placeholder {
+    /* display: none !important; */
+    font-size: 14px !important;
+  }
+
+  /* .VPNavBarSearch,
+  .VPNavBarSearch #docsearch,
+  .VPNavBarSearch .DocSearch-Button {
+    width: 200px !important;
+    max-width: 200px !important;
+  } */
+
+  .VPNavBarTitle .title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .VPNav,
+  .VPNavBar,
+  .VPNavBar .container,
+  .VPNavBar.has-sidebar .container,
+  .VPNavBarTitle,
+  .VPNavBar .content-body,
+  .VPNavBarMenuGroup .button {
+    height: 64px !important;
+  }
+
+  .VPNavBar .wrapper {
+    padding: 0 24px !important;
+  }
+
+  .VPNavBarMenu {
+    gap: 20px !important;
+    margin-left: 20px !important;
+  }
+
+  .VPNavBarMenuLink,
+  .VPNavBarMenuGroup .button {
+    font-size: 14px;
+  }
+
+  /* Shrink search */
+  .VPNavBarSearch .DocSearch-Button-Placeholder {
+    /* display: none !important; */
+    font-size: 14px !important;
+  }
+
+  .VPNavBarSearch,
+  .VPNavBarSearch #docsearch,
+  .VPNavBarSearch .DocSearch-Button {
+    width: 150px !important;
+    max-width: 150px !important;
+  }
+
+  .VPNavBarTitle .title {
+    font-size: 20px;
+  }
+}
+
+/* ── Mobile: ≤ 767px ────────────────────────────────── */
+@media (max-width: 767px) {
+  .VPNav,
+  .VPNavBar,
+  .VPNavBar .container,
+  .VPNavBar.has-sidebar .container,
+  .VPNavBarTitle,
+  .VPNavBar .content-body,
+  .VPNavBarMenuGroup .button {
+    height: 60px !important;
+  }
+
+  .VPNavBar .wrapper {
+    padding: 0 16px !important;
+  }
+
+  .VPNavBarMenu {
+    display: none !important;
+  }
+
+  /* Search collapses to icon-only button */
+  .VPNavBarSearch,
+  .VPNavBarSearch #docsearch,
+  .VPNavBarSearch .DocSearch-Button {
+    width: 44px !important;
+    max-width: 44px !important;
+    min-width: 44px !important;
+  }
+
+  .VPNavBarSearch .DocSearch-Button-Placeholder {
+    /* display: none !important; */
+  }
+
+  .VPNavBar .social-links {
+    margin-right: 4px;
+  }
+
+  .VPNavBarTitle .title {
+    font-size: 18px;
+  }
+
+  .VPNavBarTitle .logo {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .VPNavBar .hamburger  .container {
+    top: 22px;
+    display: flex !important;
+    justify-content: flex-start !important;
+    max-width: none !important;
+  }
+}
+
+/* ── Small mobile: ≤ 480px ──────────────────────────── */
+@media (max-width: 480px) {
+  .VPNavBar .wrapper {
+    padding: 0 12px !important;
+  }
+
+  .VPNavBarTitle .title {
+    /* display: none; */
+  }
+
+  .VPNavBar .extra,
+  .VPNavBar .hamburger {
+    display: flex;
+    order: 5;
+  }
+
+  .VPNavBar .hamburger  .container {
+    top: 22px;
+    display: flex !important;
+    justify-content: flex-start !important;
+    max-width: none !important;
+  }
+}
+
 /* ─────────────────────────────────────────────────────────
    7. SIDEBAR
    ───────────────────────────────────────────────────────── */
@@ -706,10 +871,11 @@ body {
     padding: 0 2.5rem !important;
     background-position: right bottom;
     background-size: 50%;
+    margin-top: 0px !important;
   }
 
   .VPContent {
-    padding-top: 4.5rem !important;
+    padding-top: 0rem !important;
   }
 
   .VPHero .text {
@@ -732,6 +898,7 @@ body {
     background-position: center bottom;
     background-size: 70%;
     align-items: flex-start;
+    margin-top: 0px !important;
   }
 
   .dark .VPHero {
@@ -932,7 +1099,6 @@ body {
   line-height: 1.7;
   flex-grow: 1;
 }
-
 
 /* ─── Tablet (≤ 1024px) ────────────────────────────────────── */
 @media (max-width: 1024px) {
