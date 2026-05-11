@@ -12,11 +12,11 @@ This is the complete API reference for BITXpay. All endpoints use HTTPS and retu
 ::: code-group
 
 ```text [Production]
-https://api.bitxpay.com/v1
+https://api.bitxpay.com/api/v1
 ```
 
 ```text [Sandbox]
-https://sandbox-api.bitxpay.com/v1
+https://sandboxapi.bitxpay.com/api/v1
 ```
 
 :::

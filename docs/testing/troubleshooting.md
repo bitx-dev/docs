@@ -405,8 +405,8 @@ Wrong: -----BEGIN RSA PRIVATE KEY-----
 
 ✅ **Verify base URL:**
 ```
-Sandbox: https://sandboxapi.bitxpay.com/api/v1
-Production: https://api.bitxpay.com/api/v1
+Sandbox: {{ $api.sandbox.baseUrl }}
+Production: {{ $api.production.baseUrl }}
 ```
 
 ✅ **Check firewall/proxy settings:**
@@ -540,7 +540,7 @@ Collect the following:
 
 ### 2. Contact Support
 
-**Email:** api-support@bitxpay.com
+**Email:** {{ $site.urls.support.email }}
 
 **Include:**
 - Detailed description of the issue
@@ -550,7 +550,7 @@ Collect the following:
 
 ### 3. Check Status Page
 
-**Status Page:** https://status.bitxpay.com
+<!-- **Status Page:** {{ $site.urls.support.statusPage }} -->
 
 Check for any ongoing incidents or maintenance.
 
@@ -564,6 +564,6 @@ Check for any ongoing incidents or maintenance.
 
 ## Support
 
-- **Email:** api-support@bitxpay.com
-- **Documentation:** https://docs.bitxpay.com
-- **Status Page:** https://status.bitxpay.com
+- **Email:** {{ $site.urls.support.email }}
+- **Documentation:** {{ $site.urls.support.documentation }}
+<!-- - **Status Page:** {{ $site.urls.support.statusPage }} -->

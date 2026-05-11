@@ -111,16 +111,16 @@ import { withBase } from "vitepress";
                 >Troubleshooting</a
               >
             </li>
-            <li>
+            <!-- <li>
               <a href="https://github.com/bitxpay/issues" target="_blank"
                 >Report Issues</a
               >
-            </li>
-            <li>
+            </li> -->
+            <!-- <li>
               <a href="https://discord.gg/bitxpay" target="_blank"
                 >Discord Community</a
               >
-            </li>
+            </li> -->
             <li><a href="mailto:support@bitxpay.com">Email Support</a></li>
             <li><a :href="withBase('/contribution/')">Contribute</a></li>
           </ul>

@@ -44,7 +44,7 @@ Keep your private key secure! Never commit it to version control or share it pub
 
 ### Production Environment
 
-**Base URL:** `https://api.bitxpay.com/api/v1`
+**Base URL:** `{{ $api.production.baseUrl }}`
 
 Production keys are available after account verification:
 
@@ -97,6 +97,6 @@ See the [Payment Links API Reference](/api-reference/payments) for detailed endp
 
 Need help with testing?
 
-- **Email:** api-support@bitxpay.com
-- **Documentation:** https://docs.bitxpay.com
-- **Status Page:** https://status.bitxpay.com
+- **Email:** {{ $site.urls.support.email }}
+- **Documentation:** {{ $site.urls.support.documentation }}
+<!-- - **Status Page:** {{ $site.urls.support.statusPage }} -->

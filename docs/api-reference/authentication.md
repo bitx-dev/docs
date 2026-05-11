@@ -27,7 +27,7 @@ Merchant-facing APIs use DSA (Digital Signature Algorithm) for enhanced security
 
 ### Obtaining Your Keys
 
-1. Log in to your [BITXpay Dashboard](https://dashboard.bitxpay.com)
+1. Log in to your [BITXpay Dashboard](https://sandbox.bitxpay.com/dashboard)
 2. Navigate to **Settings** → **API Keys**
 3. Generate your **Merchant API Key** and **Private Key**
 4. Store both securely - the private key is shown only once
@@ -105,7 +105,7 @@ const body = JSON.stringify({
 const signature = generateDSASignature(privateKey, method, path, timestamp, body);
 
 // Make request
-const response = await fetch(`https://api.bitxpay.com/api/v1${path}`, {
+const response = await fetch(`https://sandboxapi.bitxpay.com/api/v1${path}`, {
   method,
   headers: {
     'X-API-Key': apiKey,
@@ -172,7 +172,7 @@ signature = generate_dsa_signature(private_key, method, path, timestamp, body)
 
 # Make request
 response = requests.post(
-    f'https://api.bitxpay.com/api/v1{path}',
+    f'{{ $api.sandbox.baseUrl }}{path}',
     headers={
         'X-API-Key': api_key,
         'X-API-Signature': signature,
@@ -250,7 +250,7 @@ async function makeRequest(method, path, body = null) {
     .update(`${timestamp}${method}${path}${bodyString}`)
     .digest('hex');
 
-  const response = await fetch(`https://api.bitxpay.com/v1${path}`, {
+  const response = await fetch(`{{ $api.sandbox.baseUrl }}${path}`, {
     method,
     headers: {
       'Authorization': `Bearer ${apiKey}`,
@@ -304,7 +304,7 @@ def make_request(method, path, body=None):
 
     response = requests.request(
         method,
-        f'https://api.bitxpay.com/v1{path}',
+        f'{{ $api.sandbox.baseUrl }}{path}',
         headers=headers,
         json=body
     )

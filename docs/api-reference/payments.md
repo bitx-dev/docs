@@ -9,7 +9,7 @@ description: Create and manage payment links for accepting cryptocurrency paymen
 
 The Merchant API Payments endpoints allow you to create, manage, and retrieve payment links for accepting cryptocurrency payments. All endpoints require Merchant API Key authentication with DSA signature verification.
 
-**Base URL:** `https://api.bitxpay.com/payment_links`
+**Base URL:** `{{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }}`
 
 **Authentication:** Merchant API Key (Asymmetric DSA)
 
@@ -138,7 +138,7 @@ Some currencies like USDT and ETH are available on multiple networks (Ethereum, 
 #### Example Request
 
 ```bash
-curl --location 'https://api.bitxpay.com/api/v1/currencies?currency_type=string' \
+curl --location '{{ $api.sandbox.baseUrl }}{{ $api.endpoints.currencies }}?currency_type=string' \
   --header 'X-API-Key: btxm_live_xxxxxxxxxxxx' \
   --header 'X-API-Signature: <signature>' \
   --header 'X-API-Timestamp: 2026-01-31T12:00:00Z' \
@@ -284,7 +284,7 @@ The response structure varies based on the request parameters provided.
     "payment_name": "Invoice #12345",
     "amount": 100.5,
     "currency": "USDT",
-    "payment_url": "http://localhost:3000/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
     "payment_status": "processing",
     "payment_type": "one_time",
     "expires_at": "2026-03-13T15:21:12.988351519+05:00",
@@ -310,7 +310,7 @@ The response structure varies based on the request parameters provided.
     "description": "Payment for Order #12345",
     "amount": 100.5,
     "currency": "USDT",
-    "payment_url": "http://localhost:3000/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+    "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
     "payment_status": "processing",
     "payment_type": "one_time",
     "expires_at": "2026-02-01T12:00:00Z",
@@ -433,7 +433,7 @@ The response includes an array of payment links with varying detail levels based
         "description": "Payment for Order #12345",
         "amount": 100.5,
         "currency": "USDT",
-        "payment_url": "http://localhost:3000/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+        "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
         "payment_status": "processing",
         "payment_type": "one_time",
         "expires_at": "2026-02-01T12:00:00Z",
@@ -474,7 +474,7 @@ The response includes an array of payment links with varying detail levels based
         "payment_name": "Invoice #12345",
         "amount": 100.5,
         "currency": "USDT",
-        "payment_url": "http://localhost:3000/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+        "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
         "payment_status": "processing",
         "payment_type": "one_time",
         "expires_at": "2026-03-13T15:21:12.988351Z",
@@ -548,7 +548,7 @@ The response structure varies based on how the payment link was created.
     "description": "Payment for Order #12345",
     "amount": 100.5,
     "currency": "USDT",
-    "payment_url": "http://localhost:3000/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+    "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
     "payment_status": "processing",
     "payment_type": "one_time",
     "expires_at": "2026-02-01T12:00:00Z",
@@ -606,7 +606,7 @@ The response structure varies based on how the payment link was created.
     "payment_name": "Invoice #12345",
     "amount": 100.5,
     "currency": "USDT",
-    "payment_url": "http://localhost:3000/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
     "payment_status": "processing",
     "payment_type": "one_time",
     "expires_at": "2026-03-13T15:21:12.988351Z",
@@ -792,7 +792,7 @@ For detailed implementation examples in various languages, see the [Merchant API
 Before creating a payment link, fetch the list of supported currencies:
 
 ```bash
-curl https://api.bitxpay.com/api/v1/currencies \
+curl {{ $api.sandbox.baseUrl }}{{ $api.endpoints.currencies }} \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -802,7 +802,7 @@ curl https://api.bitxpay.com/api/v1/currencies \
 ### Create a Simple Payment Link
 
 ```bash
-curl -X POST https://api.bitxpay.com/payment_links \
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }} \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -817,7 +817,7 @@ curl -X POST https://api.bitxpay.com/payment_links \
 ### Create Payment Link with Full Details
 
 ```bash
-curl -X POST https://api.bitxpay.com/payment_links \
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }} \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -837,7 +837,7 @@ curl -X POST https://api.bitxpay.com/payment_links \
 ### List Payment Links with Filters
 
 ```bash
-curl https://api.bitxpay.com/payment_links?status=pending&currency=USDT&limit=10 \
+curl {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }}?status=pending&currency=USDT&limit=10 \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z"
@@ -846,7 +846,7 @@ curl https://api.bitxpay.com/payment_links?status=pending&currency=USDT&limit=10
 ### Activate a Payment Link
 
 ```bash
-curl -X PUT https://api.bitxpay.com/payment_links/{id}/status \
+curl -X PUT {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }}/{id}/status \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -860,6 +860,6 @@ curl -X PUT https://api.bitxpay.com/payment_links/{id}/status \
 
 For questions or issues:
 
-- **Documentation:** https://docs.bitxpay.com
-- **Email:** support@bitxpay.com
-- **API Status:** https://status.bitxpay.com
+- **Documentation:** {{ $site.urls.support.documentation }}
+- **Email:** {{ $site.urls.support.email }}
+- **API Status:** {{ $site.urls.support.statusPage }}

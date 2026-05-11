@@ -29,7 +29,7 @@ Test your credentials by fetching your account information:
 ::: code-group
 
 ```bash [cURL]
-curl -X GET https://api.bitxpay.com/v1/account \
+curl -X GET {{ $api.sandbox.baseUrl }}/account \
   -H "X-API-Key: your-api-key" \
   -H "X-Signature: your-signature" \
   -H "X-Timestamp: $(date +%s)000"
@@ -50,7 +50,7 @@ function generateSignature(secret, timestamp, method, path) {
 
 const signature = generateSignature(apiSecret, timestamp, 'GET', '/v1/account');
 
-axios.get('https://api.bitxpay.com/v1/account', {
+axios.get('{{ $api.sandbox.baseUrl }}/account', {
   headers: {
     'X-API-Key': apiKey,
     'X-Signature': signature,
@@ -78,7 +78,7 @@ def generate_signature(secret, timestamp, method, path):
 signature = generate_signature(api_secret, timestamp, 'GET', '/v1/account')
 
 response = requests.get(
-    'https://api.bitxpay.com/v1/account',
+    '{{ $api.sandbox.baseUrl }}/account',
     headers={
         'X-API-Key': api_key,
         'X-Signature': signature,
@@ -121,7 +121,7 @@ function generateSignature(secret, timestamp, method, path, body) {
 
 const signature = generateSignature(apiSecret, timestamp, method, path, body);
 
-axios.post('https://api.bitxpay.com/v1/payments', body, {
+axios.post('{{ $api.sandbox.baseUrl }}/payments', body, {
   headers: {
     'X-API-Key': apiKey,
     'X-Signature': signature,
@@ -163,7 +163,7 @@ def generate_signature(secret, timestamp, method, path, body):
 signature = generate_signature(api_secret, timestamp, method, path, body)
 
 response = requests.post(
-    'https://api.bitxpay.com/v1/payments',
+    '{{ $api.sandbox.baseUrl }}/payments',
     headers={
         'X-API-Key': api_key,
         'X-Signature': signature,

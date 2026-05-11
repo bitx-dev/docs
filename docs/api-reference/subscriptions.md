@@ -9,7 +9,7 @@ description: Create and manage crypto subscription links for recurring cryptocur
 
 The Merchant API Subscriptions endpoints allow you to create, manage, and retrieve subscription links for accepting **recurring cryptocurrency payments**. Unlike traditional payment links (one-time), subscriptions enable automatic billing on a recurring basis - daily, weekly, monthly, quarterly - entirely on-chain and in crypto.
 
-**Base URL:** `https://api.bitxpay.com/subscriptions`
+**Base URL:** `{{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}`
 
 **Authentication:** Merchant API Key (Asymmetric DSA)
 
@@ -588,7 +588,7 @@ For detailed implementation examples in various languages, see the [Merchant API
 ### Create a Monthly Subscription
 
 ```bash
-curl -X POST https://api.bitxpay.com/public/subscriptions/link/ \
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/ \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -606,7 +606,7 @@ curl -X POST https://api.bitxpay.com/public/subscriptions/link/ \
 ### Get All Subscriptions for a Wallet
 
 ```bash
-curl https://api.bitxpay.com/public/subscriptions/link/0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb \
+curl {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z"
@@ -615,7 +615,7 @@ curl https://api.bitxpay.com/public/subscriptions/link/0x742d35Cc6634C0532925a3b
 ### Record a Subscription Payment
 
 ```bash
-curl -X POST https://api.bitxpay.com/public/subscriptions/link/payment \
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/payment \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -631,7 +631,7 @@ curl -X POST https://api.bitxpay.com/public/subscriptions/link/payment \
 ### Pause a Subscription
 
 ```bash
-curl -X PUT https://api.bitxpay.com/public/subscriptions/link/sub_1234567890 \
+curl -X PUT {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/sub_1234567890 \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -642,7 +642,7 @@ curl -X PUT https://api.bitxpay.com/public/subscriptions/link/sub_1234567890 \
 ### Update Subscriber Information
 
 ```bash
-curl -X PUT https://api.bitxpay.com/public/subscriber/550e8400-e29b-41d4-a716-446655440000 \
+curl -X PUT {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscribers }}/550e8400-e29b-41d4-a716-446655440000 \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -676,6 +676,6 @@ See the [Webhooks Guide](/get-started/webhooks) for detailed payload structures.
 
 For questions or issues:
 
-- **Documentation:** https://docs.bitxpay.com
-- **Email:** support@bitxpay.com
-- **API Status:** https://status.bitxpay.com
+- **Documentation:** {{ $site.urls.support.documentation }}
+- **Email:** {{ $site.urls.support.email }}
+- **API Status:** {{ $site.urls.support.statusPage }}

@@ -43,7 +43,7 @@ console.log('Payment URL:', payment.hostedUrl);
 - Promise-based API
 
 **Repository:** [github.com/bitxpay/bitxpay-node](https://github.com/bitxpay/bitxpay-node)  
-**Documentation:** [Node.js SDK Docs](https://docs.bitxpay.com/sdks/nodejs)
+**Documentation:** [Node.js SDK Docs]({{ $site.urls.support.documentation }}sdks/nodejs)
 
 ---
 
@@ -86,7 +86,7 @@ print(f'Payment URL: {payment.hosted_url}')
 - Comprehensive error handling
 
 **Repository:** [github.com/bitxpay/bitxpay-python](https://github.com/bitxpay/bitxpay-python)  
-**Documentation:** [Python SDK Docs](https://docs.bitxpay.com/sdks/python)
+**Documentation:** [Python SDK Docs]({{ $site.urls.support.documentation }}sdks/python)
 
 ---
 
@@ -132,7 +132,7 @@ echo 'Payment URL: ' . $payment->hosted_url;
 - PHP 7.4+ support
 
 **Repository:** [github.com/bitxpay/bitxpay-php](https://github.com/bitxpay/bitxpay-php)  
-**Documentation:** [PHP SDK Docs](https://docs.bitxpay.com/sdks/php)
+**Documentation:** [PHP SDK Docs]({{ $site.urls.support.documentation }}sdks/php)
 
 ---
 
@@ -175,7 +175,7 @@ puts "Payment URL: #{payment.hosted_url}"
 - Ruby 2.7+ support
 
 **Repository:** [github.com/bitxpay/bitxpay-ruby](https://github.com/bitxpay/bitxpay-ruby)  
-**Documentation:** [Ruby SDK Docs](https://docs.bitxpay.com/sdks/ruby)
+**Documentation:** [Ruby SDK Docs]({{ $site.urls.support.documentation }}sdks/ruby)
 
 ---
 
@@ -229,7 +229,7 @@ func main() {
 - Go 1.18+ with generics
 
 **Repository:** [github.com/bitxpay/bitxpay-go](https://github.com/bitxpay/bitxpay-go)  
-**Documentation:** [Go SDK Docs](https://docs.bitxpay.com/sdks/go)
+**Documentation:** [Go SDK Docs]({{ $site.urls.support.documentation }}sdks/go)
 
 ---
 
@@ -288,7 +288,7 @@ public class Example {
 - Java 11+ support
 
 **Repository:** [github.com/bitxpay/bitxpay-java](https://github.com/bitxpay/bitxpay-java)  
-**Documentation:** [Java SDK Docs](https://docs.bitxpay.com/sdks/java)
+**Documentation:** [Java SDK Docs]({{ $site.urls.support.documentation }}sdks/java)
 
 ---
 
@@ -324,7 +324,7 @@ If an SDK is not available for your language, you can use the REST API directly.
 ### Authentication example
 
 ```bash
-curl -X POST https://api.bitxpay.com/v1/payments \
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.payments }} \
   -H "X-API-Key: your-api-key" \
   -H "X-Signature: generated-signature" \
   -H "X-Timestamp: 1234567890000" \
@@ -342,7 +342,7 @@ See [Authentication](/get-started/authentication) for details on generating sign
 
 - **Issues**: Report bugs on the respective GitHub repository
 - **Feature Requests**: Open an issue or discussion on GitHub
-- **Questions**: Join our [Discord community](https://discord.gg/bitxpay)
+<!-- - **Questions**: Join our [Discord community](https://discord.gg/bitxpay) -->
 - **Email**: sdk-support@bitxpay.com
 
 ## Contributing

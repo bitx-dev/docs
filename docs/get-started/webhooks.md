@@ -310,7 +310,7 @@ Monitor webhook delivery in your BITXpay dashboard:
 ### Create a webhook endpoint
 
 ```bash
-curl -X POST https://api.bitxpay.com/v1/webhook-endpoints \
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.webhookEndpoints }} \
   -H "X-API-Key: your-api-key" \
   -H "X-Signature: your-signature" \
   -H "X-Timestamp: $(date +%s)000" \
@@ -325,7 +325,7 @@ curl -X POST https://api.bitxpay.com/v1/webhook-endpoints \
 ### List webhook endpoints
 
 ```bash
-curl -X GET https://api.bitxpay.com/v1/webhook-endpoints \
+curl -X GET {{ $api.sandbox.baseUrl }}{{ $api.endpoints.webhookEndpoints }} \
   -H "X-API-Key: your-api-key" \
   -H "X-Signature: your-signature" \
   -H "X-Timestamp: $(date +%s)000"
@@ -334,7 +334,7 @@ curl -X GET https://api.bitxpay.com/v1/webhook-endpoints \
 ### Delete a webhook endpoint
 
 ```bash
-curl -X DELETE https://api.bitxpay.com/v1/webhook-endpoints/{endpoint_id} \
+curl -X DELETE {{ $api.sandbox.baseUrl }}{{ $api.endpoints.webhookEndpoints }}/{endpoint_id} \
   -H "X-API-Key: your-api-key" \
   -H "X-Signature: your-signature" \
   -H "X-Timestamp: $(date +%s)000"
@@ -363,6 +363,6 @@ Implement idempotency using the event `id` field to prevent duplicate processing
 
 For webhook-related issues:
 
-- **Documentation**: [docs.bitxpay.com](https://docs.bitxpay.com)
-- **Discord**: [discord.gg/bitxpay](https://discord.gg/bitxpay)
+- **Documentation**: {{ $site.urls.support.documentation }}
+<!-- - **Discord**: [discord.gg/bitxpay](https://discord.gg/bitxpay) -->
 - **Email**: support@bitxpay.com

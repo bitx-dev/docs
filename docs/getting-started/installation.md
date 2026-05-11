@@ -81,7 +81,7 @@ $bitxpay = new Client([
 If there's no SDK for your language, you can use the REST API directly:
 
 ```bash
-curl -X POST https://api.bitxpay.com/v1/payments \
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.payments }} \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -H "X-Signature: HMAC_SIGNATURE" \

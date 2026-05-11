@@ -73,7 +73,7 @@ const token = jwt.sign(
 );
 
 // Use in request
-const response = await fetch('https://api.bitxpay.com/v1/payment-links', {
+const response = await fetch('{{ $api.sandbox.baseUrl }}/payment-links', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`,
@@ -109,7 +109,7 @@ token = jwt.encode(
 import requests
 
 response = requests.post(
-    'https://api.bitxpay.com/v1/payment-links',
+    '{{ $api.sandbox.baseUrl }}/payment-links',
     headers={
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json'
@@ -159,7 +159,7 @@ const body = JSON.stringify({ amount: '100.00', currency: 'USD' });
 
 const signature = generateSignature(apiSecret, timestamp, method, path, body);
 
-const response = await fetch('https://api.bitxpay.com/v1/payments', {
+const response = await fetch('{{ $api.sandbox.baseUrl }}/payments', {
   method: 'POST',
   headers: {
     'X-API-Key': apiKey,
@@ -196,7 +196,7 @@ body = '{"amount":"100.00","currency":"USD"}'
 signature = generate_signature(api_secret, timestamp, method, path, body)
 
 response = requests.post(
-    'https://api.bitxpay.com/v1/payments',
+    '{{ $api.sandbox.baseUrl }}/payments',
     headers={
         'X-API-Key': api_key,
         'X-Signature': signature,

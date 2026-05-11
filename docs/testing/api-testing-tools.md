@@ -535,5 +535,5 @@ print_r($payment);
 
 Need help with a specific tool?
 
-- **Email:** api-support@bitxpay.com
-- **Documentation:** https://docs.bitxpay.com
+- **Email:** {{ $site.urls.support.email }}
+- **Documentation:** {{ $site.urls.support.documentation }}

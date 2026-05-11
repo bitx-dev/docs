@@ -23,7 +23,7 @@ const bitxpay = new BITXpay({
 
 ### Production API Base URL
 ```
-https://api.bitxpay.com/v1
+{{ $api.production.baseUrl }}
 ```
 
 ### API Keys
@@ -89,7 +89,8 @@ We're actively developing a sandbox environment with testnet support. This will 
 - Magic amounts for scenario simulation
 - Webhook testing without real transactions
 
-Stay tuned for updates on our [GitHub](https://github.com/bitxpay) or [Discord community](https://discord.gg/bitxpay).
+Stay tuned for updates on our [GitHub](https://github.com/bitxpay).
+<!-- or [Discord community](https://discord.gg/bitxpay) -->
 :::
 
 ## Production Best Practices
@@ -159,10 +160,10 @@ function verifyWebhookSignature(payload, signature, secret) {
 
 Since we're currently mainnet-only, we're here to help ensure your integration is secure and reliable:
 
-- **Documentation**: [docs.bitxpay.com](https://docs.bitxpay.com)
-- **Discord Community**: [discord.gg/bitxpay](https://discord.gg/bitxpay)
+- **Documentation**: {{ $site.urls.support.documentation }}
+<!-- - **Discord Community**: [discord.gg/bitxpay](https://discord.gg/bitxpay) -->
 - **Email Support**: support@bitxpay.com
-- **GitHub Issues**: [github.com/bitxpay/issues](https://github.com/bitxpay/issues)
+<!-- - **GitHub Issues**: [github.com/bitxpay/issues](https://github.com/bitxpay/issues) -->
 
 ::: warning Important
 All transactions on BITXpay are currently real mainnet transactions. Always test with small amounts and implement proper security measures before going live with production volumes.

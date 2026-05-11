@@ -9,7 +9,7 @@ Complete API reference for the Vault Signer multi-network EIP-7702 gasless trans
 Most API endpoints require authentication via API key. Include the `X-API-Key` header in your requests:
 
 ```bash
-curl -H "X-API-Key: your-api-key-here" http://localhost:3000/endpoint
+curl -H "X-API-Key: your-api-key-here" {{ $site.urls.apiServer.sandbox }}/endpoint
 ```
 
 Configure your API key in `.env`:
@@ -221,7 +221,7 @@ Check ETH balance of deployer address on all enabled networks.
 #### Request
 
 ```bash
-curl http://localhost:3000/contracts/deployer/balance \
+curl {{ $site.urls.apiServer.sandbox }}/contracts/deployer/balance \
   -H "X-API-Key: vault-signer-secret-key-12345"
 ```
 
@@ -261,7 +261,7 @@ Check ETH balance of an authorized caller address on all enabled networks.
 #### Request
 
 ```bash
-curl http://localhost:3000/contracts/caller/balance/0x57468bF1147F29D8B5c1D9f506D54e89bf13d7f7 \
+curl {{ $site.urls.apiServer.sandbox }}/contracts/caller/balance/0x57468bF1147F29D8B5c1D9f506D54e89bf13d7f7 \
   -H "X-API-Key: vault-signer-secret-key-12345"
 ```
 
@@ -316,7 +316,7 @@ Get all authorized callers that have been created and deployed.
 #### Request
 
 ```bash
-curl http://localhost:3000/contracts/callers \
+curl {{ $site.urls.apiServer.sandbox }}/contracts/callers \
   -H "X-API-Key: vault-signer-secret-key-12345"
 ```
 
@@ -362,7 +362,7 @@ Get the most recently created authorized caller.
 #### Request
 
 ```bash
-curl http://localhost:3000/contracts/callers/latest \
+curl {{ $site.urls.apiServer.sandbox }}/contracts/callers/latest \
   -H "X-API-Key: vault-signer-secret-key-12345"
 ```
 
@@ -400,7 +400,7 @@ Get the latest authorized caller for each network.
 #### Request
 
 ```bash
-curl http://localhost:3000/contracts/callers/by-network \
+curl {{ $site.urls.apiServer.sandbox }}/contracts/callers/by-network \
   -H "X-API-Key: vault-signer-secret-key-12345"
 ```
 
@@ -443,7 +443,7 @@ Get details for a specific authorized caller by address.
 #### Request
 
 ```bash
-curl http://localhost:3000/contracts/callers/0x57468bF1147F29D8B5c1D9f506D54e89bf13d7f7 \
+curl {{ $site.urls.apiServer.sandbox }}/contracts/callers/0x57468bF1147F29D8B5c1D9f506D54e89bf13d7f7 \
   -H "X-API-Key: vault-signer-secret-key-12345"
 ```
 
@@ -481,7 +481,7 @@ List enabled networks and their configuration.
 #### Request
 
 ```bash
-curl http://localhost:3000/contracts/networks
+curl {{ $site.urls.apiServer.sandbox }}/contracts/networks
 ```
 
 #### Response
@@ -526,7 +526,7 @@ Execute gasless ERC20 transfers using EIP-7702 delegation. **Payment wallet does
 #### Request
 
 ```bash
-curl -X POST http://localhost:3000/eip7702/transfer \
+curl -X POST {{ $site.urls.apiServer.sandbox }}/eip7702/transfer \
   -H "Content-Type: application/json" \
   -H "X-API-Key: vault-signer-secret-key-12345" \
   -d '{
@@ -636,7 +636,7 @@ The `amount` must be in the token's smallest unit (wei):
 API_KEY="vault-signer-secret-key-12345"
 
 # Step 1: Generate payment wallet (will hold tokens, no ETH needed!)
-PAYMENT_RESPONSE=$(curl -s -X POST http://localhost:3000/keys/generate \
+PAYMENT_RESPONSE=$(curl -s -X POST {{ $site.urls.apiServer.sandbox }}/keys/generate \
   -H "X-API-Key: $API_KEY")
 PAYMENT_SEAL=$(echo $PAYMENT_RESPONSE | jq -r '.data.account_seal')
 PAYMENT_ADDRESS=$(echo $PAYMENT_RESPONSE | jq -r '.data.address')
@@ -645,7 +645,7 @@ echo "Payment Wallet: $PAYMENT_ADDRESS"
 echo "Payment Seal: $PAYMENT_SEAL"
 
 # Step 2: Deploy SimpleDelegate (generates authorized caller)
-DEPLOY_RESPONSE=$(curl -s -X POST http://localhost:3000/contracts/deploy \
+DEPLOY_RESPONSE=$(curl -s -X POST {{ $site.urls.apiServer.sandbox }}/contracts/deploy \
   -H "X-API-Key: $API_KEY")
 AUTHORIZED_SEAL=$(echo $DEPLOY_RESPONSE | jq -r '.data.authorized_caller.account_seal')
 DELEGATE_ADDRESS=$(echo $DEPLOY_RESPONSE | jq -r '.data.deployments.successful[0].contractAddress')
@@ -686,7 +686,7 @@ Get information about EIP-7702 capabilities.
 #### Request
 
 ```bash
-curl http://localhost:3000/eip7702/info
+curl {{ $site.urls.apiServer.sandbox }}/eip7702/info
 ```
 
 #### Response
@@ -720,7 +720,7 @@ Generate a new EOA (Externally Owned Account) with encrypted private key.
 #### Request
 
 ```bash
-curl -X POST http://localhost:3000/keys/generate \
+curl -X POST {{ $site.urls.apiServer.sandbox }}/keys/generate \
   -H "X-API-Key: vault-signer-secret-key-12345"
 ```
 
@@ -749,7 +749,7 @@ Sign arbitrary hex data with a specific EOA.
 #### Request
 
 ```bash
-curl -X POST http://localhost:3000/signing/sign-data \
+curl -X POST {{ $site.urls.apiServer.sandbox }}/signing/sign-data \
   -H "Content-Type: application/json" \
   -H "X-API-Key: vault-signer-secret-key-12345" \
   -d '{
@@ -778,7 +778,7 @@ Sign an EIP-7702 authorization tuple.
 #### Request
 
 ```bash
-curl -X POST http://localhost:3000/signing/sign-authorization \
+curl -X POST {{ $site.urls.apiServer.sandbox }}/signing/sign-authorization \
   -H "Content-Type: application/json" \
   -d '{
     "account_seal": "your-base64-sealed-key",
@@ -824,11 +824,11 @@ echo "ALCHEMY_API_KEY_ARBITRUM=your-key" >> .env
 echo "API_KEY=$API_KEY" >> .env
 
 # 2. Check deployer balance
-curl http://localhost:3000/contracts/deployer/balance \
+curl {{ $site.urls.apiServer.sandbox }}/contracts/deployer/balance \
   -H "X-API-Key: $API_KEY"
 
 # 3. Deploy SimpleDelegate to all networks (CREATE2)
-DEPLOY=$(curl -s -X POST http://localhost:3000/contracts/deploy \
+DEPLOY=$(curl -s -X POST {{ $site.urls.apiServer.sandbox }}/contracts/deploy \
   -H "X-API-Key: $API_KEY")
 AUTHORIZED_SEAL=$(echo $DEPLOY | jq -r '.data.authorized_caller.account_seal')
 DELEGATE_ADDR=$(echo $DEPLOY | jq -r '.data.deployments.successful[0].contractAddress')
@@ -837,7 +837,7 @@ echo "Contract deployed to: $DELEGATE_ADDR (same on all networks)"
 echo "Authorized caller seal: $AUTHORIZED_SEAL"
 
 # 4. Generate payment wallet
-PAYMENT=$(curl -s -X POST http://localhost:3000/keys/generate \
+PAYMENT=$(curl -s -X POST {{ $site.urls.apiServer.sandbox }}/keys/generate \
   -H "X-API-Key: $API_KEY")
 PAYMENT_SEAL=$(echo $PAYMENT | jq -r '.data.account_seal')
 PAYMENT_ADDR=$(echo $PAYMENT | jq -r '.data.address')
@@ -846,7 +846,7 @@ echo "Payment wallet: $PAYMENT_ADDR"
 echo "Fund this address with USDC (no ETH needed!)"
 
 # 5. Execute gasless transfer on all networks
-curl -X POST http://localhost:3000/eip7702/transfer \
+curl -X POST {{ $site.urls.apiServer.sandbox }}/eip7702/transfer \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $API_KEY" \
   -d "{

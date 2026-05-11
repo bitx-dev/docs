@@ -368,11 +368,11 @@ Note: The List endpoint uses Bearer token authentication instead of X-API-Key.
 Create separate environments for different stages:
 
 1. **BITXpay Sandbox**
-   - `BASE_URL`: `https://sandboxapi.bitxpay.com/api/v1`
+   - `BASE_URL`: `{{ $api.sandbox.baseUrl }}`
    - Use sandbox API keys
 
 2. **BITXpay Production**
-   - `BASE_URL`: `https://api.bitxpay.com/api/v1`
+   - `BASE_URL`: `{{ $api.production.baseUrl }}`
    - Use production API keys
 
 Switch between environments using the dropdown in the top-right corner.
@@ -473,5 +473,5 @@ Download the environment template:
 
 Need help with Postman setup?
 
-- **Email:** api-support@bitxpay.com
-- **Documentation:** https://docs.bitxpay.com
+- **Email:** {{ $site.urls.support.email }}
+- **Documentation:** {{ $site.urls.support.documentation }}

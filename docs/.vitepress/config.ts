@@ -1,40 +1,42 @@
 import { defineConfig } from 'vitepress'
+import apiEndpointsPlugin from './plugins/api-endpoints-plugin'
+import { SITE_CONFIG, getBasePath } from './config/site-config'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "BITXpay",
-  description: "Official API documentation for BITXpay - Cryptocurrency Payment Gateway",
+  title: SITE_CONFIG.title,
+  description: SITE_CONFIG.description,
 
   // Base path: root for local dev, /docs/ for production (GitHub Pages repository name)
-  base: process.env.NODE_ENV === 'production' ? '/docs/' : '/',
+  base: getBasePath(),
 
   // Clean URLs without .html extension
-  cleanUrls: true,
+  cleanUrls: SITE_CONFIG.features.cleanUrls,
 
   // SEO: Generate sitemap
   sitemap: {
-    hostname: 'https://docs.bitxpay.com'
+    hostname: SITE_CONFIG.seo.hostname
   },
 
   // Head tags for SEO
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
-    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/logo.svg' }],
-    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/logo.svg' }],
-    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
-    ['meta', { name: 'theme-color', content: '#3b82f6' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: SITE_CONFIG.theme.logo }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: SITE_CONFIG.theme.logo }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: SITE_CONFIG.theme.logo }],
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: SITE_CONFIG.theme.appleIcon }],
+    ['meta', { name: 'theme-color', content: SITE_CONFIG.theme.primaryColor }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:site_name', content: 'BITXpay Documentation' }],
-    ['meta', { property: 'og:image', content: 'https://docs.bitxpay.com/docs/og-image.png' }],
+    ['meta', { property: 'og:site_name', content: SITE_CONFIG.title + ' Documentation' }],
+    ['meta', { property: 'og:image', content: SITE_CONFIG.seo.ogImage }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    ['link', { href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap', rel: 'stylesheet' }]
+    ['link', { href: SITE_CONFIG.fonts.google.url, rel: 'stylesheet' }]
   ],
 
   themeConfig: {
     // Site logo
-    logo: '/logo.svg',
+    logo: SITE_CONFIG.theme.logo,
 
     // Navigation bar
     nav: [
