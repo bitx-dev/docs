@@ -52,7 +52,7 @@ export default defineConfig({
       {
         text: 'Resources',
         items: [
-          { text: 'SDKs & Libraries', link: '/get-started/sdks-libraries' },
+          // { text: 'SDKs & Libraries', link: '/get-started/sdks-libraries' },
           { text: 'Testing Tools', link: '/testing/' },
           { text: 'Webhooks', link: '/get-started/webhooks' }
         ]
@@ -78,7 +78,7 @@ export default defineConfig({
             { text: 'Supported Networks', link: '/get-started/supported-networks' },
             { text: 'Authentication', link: '/get-started/authentication' },
             { text: 'Quick Start', link: '/get-started/quick-start' },
-            { text: 'SDKs and Libraries', link: '/get-started/sdks-libraries' },
+            // { text: 'SDKs and Libraries', link: '/get-started/sdks-libraries' },
             { text: 'Webhooks', link: '/get-started/webhooks' }
           ]
         }

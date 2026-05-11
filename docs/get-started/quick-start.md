@@ -283,7 +283,7 @@ Now that you've created your first payment, explore more features:
 
 - [Authentication](/get-started/authentication) - Learn about security best practices
 - [Webhooks](/integration/webhooks) - Deep dive into webhook events
-- [SDKs and Libraries](/get-started/sdks-libraries) - Use our official SDKs
+<!-- - [SDKs and Libraries](/get-started/sdks-libraries) - Use our official SDKs -->
 - [API Reference](/api-reference/) - Explore all available endpoints
 
 ## Common issues
