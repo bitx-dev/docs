@@ -86,11 +86,12 @@ import { withBase } from "vitepress";
         <div class="footer-section">
           <h4 class="footer-heading">Resources</h4>
           <ul class="footer-links">
-            <li>
+            <!--  <li>
               <a :href="withBase('/get-started/sdks-libraries')"
                 >SDKs & Libraries</a
               >
             </li>
+            -->
             <li><a :href="withBase('/get-started/webhooks')">Webhooks</a></li>
             <li><a :href="withBase('/testing/')">Testing Tools</a></li>
             <li>

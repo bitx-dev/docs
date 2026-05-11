@@ -136,7 +136,7 @@ import { withBase } from 'vitepress'
     <li><a :href="withBase('/get-started/supported-networks')">Supported Networks</a></li>
     <li><a :href="withBase('/get-started/authentication')">Authentication</a></li>
     <li><a :href="withBase('/get-started/quick-start')">Quick Start Guide</a></li>
-    <li><a :href="withBase('/get-started/sdks-libraries')">SDKs & Libraries</a></li>
+    <!-- <li><a :href="withBase('/get-started/sdks-libraries')">SDKs & Libraries</a></li> -->
     <li><a :href="withBase('/get-started/webhooks')">Webhooks</a></li>
   </ul>
   </div>

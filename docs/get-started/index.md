@@ -39,4 +39,4 @@ Issue invoices in any currency with real-time rate lock-in and automatic settlem
 - [Supported Networks](/get-started/supported-networks) - Learn about the 16 blockchain networks we support
 - [Authentication](/get-started/authentication) - Secure your API integration
 - [Quick Start](/get-started/quick-start) - Start building in minutes
-- [SDKs and Libraries](/get-started/sdks-libraries) - Use our official SDKs
+<!-- - [SDKs and Libraries](/get-started/sdks-libraries) - Use our official SDKs -->
