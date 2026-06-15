@@ -45,6 +45,7 @@ export default defineConfig({
         items: [
           { text: 'Get Started', link: '/get-started/' },
           { text: 'API Reference', link: '/api-reference/' },
+          { text: 'SDKs & Libraries', link: '/sdks/' },
           { text: 'Integration', link: '/integration/' },
           { text: 'Security', link: '/security/' }
         ]
@@ -130,6 +131,16 @@ export default defineConfig({
             { text: 'Overview', link: '/security/' },
             { text: 'Authentication', link: '/security/authentication' },
             { text: 'Best Practices', link: '/security/best-practices' }
+          ]
+        }
+      ],
+      '/sdks/': [
+        {
+          text: 'SDKs & Libraries',
+          items: [
+            { text: 'Overview', link: '/sdks/' },
+            { text: 'JavaScript / TypeScript SDK', link: '/sdks/javascript-sdk' },
+            { text: 'Wallet SDK', link: '/sdks/wallet-sdk' }
           ]
         }
       ]

@@ -113,6 +113,15 @@ import { withBase } from 'vitepress'
       <p>Create and manage payments</p>
     </div>
   </a>
+  <a :href="withBase('/sdks/')" class="resource-card">
+    <div class="resource-icon">
+      <img :src="withBase('/icons/developer-first-api.svg')" alt="" />
+    </div>
+    <div class="resource-content">
+      <h4>SDKs & Libraries</h4>
+      <p>Official SDKs for fast integration</p>
+    </div>
+  </a>
 </div>
 </section>
 
@@ -136,7 +145,7 @@ import { withBase } from 'vitepress'
     <li><a :href="withBase('/get-started/supported-networks')">Supported Networks</a></li>
     <li><a :href="withBase('/get-started/authentication')">Authentication</a></li>
     <li><a :href="withBase('/get-started/quick-start')">Quick Start Guide</a></li>
-    <!-- <li><a :href="withBase('/get-started/sdks-libraries')">SDKs & Libraries</a></li> -->
+    <li><a :href="withBase('/sdks/')">SDKs & Libraries</a></li>
     <li><a :href="withBase('/get-started/webhooks')">Webhooks</a></li>
   </ul>
   </div>
@@ -207,6 +216,23 @@ import { withBase } from 'vitepress'
       <li><a :href="withBase('/integration/')">Integration Overview</a></li>
       <li><a :href="withBase('/integration/webhooks')">Webhook Integration</a></li>
       <li><a :href="withBase('/integration/environments')">Environments</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="doc-card">
+  <div class="doc-card-header">
+    <div class="doc-icon">
+      <img :src="withBase('/icons/developer-first-api.svg')" alt="" />
+    </div>
+    <h3>SDKs & Libraries</h3>
+  </div>
+  <div class="doc-card-desc-container">
+    <p class="doc-card-desc">Official SDKs to integrate BITXpay faster</p>
+    <ul class="doc-links">
+      <li><a :href="withBase('/sdks/')">SDK Overview</a></li>
+      <li><a :href="withBase('/sdks/javascript-sdk')">JavaScript / TypeScript SDK</a></li>
+      <li><a :href="withBase('/sdks/wallet-sdk')">Wallet SDK</a></li>
     </ul>
   </div>
 </div>
