@@ -1,6 +1,6 @@
 # SDKs & Libraries
 
-BITXpay provides official SDKs to help you integrate faster — no manual request signing, no boilerplate. Pick the SDK that fits your stack and start accepting payments in minutes.
+BITXpay provides official SDKs to help you integrate faster, no manual request signing, no boilerplate. Pick the SDK that fits your stack and start accepting payments in minutes.
 
 ## Available SDKs
 

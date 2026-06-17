@@ -171,12 +171,6 @@ export default defineConfig({
       copyright: ''
     },
 
-    // Edit link
-    editLink: {
-      pattern: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTabt=readme',
-      text: 'View on npm'
-    },
-
     // Last updated
     lastUpdated: {
       text: 'Last updated',

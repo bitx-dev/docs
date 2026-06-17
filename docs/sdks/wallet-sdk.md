@@ -1,3 +1,9 @@
+---
+editLink:
+  pattern: https://www.npmjs.com/package/@bitxpay/wallet-sdk
+  text: View on npm
+---
+
 # Wallet SDK
 
 The `@bitxpay/wallet-sdk` package enables client-side wallet connection and transaction signing for browser and React Native applications. Use it to build dApps, checkout flows, and wallet-connected experiences on top of BITXpay.
@@ -24,9 +30,9 @@ pnpm add @bitxpay/wallet-sdk
 
 ## Requirements
 
-- **Browser** — any modern browser with ES2020 support
-- **React Native** — 0.70+
-- **React** — 17+ (for React hooks)
+- **Browser** any modern browser with ES2020 support
+- **React Native** 0.70+
+- **React** 17+ (for React hooks)
 
 ---
 
@@ -330,7 +336,7 @@ try {
 
 ## Next Steps
 
-- [JavaScript SDK](/sdks/javascript-sdk) — Server-side SDK for payment creation
-- [API Reference](/api-reference/) — Full REST API documentation
-- [Supported Networks](/get-started/supported-networks) — All supported blockchains
-- [Testing](/testing/) — Test your wallet integration in sandbox
+- [JavaScript SDK](/sdks/javascript-sdk) Server-side SDK for payment creation
+- [API Reference](/api-reference/) Full REST API documentation
+- [Supported Networks](/get-started/supported-networks) All supported blockchains
+- [Testing](/testing/) Test your wallet integration in sandbox

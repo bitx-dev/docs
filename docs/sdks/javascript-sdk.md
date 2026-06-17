@@ -1,3 +1,9 @@
+---
+editLink:
+  pattern: https://www.npmjs.com/package/@bitxpay/sdk
+  text: View on npm
+---
+
 # JavaScript / TypeScript SDK
 
 The `@bitxpay/sdk` package is the official server-side SDK for Node.js and TypeScript. It handles request authentication, response parsing, and provides a typed interface for the full BITXpay API.
@@ -290,7 +296,7 @@ BITXPAY_ENVIRONMENT=sandbox
 
 ## Next Steps
 
-- [Wallet SDK](/sdks/wallet-sdk) — Client-side wallet connection
-- [API Reference](/api-reference/) — Full endpoint documentation
-- [Webhooks](/integration/webhooks) — Webhook events and verification
-- [Testing](/testing/) — Test your integration in sandbox
+- [Wallet SDK](/sdks/wallet-sdk) Client-side wallet connection
+- [API Reference](/api-reference/) Full endpoint documentation
+- [Webhooks](/integration/webhooks) Webhook events and verification
+- [Testing](/testing/) Test your integration in sandbox
