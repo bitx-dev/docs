@@ -90,29 +90,28 @@ const timestamp = Math.floor(Date.now() / 1000);
 
 ## Webhook Verification
 
-Always verify webhook signatures:
+Always verify webhook signatures using the **raw request body** (before JSON parsing):
 
 ```javascript
-function verifyWebhook(payload, signature, secretKey) {
+// IMPORTANT: Use express.raw() so req.body is the raw Buffer
+app.post('/webhooks', express.raw({ type: 'application/json' }), (req, res) => {
+  const signature = req.headers['x-bitxpay-signature'];
+  const rawPayload = req.body; // Raw Buffer — do NOT parse before verifying
+
   const expectedSignature = crypto
     .createHmac('sha256', secretKey)
-    .update(JSON.stringify(payload))
+    .update(rawPayload)
     .digest('hex');
 
   // Use timing-safe comparison to prevent timing attacks
-  return crypto.timingSafeEqual(
+  if (!crypto.timingSafeEqual(
     Buffer.from(signature),
     Buffer.from(expectedSignature)
-  );
-}
-
-app.post('/webhooks', (req, res) => {
-  const signature = req.headers['x-bitxpay-signature'];
-
-  if (!verifyWebhook(req.body, signature, secretKey)) {
+  )) {
     return res.status(401).send('Invalid signature');
   }
 
+  const event = JSON.parse(rawPayload);
   // Process webhook...
 });
 ```

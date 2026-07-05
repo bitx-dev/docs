@@ -1,22 +1,49 @@
 ---
 title: Environments
-description: Understand BITXpay production environment and upcoming testnet support.
+description: Understand BITXpay sandbox and production environments.
 ---
 
 # Environments
 
-BITXpay currently operates exclusively on **mainnet** for production-grade applications. Testnet support is planned for future releases.
+BITXpay provides two environments: a **sandbox** for development and testing, and a **production** environment for live transactions.
 
-## Current Environment: Production (Mainnet Only)
+## Sandbox Environment
 
-BITXpay currently supports mainnet-only operations across all 16 supported blockchain networks. This means all transactions are real and involve actual cryptocurrency.
+The sandbox environment allows you to test your integration without using real funds. All 16 supported blockchain networks are available in sandbox mode.
+
+### Sandbox Configuration
+
+```javascript
+const bitxpay = new BITXpay({
+  apiKey: process.env.MERCHANT_API_KEY,
+  environment: 'sandbox'
+});
+```
+
+### Sandbox API Base URL
+```
+https://sandboxapi.bitxpay.com/api/v1
+```
+
+### Sandbox Dashboard
+
+[sandbox.bitxpay.com](https://sandbox.bitxpay.com) — Sign up and generate your sandbox API keys here.
+
+### Sandbox API Keys
+
+- **Format**: `btxm_*` (Merchant API)
+- **Access**: Full sandbox access — no real funds involved
+- **Authentication**: DSA signature (SHA-256, DER encoding, Base64)
+
+## Production Environment
+
+The production environment handles real transactions with actual cryptocurrency.
 
 ### Production Configuration
 
 ```javascript
 const bitxpay = new BITXpay({
-  apiKey: process.env.BITXPAY_API_KEY,
-  secretKey: process.env.BITXPAY_SECRET_KEY,
+  apiKey: process.env.MERCHANT_API_KEY,
   environment: 'production'
 });
 ```
@@ -26,42 +53,18 @@ const bitxpay = new BITXpay({
 {{ $api.production.baseUrl }}
 ```
 
-### API Keys
+### Production API Keys
 
-All API keys are production keys and should be handled with maximum security:
-
-- **Format**: `sk_live_*` prefix
-- **Access**: Full production access
+- **Format**: `btxm_*` (Merchant API)
+- **Access**: Full production access — real funds
 - **Security**: Store securely, never commit to version control
+- **Authentication**: DSA signature (SHA-256, DER encoding, Base64)
 
-## Development & Testing
+## Testing & Development
 
-Since BITXpay currently operates on mainnet only, we recommend the following approaches for development and testing:
+Use the sandbox environment for all development and testing. Additional local testing tools:
 
-### 1. Use Small Amounts for Testing
-
-When testing your integration, use minimal cryptocurrency amounts to reduce risk:
-
-```javascript
-// Example: Test with small amounts
-const testPayment = await bitxpay.payments.create({
-  amount: '0.01',  // Small test amount
-  currency: 'USD',
-  description: 'Integration test'
-});
-```
-
-### 2. Dedicated Test Wallets
-
-Create separate wallets specifically for development and testing purposes:
-
-- Use dedicated addresses for testing
-- Keep minimal balances in test wallets
-- Monitor all test transactions closely
-
-### 3. Webhook Testing
-
-Test webhook integration using tools like:
+### Webhook Testing
 
 - **webhook.site** - Free temporary webhook URLs
 - **ngrok** - Expose local development server
@@ -72,30 +75,9 @@ Test webhook integration using tools like:
 ngrok http 3000
 ```
 
-## Sandbox Environment (Coming Soon)
-
-::: info Testnet Support Coming Soon
-We're actively developing a sandbox environment with testnet support. This will allow you to:
-
-- Test integrations without real funds
-- Simulate various payment scenarios
-- Use testnet cryptocurrencies across all supported networks
-- Access sandbox-specific API endpoints
-
-**Expected Features:**
-- Dedicated sandbox API: `https://sandbox-api.bitxpay.com/v1`
-- Test API keys with `sk_test_*` prefix
-- Testnet support for all 16 networks
-- Magic amounts for scenario simulation
-- Webhook testing without real transactions
-
-Stay tuned for updates on our [GitHub](https://github.com/bitxpay).
-<!-- or [Discord community](https://discord.gg/bitxpay) -->
-:::
-
 ## Production Best Practices
 
-Since you're working directly with mainnet:
+Before going live with production traffic:
 
 ### Security Checklist
 
@@ -158,7 +140,7 @@ function verifyWebhookSignature(payload, signature, secret) {
 
 ## Need Help?
 
-Since we're currently mainnet-only, we're here to help ensure your integration is secure and reliable:
+We're here to help ensure your integration is secure and reliable:
 
 - **Documentation**: {{ $site.urls.support.documentation }}
 <!-- - **Discord Community**: [discord.gg/bitxpay](https://discord.gg/bitxpay) -->
@@ -166,5 +148,5 @@ Since we're currently mainnet-only, we're here to help ensure your integration i
 <!-- - **GitHub Issues**: [github.com/bitxpay/issues](https://github.com/bitxpay/issues) -->
 
 ::: warning Important
-All transactions on BITXpay are currently real mainnet transactions. Always test with small amounts and implement proper security measures before going live with production volumes.
+All production transactions on BITXpay involve real funds on mainnet. Always fully test your integration in the sandbox environment before switching to production credentials.
 :::

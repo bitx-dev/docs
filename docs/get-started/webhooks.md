@@ -267,10 +267,13 @@ Never hardcode webhook secrets. Use environment variables or secure secret manag
 
 BITXpay automatically retries failed webhook deliveries:
 
-- **Retry schedule**: 1min, 5min, 15min, 1hr, 6hr, 24hr
-- **Success criteria**: HTTP 200-299 response
+- **Attempt 1**: Immediate
+- **Attempt 2**: After 5 minutes
+- **Attempt 3**: After 30 minutes
+- **Attempt 4**: After 2 hours
+- **Attempt 5**: After 24 hours
+- **Success criteria**: HTTP 2xx response
 - **Timeout**: 30 seconds per attempt
-- **Max retries**: 6 attempts over 24 hours
 
 ## Testing Webhooks Locally
 

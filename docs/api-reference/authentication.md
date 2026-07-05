@@ -28,12 +28,12 @@ Merchant-facing APIs use DSA (Digital Signature Algorithm) for enhanced security
 ### Obtaining Your Keys
 
 1. Log in to your [BITXpay Dashboard](https://sandbox.bitxpay.com/dashboard)
-2. Navigate to **Settings** → **API Keys**
+2. Navigate to **Developers** → **API Keys**
 3. Generate your **Merchant API Key** and **Private Key**
 4. Store both securely - the private key is shown only once
 
 Your credentials will include:
-- **API Key:** `bknn_xxxxxxxxxx` (public identifier)
+- **API Key:** `btxm_xxxxxxxxxx` (public identifier)
 - **Private Key:** DSA private key in PEM format (keep secret)
 - **Public Key:** DSA public key in PEM format (for verification)
 
@@ -48,7 +48,7 @@ METHOD + PATH + TIMESTAMP + BODY
 
 **Example Message:**
 ```
-POST/payments/links2026-01-31T17:53:56Z{"merchant_key":"mkey-xxx","order_amount":10}
+POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USD","payment_name":"Invoice #12345"}
 ```
 
 **Signature Parameters:**
@@ -90,14 +90,13 @@ const privateKey = fs.readFileSync('private-key.pem', 'utf8');
 const apiKey = process.env.MERCHANT_API_KEY;
 
 const method = 'POST';
-const path = '/payments/links';
+const path = '/payment_links';
 const timestamp = new Date().toISOString();
 const body = JSON.stringify({
-  merchant_key: 'mkey-xxx',
-  order_currency: 'USD',
-  order_amount: 10,
-  payment_name: 'Test Payment',
-  payer_email: 'test@example.com',
+  payment_name: 'Invoice #12345',
+  amount: 100.50,
+  currency: 'USD',
+  customer_email: 'john@example.com',
   success_url: 'https://example.com/success',
   cancel_url: 'https://example.com/cancel'
 });
@@ -155,14 +154,13 @@ with open('private-key.pem', 'r') as f:
 api_key = os.environ.get('MERCHANT_API_KEY')
 
 method = 'POST'
-path = '/payments/links'
+path = '/payment_links'
 timestamp = datetime.utcnow().isoformat() + 'Z'
 body_data = {
-    'merchant_key': 'mkey-xxx',
-    'order_currency': 'USD',
-    'order_amount': 10,
-    'payment_name': 'Test Payment',
-    'payer_email': 'test@example.com',
+    'payment_name': 'Invoice #12345',
+    'amount': 100.50,
+    'currency': 'USD',
+    'customer_email': 'john@example.com',
     'success_url': 'https://example.com/success',
     'cancel_url': 'https://example.com/cancel'
 }
@@ -205,9 +203,10 @@ Ensure your system clock is synchronized with NTP servers.
 
 ## HMAC-SHA256 Authentication (Standard APIs)
 
+
 Standard payment APIs use HMAC-based authentication to secure API requests. Every request must include your API key and a signature.
 
-## Required Headers
+### Required Headers
 
 | Header | Description |
 |--------|-------------|
@@ -216,7 +215,7 @@ Standard payment APIs use HMAC-based authentication to secure API requests. Ever
 | `X-Timestamp` | Unix timestamp of the request |
 | `Content-Type` | `application/json` |
 
-## Generating the Signature
+### Generating the Signature
 
 The signature is created by signing the request payload with your secret key:
 
@@ -233,7 +232,7 @@ function generateSignature(secretKey, timestamp, method, path, body = '') {
 }
 ```
 
-## Complete Example
+### Complete Example
 
 ```javascript
 import crypto from 'crypto';
@@ -272,7 +271,7 @@ const payment = await makeRequest('POST', '/payments', {
 });
 ```
 
-## Python Example
+### Python Example
 
 ```python
 import hmac
@@ -312,7 +311,7 @@ def make_request(method, path, body=None):
     return response.json()
 ```
 
-## Timestamp Validation
+### Timestamp Validation
 
 Requests with timestamps older than 5 minutes will be rejected:
 
@@ -326,7 +325,7 @@ Requests with timestamps older than 5 minutes will be rejected:
 }
 ```
 
-## Security Best Practices
+### Security Best Practices
 
 ::: warning
 Keep your secret key secure and never expose it in client-side code.

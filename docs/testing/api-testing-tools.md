@@ -60,10 +60,10 @@ fi
 chmod +x bitxpay-curl.sh
 
 # Create payment link
-./bitxpay-curl.sh POST /payments/links '{"merchant_key":"mkey-xxx","order_currency":"USD","order_amount":10,"payment_name":"Test","payer_email":"test@example.com","success_url":"https://example.com/success","cancel_url":"https://example.com/cancel"}'
+./bitxpay-curl.sh POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USD","success_url":"https://example.com/success","cancel_url":"https://example.com/cancel"}'
 
 # Get payment details
-./bitxpay-curl.sh GET /payments/links/payment-id-here
+./bitxpay-curl.sh GET /payment_links/payment-id-here
 ```
 
 ### Node.js Helper for cURL
@@ -100,7 +100,7 @@ Save as `bitxpay-request.js` and use:
 
 ```bash
 chmod +x bitxpay-request.js
-./bitxpay-request.js POST /payments/links '{"merchant_key":"mkey-xxx",...}'
+./bitxpay-request.js POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USD",...}'
 ```
 
 ---
@@ -232,7 +232,7 @@ fi
 chmod +x bitxpay-http.sh
 
 # Create payment
-./bitxpay-http.sh POST /payments/links '{"merchant_key":"mkey-xxx","order_amount":10,...}'
+./bitxpay-http.sh POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USD",...}'
 ```
 
 ---
@@ -259,24 +259,22 @@ Create a file `bitxpay-requests.http`:
 
 ### Create Payment Link
 # @name createPayment
-POST {{baseUrl}}/payments/links
+POST {{baseUrl}}/payment_links
 X-API-Key: {{apiKey}}
 X-API-Signature: {{$processEnv SIGNATURE}}
 X-API-Timestamp: {{$processEnv TIMESTAMP}}
 Content-Type: application/json
 
 {
-  "merchant_key": "mkey-xxx",
-  "order_currency": "USD",
-  "order_amount": 10,
   "payment_name": "Test Payment",
-  "payer_email": "test@example.com",
+  "amount": 10,
+  "currency": "USD",
   "success_url": "https://example.com/success",
   "cancel_url": "https://example.com/cancel"
 }
 
-### Get Payment Details
-GET {{baseUrl}}/payments/links/{{createPayment.response.body.payment_reference}}
+### Get Payment Link by ID
+GET {{baseUrl}}/payment_links/{{createPayment.response.body.id}}
 X-API-Key: {{apiKey}}
 X-API-Signature: {{$processEnv SIGNATURE}}
 X-API-Timestamp: {{$processEnv TIMESTAMP}}
@@ -396,13 +394,13 @@ class BITXpayClient:
         return response.json()
     
     def create_payment_link(self, payment_data):
-        return self.request('POST', '/payments/links', payment_data)
+        return self.request('POST', '/payment_links', payment_data)
     
-    def get_payment(self, payment_id):
-        return self.request('GET', f'/payments/links/{payment_id}')
+    def get_payment_link(self, payment_id):
+        return self.request('GET', f'/payment_links/{payment_id}')
     
-    def update_payment_status(self, payment_id, status):
-        return self.request('PATCH', f'/payments/links/{payment_id}', {'status': status})
+    def delete_payment_link(self, payment_id):
+        return self.request('DELETE', f'/payment_links/{payment_id}')
 
 # Usage
 client = BITXpayClient(
@@ -411,11 +409,9 @@ client = BITXpayClient(
 )
 
 payment = client.create_payment_link({
-    'merchant_key': 'mkey-xxx',
-    'order_currency': 'USD',
-    'order_amount': 10,
     'payment_name': 'Test Payment',
-    'payer_email': 'test@example.com',
+    'amount': 10,
+    'currency': 'USD',
     'success_url': 'https://example.com/success',
     'cancel_url': 'https://example.com/cancel'
 })
@@ -485,7 +481,7 @@ class BITXpayClient {
     }
     
     public function createPaymentLink($paymentData) {
-        return $this->request('POST', '/payments/links', $paymentData);
+        return $this->request('POST', '/payment_links', $paymentData);
     }
 }
 
@@ -496,11 +492,9 @@ $client = new BITXpayClient(
 );
 
 $payment = $client->createPaymentLink([
-    'merchant_key' => 'mkey-xxx',
-    'order_currency' => 'USD',
-    'order_amount' => 10,
     'payment_name' => 'Test Payment',
-    'payer_email' => 'test@example.com',
+    'amount' => 10,
+    'currency' => 'USD',
     'success_url' => 'https://example.com/success',
     'cancel_url' => 'https://example.com/cancel'
 ]);

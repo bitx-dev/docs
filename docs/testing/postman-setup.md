@@ -29,7 +29,7 @@ Add the following variables to your environment:
 | Variable Name | Type | Initial Value | Current Value |
 |--------------|------|---------------|---------------|
 | `BASE_URL` | default | `https://sandboxapi.bitxpay.com/api/v1` | (same) |
-| `MERCHANT_API_KEY` | default | `bknn_e552de1d1e0` | Your API key |
+| `MERCHANT_API_KEY` | default | `btxm_xxxxxxxxxxxx` | Your API key |
 | `MERCHANT_PRIVATE_KEY` | secret | `Ed25519:base64_encoded_pkcs8_key` | Your private key |
 | `X_API_KEY` | default | (leave empty) | (auto-generated) |
 | `X_API_SIGNATURE` | default | (leave empty) | (auto-generated) |
@@ -247,15 +247,15 @@ Message = METHOD + PATH + TIMESTAMP + BODY
 
 **Example:**
 ```
-POST/payments/links2026-01-31T17:53:56Z{"merchant_key":"mkey-xxx","order_amount":10}
+POST/payment_links2026-01-31T17:53:56Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USD"}
 ```
 
 This message is then signed using:
-- **Algorithm:** Ed25519 (Edwards-curve Digital Signature Algorithm)
-- **Curve:** Curve25519
-- **Signature Size:** 64 bytes (fixed)
-- **Key Size:** 32 bytes (256 bits)
-- **Libraries:** TweetNaCl for signing, node-forge for key parsing
+- **Algorithm:** DSA (Digital Signature Algorithm) — FIPS 186-4
+- **Hash Function:** SHA-256
+- **Output Format:** DER-encoded signature, base64-encoded for transmission
+- **Key Size:** 2048 bits (minimum recommended)
+- **Library:** Node.js built-in `crypto` module
 
 ## Creating Your First Request
 
@@ -264,7 +264,7 @@ This message is then signed using:
 1. In your collection, click **Add Request**
 2. Name it "Create Payment Link"
 3. Set method to **POST**
-4. Set URL to: `{{BASE_URL}}/payments/links`
+4. Set URL to: `{{BASE_URL}}/payment_links`
 5. Go to **Headers** tab and add:
 
 | Key | Value |
@@ -278,11 +278,9 @@ This message is then signed using:
 
 ```json
 {
-  "merchant_key": "mkey-ckfhqahxy04g6e4qs6t3f00nl",
-  "order_currency": "USD",
-  "order_amount": 10,
   "payment_name": "Test Payment",
-  "payer_email": "test@example.com",
+  "amount": 10,
+  "currency": "USD",
   "success_url": "https://example.com/success",
   "cancel_url": "https://example.com/cancel"
 }
@@ -319,46 +317,42 @@ To see the signature generation process:
 3. You'll see logs like:
 
 ```
-🔐 Signing: POST /payments/links
+🔐 Signing: POST /payment_links
   Timestamp: 2026-01-31T17:53:56Z
 ✅ Signature: CHJRTWpRdJ4Wqo8AoGE4QQ0FnQIUJQSWt0YmWyqZZq4J...
 ```
 
 ## Testing Other Endpoints
 
-### Get Payment Details
+### Get Payment Link by ID
 
 ```
 Method: GET
-URL: {{BASE_URL}}/payments/links/{{payment_id}}
+URL: {{BASE_URL}}/payment_links/{{payment_id}}
 Headers: Same as above (X-API-Key, X-API-Signature, X-API-Timestamp)
 Body: None
 ```
 
-### Update Payment Status
+### Delete Payment Link
 
 ```
-Method: PATCH
-URL: {{BASE_URL}}/payments/links/{{payment_id}}
+Method: DELETE
+URL: {{BASE_URL}}/payment_links/{{payment_id}}
 Headers: Same as above
-Body:
-{
-  "id": "b8b2362d-f30c-4d9b-9a2e-08fa183d0d49",
-  "status": "expired"
-}
+Body: None
 ```
 
 ### List Payment Links
 
 ```
 Method: GET
-URL: {{BASE_URL}}/payments/links?page=1&page_size=20
-Headers: Authorization: Bearer {{MERCHANT_API_KEY}}
+URL: {{BASE_URL}}/payment_links?page=1&limit=20
+Headers: Same as above (X-API-Key, X-API-Signature, X-API-Timestamp)
 Body: None
 ```
 
-::: warning
-Note: The List endpoint uses Bearer token authentication instead of X-API-Key.
+::: tip
+All `/payment_links` endpoints use the same DSA authentication headers: `X-API-Key`, `X-API-Signature`, and `X-API-Timestamp`.
 :::
 
 ## Advanced Configuration

@@ -16,7 +16,7 @@ BITXpay supports two authentication methods depending on which API you're using.
 
 ### DSA Signature
 **Merchant APIs**  
-Payment links and merchant-facing operations. Uses DSA private key signing — FIPS 186-4 standard.
+Payment links and merchant-facing operations. Uses DSA (Digital Signature Algorithm) — FIPS 186-4 standard with SHA-256 hashing and DER encoding.
 
 ### HMAC-SHA256
 **Standard payment APIs**  
@@ -32,92 +32,158 @@ These keys are for server side use only. If a secret key is exposed, delete it i
 
 ### Getting your keys
 
-1. Sign up at [sandbox.bitxpay.com/auth/signup](https://sandbox.bitxpay.com/auth/signup)
-2. Navigate to **API Keys**
-3. Select **Create API key** under the Secret API Keys tab
-4. Enter an API key nickname (restrictions are optional)
-5. Click **Create**
-6. Secure your API Key ID and Secret in a safe location
+1. Log in to your [BITXpay Dashboard](https://sandbox.bitxpay.com/dashboard)
+2. Navigate to **Developers** → **API Keys**
+3. Generate your **Merchant API Key** and **Private Key**
+4. Store both securely — the private key is shown only once
+
+Your credentials will include:
+- **API Key:** `btxm_xxxxxxxxxx` (public identifier)
+- **Private Key:** DSA private key in PEM format (keep secret)
+- **Public Key:** DSA public key in PEM format (for verification)
 
 ### Required headers
 
 ```http
-Authorization: Bearer <JWT_TOKEN>
+X-API-Key: btxm_xxxxxxxxxxxx
+X-API-Signature: <base64_encoded_dsa_signature>
+X-API-Timestamp: 2026-01-31T17:53:56Z
 Content-Type: application/json
 ```
 
 ### Generating the signature
 
-The JWT token must be signed using your DSA private key following FIPS 186-4 standard.
+The signature is created by signing a message with your DSA private key:
+
+**Message Format:**
+```
+METHOD + PATH + TIMESTAMP + BODY
+```
+
+**Example Message:**
+```
+POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USD","payment_name":"Invoice #12345"}
+```
+
+**Signature Parameters:**
+- **Algorithm:** DSA (Digital Signature Algorithm)
+- **Hash Function:** SHA-256
+- **Key Size:** 2048 bits (minimum recommended)
+- **Output Format:** DER-encoded signature, base64-encoded for transmission
+- **Standard:** FIPS 186-4
 
 ### Code examples
 
 ::: code-group
 
 ```javascript [Node.js]
-const jwt = require('jsonwebtoken');
-const fs = require('fs');
+import crypto from 'crypto';
+import fs from 'fs';
 
-// Load your DSA private key
-const privateKey = fs.readFileSync('path/to/private-key.pem');
+function generateDSASignature(privateKeyPEM, method, path, timestamp, body = '') {
+  const message = `${method}${path}${timestamp}${body}`;
 
-// Create JWT token
-const token = jwt.sign(
-  {
-    sub: 'your-api-key-id',
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 3600
-  },
-  privateKey,
-  { algorithm: 'ES256' }
-);
+  // DSA signature using SHA-256
+  const signature = crypto.sign(
+    'sha256',
+    Buffer.from(message, 'utf8'),
+    {
+      key: privateKeyPEM,
+      dsaEncoding: 'der' // DER encoding for DSA signature
+    }
+  );
 
-// Use in request
-const response = await fetch('{{ $api.sandbox.baseUrl }}/payment-links', {
-  method: 'POST',
+  return signature.toString('base64');
+}
+
+// Usage
+const privateKey = fs.readFileSync('private-key.pem', 'utf8');
+const apiKey = process.env.MERCHANT_API_KEY;
+
+const method = 'POST';
+const path = '/payment_links';
+const timestamp = new Date().toISOString();
+const body = JSON.stringify({
+  payment_name: 'Invoice #12345',
+  amount: 100.50,
+  currency: 'USD',
+  success_url: 'https://example.com/success',
+  cancel_url: 'https://example.com/cancel'
+});
+
+const signature = generateDSASignature(privateKey, method, path, timestamp, body);
+
+// Make request
+const response = await fetch(`{{ $api.sandbox.baseUrl }}${path}`, {
+  method,
   headers: {
-    'Authorization': `Bearer ${token}`,
+    'X-API-Key': apiKey,
+    'X-API-Signature': signature,
+    'X-API-Timestamp': timestamp,
     'Content-Type': 'application/json'
   },
-  body: JSON.stringify({
-    amount: '100.00',
-    currency: 'USD'
-  })
+  body
 });
 ```
 
 ```python [Python]
-import jwt
-import time
-from pathlib import Path
-
-# Load your DSA private key
-private_key = Path('path/to/private-key.pem').read_text()
-
-# Create JWT token
-token = jwt.encode(
-    {
-        'sub': 'your-api-key-id',
-        'iat': int(time.time()),
-        'exp': int(time.time()) + 3600
-    },
-    private_key,
-    algorithm='ES256'
-)
-
-# Use in request
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import dsa
+from cryptography.hazmat.backends import default_backend
+import base64
+from datetime import datetime
+import json
 import requests
+import os
 
+def generate_dsa_signature(private_key_pem, method, path, timestamp, body=''):
+    message = f"{method}{path}{timestamp}{body}"
+
+    # Load DSA private key
+    private_key = serialization.load_pem_private_key(
+        private_key_pem.encode(),
+        password=None,
+        backend=default_backend()
+    )
+
+    # Sign with DSA using SHA-256
+    signature = private_key.sign(
+        message.encode('utf-8'),
+        hashes.SHA256()
+    )
+
+    # Return base64-encoded DER signature
+    return base64.b64encode(signature).decode('utf-8')
+
+# Usage
+with open('private-key.pem', 'r') as f:
+    private_key = f.read()
+
+api_key = os.environ.get('MERCHANT_API_KEY')
+
+method = 'POST'
+path = '/payment_links'
+timestamp = datetime.utcnow().isoformat() + 'Z'
+body = json.dumps({
+    'payment_name': 'Invoice #12345',
+    'amount': 100.50,
+    'currency': 'USD',
+    'success_url': 'https://example.com/success',
+    'cancel_url': 'https://example.com/cancel'
+})
+
+signature = generate_dsa_signature(private_key, method, path, timestamp, body)
+
+# Make request
 response = requests.post(
-    '{{ $api.sandbox.baseUrl }}/payment-links',
+    f'{{ $api.sandbox.baseUrl }}{path}',
     headers={
-        'Authorization': f'Bearer {token}',
+        'X-API-Key': api_key,
+        'X-API-Signature': signature,
+        'X-API-Timestamp': timestamp,
         'Content-Type': 'application/json'
     },
-    json={
-        'amount': '100.00',
-        'currency': 'USD'
-    }
+    data=body
 )
 ```
 
@@ -128,7 +194,7 @@ response = requests.post(
 ### Required headers
 
 ```http
-X-API-Key: <your-api-key>
+Authorization: Bearer <your-api-key>
 X-Signature: <hmac-sha256-signature>
 X-Timestamp: <unix-timestamp>
 Content-Type: application/json
@@ -139,35 +205,39 @@ Content-Type: application/json
 ::: code-group
 
 ```javascript [Node.js]
-const crypto = require('crypto');
+import crypto from 'crypto';
 
-function generateSignature(apiSecret, timestamp, method, path, body = '') {
-  const message = `${timestamp}${method}${path}${body}`;
-  return crypto
-    .createHmac('sha256', apiSecret)
-    .update(message)
+const apiKey = process.env.BITXPAY_API_KEY;
+const secretKey = process.env.BITXPAY_SECRET_KEY;
+
+async function makeRequest(method, path, body = null) {
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const bodyString = body ? JSON.stringify(body) : '';
+
+  const signature = crypto
+    .createHmac('sha256', secretKey)
+    .update(`${timestamp}${method}${path}${bodyString}`)
     .digest('hex');
+
+  const response = await fetch(`{{ $api.sandbox.baseUrl }}${path}`, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'X-Signature': signature,
+      'X-Timestamp': timestamp,
+      'Content-Type': 'application/json'
+    },
+    body: body ? bodyString : undefined
+  });
+
+  return response.json();
 }
 
-// Example usage
-const apiKey = 'your-api-key';
-const apiSecret = 'your-api-secret';
-const timestamp = Date.now().toString();
-const method = 'POST';
-const path = '/v1/payments';
-const body = JSON.stringify({ amount: '100.00', currency: 'USD' });
-
-const signature = generateSignature(apiSecret, timestamp, method, path, body);
-
-const response = await fetch('{{ $api.sandbox.baseUrl }}/payments', {
-  method: 'POST',
-  headers: {
-    'X-API-Key': apiKey,
-    'X-Signature': signature,
-    'X-Timestamp': timestamp,
-    'Content-Type': 'application/json'
-  },
-  body: body
+// Usage
+const payment = await makeRequest('POST', '/payments', {
+  amount: 100,
+  currency: 'USD',
+  crypto: 'BTC'
 });
 ```
 
@@ -176,35 +246,38 @@ import hmac
 import hashlib
 import time
 import requests
+import json
+import os
 
-def generate_signature(api_secret, timestamp, method, path, body=''):
-    message = f'{timestamp}{method}{path}{body}'
-    return hmac.new(
-        api_secret.encode(),
-        message.encode(),
+api_key = os.environ.get('BITXPAY_API_KEY')
+secret_key = os.environ.get('BITXPAY_SECRET_KEY')
+
+def make_request(method, path, body=None):
+    timestamp = str(int(time.time()))
+    body_string = json.dumps(body) if body else ''
+
+    payload = f"{timestamp}{method}{path}{body_string}"
+    signature = hmac.new(
+        secret_key.encode(),
+        payload.encode(),
         hashlib.sha256
     ).hexdigest()
 
-# Example usage
-api_key = 'your-api-key'
-api_secret = 'your-api-secret'
-timestamp = str(int(time.time() * 1000))
-method = 'POST'
-path = '/v1/payments'
-body = '{"amount":"100.00","currency":"USD"}'
-
-signature = generate_signature(api_secret, timestamp, method, path, body)
-
-response = requests.post(
-    '{{ $api.sandbox.baseUrl }}/payments',
-    headers={
-        'X-API-Key': api_key,
+    headers = {
+        'Authorization': f'Bearer {api_key}',
         'X-Signature': signature,
         'X-Timestamp': timestamp,
         'Content-Type': 'application/json'
-    },
-    data=body
-)
+    }
+
+    response = requests.request(
+        method,
+        f'{{ $api.sandbox.baseUrl }}{path}',
+        headers=headers,
+        json=body
+    )
+
+    return response.json()
 ```
 
 :::
@@ -228,7 +301,7 @@ Embedding API keys in code increases the risk of accidental exposure. When shari
 Keep API key files outside your application's source tree to prevent them from being committed to version control systems like GitHub.
 
 ### 3. Restrict signatures to specific APIs
-When multiple APIs are enabled in your project, restrict JWT token usage to specific APIs to prevent replay attacks. Include the API request path in the signing body to ensure signatures work only for their intended API.
+When multiple APIs are enabled in your project, restrict key usage to specific APIs to prevent replay attacks. Include the API request path in the signing body to ensure signatures work only for their intended API.
 
 ### 4. Delete unused keys
 Remove API keys you no longer need to minimize the attack surface.

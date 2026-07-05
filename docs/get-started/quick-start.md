@@ -6,20 +6,20 @@ Get started with BITXpay in minutes. This guide will walk you through creating y
 
 Before you begin, ensure you have:
 
-- A BITXpay account ([Sign up here](https://sandbox.bitxpay.com/auth/signup))
-- API credentials (API Key and Secret)
+- A BITXpay merchant account ([Sign up here](https://sandbox.bitxpay.com/auth/signup))
+- API credentials (API Key and DSA private key)
 - Basic knowledge of REST APIs
 - A development environment with Node.js, Python, or your preferred language
 
 ## Step 1: Get your API credentials
 
-1. Log in to your BITXpay dashboard at [sandbox.bitxpay.com](https://sandbox.bitxpay.com)
-2. Navigate to **Settings** → **API Keys**
+1. Log in to your [BITXpay Dashboard](https://sandbox.bitxpay.com/dashboard)
+2. Navigate to **Developers** → **API Keys**
 3. Click **Create API Key**
-4. Save your API Key ID and Secret securely
+4. Save your API Key (`btxm_xxxxxxxxxx`) and DSA private key securely
 
 ::: warning Keep your credentials safe
-Never commit API keys to version control or expose them in client-side code.
+Never commit API keys or private keys to version control or expose them in client-side code.
 :::
 
 ## Step 2: Make your first API call
@@ -30,31 +30,41 @@ Test your credentials by fetching your account information:
 
 ```bash [cURL]
 curl -X GET {{ $api.sandbox.baseUrl }}/account \
-  -H "X-API-Key: your-api-key" \
-  -H "X-Signature: your-signature" \
-  -H "X-Timestamp: $(date +%s)000"
+  -H "X-API-Key: btxm_xxxxxxxxxxxx" \
+  -H "X-API-Signature: <base64_encoded_dsa_signature>" \
+  -H "X-API-Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 ```
 
 ```javascript [Node.js]
 const axios = require('axios');
 const crypto = require('crypto');
+const fs = require('fs');
 
-const apiKey = 'your-api-key';
-const apiSecret = 'your-api-secret';
-const timestamp = Date.now().toString();
+const apiKey = process.env.MERCHANT_API_KEY; // btxm_xxxxxxxxxxxx
+const privateKey = fs.readFileSync('private-key.pem', 'utf8');
+const timestamp = new Date().toISOString();
 
-function generateSignature(secret, timestamp, method, path) {
-  const message = `${timestamp}${method}${path}`;
-  return crypto.createHmac('sha256', secret).update(message).digest('hex');
+function generateDSASignature(privateKeyPEM, method, path, timestamp, body = '') {
+  const message = `${method}${path}${timestamp}${body}`;
+  // DSA signature using SHA-256
+  const signature = crypto.sign(
+    'sha256',
+    Buffer.from(message, 'utf8'),
+    {
+      key: privateKeyPEM,
+      dsaEncoding: 'der'
+    }
+  );
+  return signature.toString('base64');
 }
 
-const signature = generateSignature(apiSecret, timestamp, 'GET', '/v1/account');
+const signature = generateDSASignature(privateKey, 'GET', '/account', timestamp);
 
 axios.get('{{ $api.sandbox.baseUrl }}/account', {
   headers: {
     'X-API-Key': apiKey,
-    'X-Signature': signature,
-    'X-Timestamp': timestamp
+    'X-API-Signature': signature,
+    'X-API-Timestamp': timestamp
   }
 })
 .then(response => console.log(response.data))
@@ -63,26 +73,42 @@ axios.get('{{ $api.sandbox.baseUrl }}/account', {
 
 ```python [Python]
 import requests
-import hmac
-import hashlib
-import time
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.backends import default_backend
+import base64
+from datetime import datetime
+import os
 
-api_key = 'your-api-key'
-api_secret = 'your-api-secret'
-timestamp = str(int(time.time() * 1000))
+api_key = os.environ.get('MERCHANT_API_KEY')  # btxm_xxxxxxxxxxxx
 
-def generate_signature(secret, timestamp, method, path):
-    message = f'{timestamp}{method}{path}'
-    return hmac.new(secret.encode(), message.encode(), hashlib.sha256).hexdigest()
+# Load your DSA private key
+with open('private-key.pem', 'r') as f:
+    private_key_pem = f.read()
 
-signature = generate_signature(api_secret, timestamp, 'GET', '/v1/account')
+private_key = serialization.load_pem_private_key(
+    private_key_pem.encode(),
+    password=None,
+    backend=default_backend()
+)
+
+timestamp = datetime.utcnow().isoformat() + 'Z'
+
+def generate_dsa_signature(private_key, method, path, timestamp, body=''):
+    message = f'{method}{path}{timestamp}{body}'
+    signature = private_key.sign(
+        message.encode('utf-8'),
+        hashes.SHA256()
+    )
+    return base64.b64encode(signature).decode('utf-8')
+
+signature = generate_dsa_signature(private_key, 'GET', '/account', timestamp)
 
 response = requests.get(
     '{{ $api.sandbox.baseUrl }}/account',
     headers={
         'X-API-Key': api_key,
-        'X-Signature': signature,
-        'X-Timestamp': timestamp
+        'X-API-Signature': signature,
+        'X-API-Timestamp': timestamp
     }
 )
 
@@ -100,32 +126,41 @@ Create your first payment request:
 ```javascript [Node.js]
 const axios = require('axios');
 const crypto = require('crypto');
+const fs = require('fs');
 
-const apiKey = 'your-api-key';
-const apiSecret = 'your-api-secret';
-const timestamp = Date.now().toString();
+const apiKey = process.env.MERCHANT_API_KEY;
+const privateKey = fs.readFileSync('private-key.pem', 'utf8');
+const timestamp = new Date().toISOString();
 const method = 'POST';
-const path = '/v1/payments';
+const path = '/payment_links';
 const body = JSON.stringify({
-  amount: '100.00',
+  payment_name: 'Test Payment',
+  amount: 10,
   currency: 'USD',
-  description: 'Test payment',
-  redirect_url: 'https://yoursite.com/success',
-  webhook_url: 'https://yoursite.com/webhook'
+  success_url: 'https://yoursite.com/success',
+  cancel_url: 'https://yoursite.com/cancel'
 });
 
-function generateSignature(secret, timestamp, method, path, body) {
-  const message = `${timestamp}${method}${path}${body}`;
-  return crypto.createHmac('sha256', secret).update(message).digest('hex');
+function generateDSASignature(privateKeyPEM, method, path, timestamp, body = '') {
+  const message = `${method}${path}${timestamp}${body}`;
+  const signature = crypto.sign(
+    'sha256',
+    Buffer.from(message, 'utf8'),
+    {
+      key: privateKeyPEM,
+      dsaEncoding: 'der'
+    }
+  );
+  return signature.toString('base64');
 }
 
-const signature = generateSignature(apiSecret, timestamp, method, path, body);
+const signature = generateDSASignature(privateKey, method, path, timestamp, body);
 
-axios.post('{{ $api.sandbox.baseUrl }}/payments', body, {
+axios.post(`{{ $api.sandbox.baseUrl }}${path}`, body, {
   headers: {
     'X-API-Key': apiKey,
-    'X-Signature': signature,
-    'X-Timestamp': timestamp,
+    'X-API-Signature': signature,
+    'X-API-Timestamp': timestamp,
     'Content-Type': 'application/json'
   }
 })
@@ -138,36 +173,52 @@ axios.post('{{ $api.sandbox.baseUrl }}/payments', body, {
 
 ```python [Python]
 import requests
-import hmac
-import hashlib
-import time
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.backends import default_backend
+import base64
+from datetime import datetime
 import json
+import os
 
-api_key = 'your-api-key'
-api_secret = 'your-api-secret'
-timestamp = str(int(time.time() * 1000))
+api_key = os.environ.get('MERCHANT_API_KEY')
+
+# Load your DSA private key
+with open('private-key.pem', 'r') as f:
+    private_key_pem = f.read()
+
+private_key = serialization.load_pem_private_key(
+    private_key_pem.encode(),
+    password=None,
+    backend=default_backend()
+)
+
+timestamp = datetime.utcnow().isoformat() + 'Z'
 method = 'POST'
-path = '/v1/payments'
+path = '/payment_links'
 body = json.dumps({
-    'amount': '100.00',
+    'payment_name': 'Test Payment',
+    'amount': 10,
     'currency': 'USD',
-    'description': 'Test payment',
-    'redirect_url': 'https://yoursite.com/success',
-    'webhook_url': 'https://yoursite.com/webhook'
+    'success_url': 'https://yoursite.com/success',
+    'cancel_url': 'https://yoursite.com/cancel'
 })
 
-def generate_signature(secret, timestamp, method, path, body):
-    message = f'{timestamp}{method}{path}{body}'
-    return hmac.new(secret.encode(), message.encode(), hashlib.sha256).hexdigest()
+def generate_dsa_signature(private_key, method, path, timestamp, body=''):
+    message = f'{method}{path}{timestamp}{body}'
+    signature = private_key.sign(
+        message.encode('utf-8'),
+        hashes.SHA256()
+    )
+    return base64.b64encode(signature).decode('utf-8')
 
-signature = generate_signature(api_secret, timestamp, method, path, body)
+signature = generate_dsa_signature(private_key, method, path, timestamp, body)
 
 response = requests.post(
-    '{{ $api.sandbox.baseUrl }}/payments',
+    f'{{ $api.sandbox.baseUrl }}{path}',
     headers={
         'X-API-Key': api_key,
-        'X-Signature': signature,
-        'X-Timestamp': timestamp,
+        'X-API-Signature': signature,
+        'X-API-Timestamp': timestamp,
         'Content-Type': 'application/json'
     },
     data=body
@@ -191,24 +242,24 @@ const express = require('express');
 const crypto = require('crypto');
 
 const app = express();
-app.use(express.json());
 
-app.post('/webhook', (req, res) => {
+// IMPORTANT: Use express.raw() for webhook routes to preserve the raw body for signature verification
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   const signature = req.headers['x-bitxpay-signature'];
-  const payload = JSON.stringify(req.body);
+  const payload = req.body; // Raw buffer
   
-  // Verify webhook signature
+  // Verify webhook signature using HMAC-SHA256
   const expectedSignature = crypto
-    .createHmac('sha256', 'your-webhook-secret')
+    .createHmac('sha256', process.env.WEBHOOK_SECRET)
     .update(payload)
     .digest('hex');
   
-  if (signature !== expectedSignature) {
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
     return res.status(401).send('Invalid signature');
   }
   
   // Process the webhook
-  const event = req.body;
+  const event = JSON.parse(payload);
   console.log('Webhook received:', event.type);
   
   switch (event.type) {
@@ -228,30 +279,32 @@ app.listen(3000, () => console.log('Webhook server running on port 3000'));
 ```
 
 ```python [Flask]
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import hmac
 import hashlib
 import json
+import os
 
 app = Flask(__name__)
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
     signature = request.headers.get('X-Bitxpay-Signature')
+    # Use raw data for signature verification
     payload = request.get_data()
     
-    # Verify webhook signature
+    # Verify webhook signature using HMAC-SHA256
     expected_signature = hmac.new(
-        b'your-webhook-secret',
+        os.environ['WEBHOOK_SECRET'].encode(),
         payload,
         hashlib.sha256
     ).hexdigest()
     
-    if signature != expected_signature:
+    if not hmac.compare_digest(signature, expected_signature):
         return 'Invalid signature', 401
     
     # Process the webhook
-    event = request.json
+    event = json.loads(payload)
     print(f'Webhook received: {event["type"]}')
     
     if event['type'] == 'payment.completed':
@@ -272,8 +325,8 @@ if __name__ == '__main__':
 
 BITXpay provides a sandbox environment for testing:
 
-- **Sandbox API**: `https://sandbox-api.bitxpay.com`
-- **Sandbox Dashboard**: `https://sandbox.bitxpay.com`
+- **Sandbox API**: `https://sandboxapi.bitxpay.com/api/v1`
+- **Sandbox Dashboard**: [sandbox.bitxpay.com](https://sandbox.bitxpay.com)
 
 Use sandbox credentials to test your integration without real funds.
 
@@ -291,9 +344,11 @@ Now that you've created your first payment, explore more features:
 ### Invalid signature error
 
 Make sure you're:
-- Using the correct API secret
-- Including the timestamp in the signature
-- Formatting the message string correctly: `${timestamp}${method}${path}${body}`
+- Using the correct DSA private key
+- Including the timestamp in the signature (ISO 8601 format)
+- Formatting the message string correctly: `${method}${path}${timestamp}${body}` — e.g. `POST/payment_links2026-01-31T12:00:00Z{...}`
+- Using SHA-256 hash with DER encoding
+- Encoding the final signature as Base64
 
 ### Webhook not receiving events
 

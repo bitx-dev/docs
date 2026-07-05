@@ -222,4 +222,4 @@ Use this checklist before going live:
 - [ ] Dependencies are up to date
 - [ ] Rate limiting configured
 - [ ] Monitoring and alerts set up
-- [ ] Tested in sandbox environment
+- [ ] Integration fully tested in sandbox environment before production switch

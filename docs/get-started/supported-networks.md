@@ -39,6 +39,10 @@ Bitcoin, Solana, and Tron use their own address formats and transaction models. 
 | 15 | Unichain | EVM | Mainnet | ETH | ETH, USDC, UNI |
 | 16 | Ink | EVM | Mainnet | ETH | ETH, USDC |
 
+::: tip Payment Link Currencies vs Networks
+The above table lists all **blockchain networks** supported by BITXpay. For **Payment Link creation**, only the following currencies are currently accepted: AVAX, BNB, ETH, LINK, USDC, USDT, WBTC, WETH. Use the [Get Currencies](/api-reference/payments#_1-get-currencies) endpoint for the real-time list.
+:::
+
 ## Mainnets
 
 ### Production-only environment

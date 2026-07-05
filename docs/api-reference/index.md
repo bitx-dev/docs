@@ -25,6 +25,14 @@ https://sandboxapi.bitxpay.com/api/v1
 
 All API requests must include authentication headers. See [Authentication](/api-reference/authentication) for details.
 
+**Merchant APIs (DSA):**
+```bash
+X-API-Key: btxm_xxxxxxxxxxxx
+X-API-Signature: <base64_encoded_dsa_signature>
+X-API-Timestamp: 2026-01-31T12:00:00Z
+```
+
+**Standard APIs (HMAC-SHA256):**
 ```bash
 Authorization: Bearer YOUR_API_KEY
 X-Signature: HMAC_SIGNATURE
@@ -33,23 +41,20 @@ X-Timestamp: UNIX_TIMESTAMP
 
 ## Endpoints
 
-### Payments
+### Payments (Merchant API)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/payments` | Create a new payment |
-| `GET` | `/payments/:id` | Get payment details |
-| `GET` | `/payments` | List all payments |
-| `POST` | `/payments/:id/cancel` | Cancel a payment |
+| `GET` | `/currencies` | Get supported currencies |
+| `GET` | `/payment_links` | List all payment links |
+| `POST` | `/payment_links` | Create a payment link |
+| `GET` | `/payment_links/:id` | Get payment link by ID |
+| `DELETE` | `/payment_links/:id` | Delete a payment link |
 
 ### Subscriptions
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/public/subscriptions/link/` | Create subscription link |
-| `GET` | `/public/subscriptions/link/{walletAddress}` | Get subscriptions by wallet |
-| `POST` | `/public/subscriptions/link/payment` | Record subscription payment |
-| `PUT` | `/public/subscriptions/link/{id}` | Update subscription link |
-| `GET` | `/public/subscriber/{id}` | Get subscriber details |
-| `PUT` | `/public/subscriber/{id}` | Update subscriber |
+| `POST` | `/subscriptions/subscribers/createlink` | Create subscriber and generate subscription link |
+| `GET` | `/public/subscriptions/link/{walletAddress}` | Get subscriptions by wallet address |
 
 ## Response Format
 

@@ -33,8 +33,8 @@ This guide covers common issues you might encounter when testing BITXpay APIs an
 
 ✅ **Verify API key format:**
 ```
-Correct: bknn_e552de1d1e0
-Incorrect: Bearer bknn_e552de1d1e0 (for X-API-Key header)
+Correct: btxm_live_xxxxxxxxxxxx or btxm_xxxxxxxxxxxx
+Incorrect: Bearer btxm_live_xxxxxxxxxxxx (for X-API-Key header)
 ```
 
 ✅ **Ensure key is active:**
@@ -69,7 +69,7 @@ Incorrect: Bearer bknn_e552de1d1e0 (for X-API-Key header)
 const message = `${METHOD}${PATH}${TIMESTAMP}${BODY}`;
 
 // Example
-"POST/payments/links2026-01-31T17:53:56Z{\"merchant_key\":\"mkey-xxx\"}"
+"POST/payment_links2026-01-31T17:53:56Z{\"payment_name\":\"Invoice #12345\",\"amount\":100.50,\"currency\":\"USD\"}"
 ```
 
 ✅ **Check signature parameters:**
@@ -107,12 +107,12 @@ Use this test case to verify your signature generation:
 ```javascript
 // Test inputs
 const method = 'POST';
-const path = '/payments/links';
+const path = '/payment_links';
 const timestamp = '2026-01-31T12:00:00Z';
-const body = '{"test":"value"}';
+const body = '{"payment_name":"Invoice #12345","amount":100.50,"currency":"USD"}';
 
 // Expected message
-const expectedMessage = 'POST/payments/links2026-01-31T12:00:00Z{"test":"value"}';
+const expectedMessage = 'POST/payment_links2026-01-31T12:00:00Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USD"}';
 
 // Verify your message matches
 console.assert(message === expectedMessage, 'Message format incorrect');
@@ -147,8 +147,9 @@ const timestamp = new Date().toISOString(); // "2026-01-31T17:53:56.123Z"
 const timestamp = "2026-01-31T17:53:56Z";
 
 // Incorrect formats
-"2026-01-31 17:53:56"  // Wrong format
-"1706721236"           // Unix timestamp (not supported for merchant APIs)
+"2026-01-31 17:53:56"  // Wrong: missing T and Z
+"1706721236"           // Wrong: Unix timestamp not supported
+"1706721236000"        // Wrong: milliseconds not supported
 ```
 
 ✅ **Synchronize system clock:**
@@ -378,12 +379,12 @@ Wrong: merchant_api_key, Merchant_Api_Key
 ✅ **Remove extra spaces:**
 ```
 // ❌ Wrong - extra spaces
------BEGIN RSA PRIVATE KEY-----  
-MIIEpAIBAAKCAQEA...
+-----BEGIN DSA PRIVATE KEY-----  
+MIIBuwIBAAKBgQD...
 
 // ✅ Correct - no trailing spaces
------BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA...
+-----BEGIN DSA PRIVATE KEY-----
+MIIBuwIBAAKBgQD...
 ```
 
 ✅ **Verify key markers:**

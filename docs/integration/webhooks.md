@@ -17,25 +17,26 @@ In your [BITXpay Dashboard](https://dashboard.bitxpay.com), navigate to **Settin
 
 ```javascript
 import express from 'express';
-import { BITXpay } from '@bitxpay/sdk';
+import crypto from 'crypto';
 
 const app = express();
-app.use(express.json());
 
-const bitxpay = new BITXpay({
-  apiKey: process.env.BITXPAY_API_KEY,
-  secretKey: process.env.BITXPAY_SECRET_KEY
-});
-
-app.post('/webhooks/bitxpay', (req, res) => {
+// IMPORTANT: Use express.raw() for webhook routes to get the raw body for signature verification
+app.post('/webhooks/bitxpay', express.raw({ type: 'application/json' }), (req, res) => {
   const signature = req.headers['x-bitxpay-signature'];
+  const payload = req.body; // Raw buffer
 
   // Verify the webhook signature
-  if (!bitxpay.webhooks.verify(req.body, signature)) {
+  const expectedSignature = crypto
+    .createHmac('sha256', process.env.WEBHOOK_SECRET)
+    .update(payload)
+    .digest('hex');
+
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
     return res.status(401).send('Invalid signature');
   }
 
-  const event = req.body;
+  const event = JSON.parse(payload);
 
   switch (event.type) {
     case 'payment.completed':
@@ -92,10 +93,11 @@ Always verify webhook signatures to ensure requests are from BITXpay.
 ```javascript
 import crypto from 'crypto';
 
-function verifyWebhook(payload, signature, secretKey) {
+// payload must be the raw request body (Buffer or string), NOT a parsed JSON object
+function verifyWebhook(rawPayload, signature, secretKey) {
   const expectedSignature = crypto
     .createHmac('sha256', secretKey)
-    .update(JSON.stringify(payload))
+    .update(rawPayload)
     .digest('hex');
 
   return crypto.timingSafeEqual(

@@ -34,7 +34,7 @@ features:
     details: Bank-grade security with DSA/HMAC authentication, encrypted communications, and regulatory compliance.
   - icon:
       src: /icons/realtime-settlement.svg
-      alt: Enterprise Security
+      alt: Real-Time Settlement
       width: 30
       height: 30
       wrap: true
@@ -42,7 +42,7 @@ features:
     details: Process payments 24/7 with instant on-chain confirmations and real-time webhook notifications.
   - icon:
       src: /icons/self-custodial.svg
-      alt: Enterprise Security
+      alt: Self-Custodial Wallet
       width: 30
       height: 30
       wrap: true
@@ -50,7 +50,7 @@ features:
     details: Full ownership and control of your funds. No third-party custody—your keys, your crypto.
   - icon:
       src: /icons/crypto-to-fiat-bridge.svg
-      alt: Enterprise Security
+      alt: Crypto-to-Fiat Bridge
       width: 30
       height: 30
       wrap: true
@@ -58,7 +58,7 @@ features:
     details: Seamless conversion between cryptocurrencies and 30+ local currencies for global settlement.
   - icon:
       src: /icons/developer-first-api.svg
-      alt: Enterprise Security
+      alt: Developer-First APIs
       width: 30
       height: 30
       wrap: true

@@ -19,7 +19,7 @@ Choose your preferred testing method:
 
 Before testing, you'll need:
 
-1. **Merchant API Key** - Your unique API key (format: `bknn_xxxxxxxx`)
+1. **Merchant API Key** - Your unique API key (format: `btxm_xxxxxxxx`)
 2. **Merchant Private Key** - DSA private key in PEM format
 3. **API Testing Tool** - Postman, Insomnia, cURL, etc.
 
@@ -80,10 +80,10 @@ graph LR
 
 ### Payment Links API
 
-- **Create Payment Link** - `POST /payments/links`
-- **Get Payment Details** - `GET /payments/links/{payment_id}`
-- **Update Payment Status** - `PATCH /payments/links/{id}`
-- **List Payment Links** - `GET /payments/links`
+- **List Payment Links** - `GET /payment_links`
+- **Create Payment Link** - `POST /payment_links`
+- **Get Payment Link by ID** - `GET /payment_links/{id}`
+- **Delete Payment Link** - `DELETE /payment_links/{id}`
 
 See the [Payment Links API Reference](/api-reference/payments) for detailed endpoint documentation.
 

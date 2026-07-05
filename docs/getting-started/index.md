@@ -1,7 +1,9 @@
 ---
 title: Getting Started
 description: Learn how to integrate BITXpay into your application and start accepting cryptocurrency payments.
+draft: true
 ---
+<!-- NOTE: This file is legacy/draft content. The active documentation lives in /get-started/ — do not link to this directory. -->
 
 # Getting Started 
 

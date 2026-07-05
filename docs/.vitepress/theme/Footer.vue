@@ -131,25 +131,25 @@ import { withBase } from "vitepress";
         <div class="footer-section">
           <h4 class="footer-heading">Company</h4>
           <ul class="footer-links">
-            <li>
+            <!-- <li>
               <a href="https://bitx.es/" target="_blank">About BITXpay</a>
-            </li>
-            <li>
+            </li> -->
+            <!-- <li>
               <a href="https://bitx.es/contact-us" target="_blank"
                 >Contact Us</a
               >
-            </li>
+            </li> -->
             <li><a :href="withBase('/security/')">Security</a></li>
-            <li>
+            <!-- <li>
               <a href="https://bitx.es/privacy-policy" target="_blank"
                 >Privacy Policy</a
               >
-            </li>
-            <li>
+            </li> -->
+            <!-- <li>
               <a href="https://bitx.es/terms-and-conditions" target="_blank"
                 >Terms of Service</a
               >
-            </li>
+            </li> -->
           </ul>
         </div>
       </div>

@@ -9,7 +9,7 @@ description: Create and manage payment links for accepting cryptocurrency paymen
 
 The Merchant API Payments endpoints allow you to create, manage, and retrieve payment links for accepting cryptocurrency payments. All endpoints require Merchant API Key authentication with DSA signature verification.
 
-**Base URL:** `{{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }}`
+**Base URL:** `{{ $api.sandbox.baseUrl }}`
 
 **Authentication:** Merchant API Key (Asymmetric DSA)
 
@@ -185,6 +185,8 @@ Content-Type: application/json
 | `success_url` | string | No | Redirect URL after success (valid URL, max 500 chars) | "https://www.success.io/success.html" |
 | `cancel_url` | string | No | Redirect URL after cancellation (valid URL, max 500 chars) | "https://www.failure.io/cancel.html" |
 | `webhook_metadata` | object | No | Custom metadata for webhooks | {"merchant_id": "M-10001"} |
+| `checkout_mode` | string | No | Checkout flow mode | "redirect" |
+| `origin` | string | No | Origin URL of the requesting application | "https://yoursite.com" |
 
 **Cart Object Structure:**
 
@@ -194,10 +196,13 @@ Content-Type: application/json
     "items": [
       {
         "name": "Course A",
+        "product_id": "prod_001",
         "quantity": 1,
-        "price": 100.50
+        "unit_price": 100.50,
+        "total": 100.50
       }
     ],
+    "shipping": 0,
     "subtotal": 100.50,
     "tax": 0,
     "total": 100.50
@@ -209,9 +214,12 @@ Content-Type: application/json
 |-------|------|----------|-------------|
 | `items` | array | Yes | Array of cart items |
 | `items[].name` | string | Yes | Item name |
+| `items[].product_id` | string | No | Your internal product identifier |
 | `items[].quantity` | integer | Yes | Item quantity (must be > 0) |
-| `items[].price` | float | Yes | Item price (must be > 0) |
+| `items[].unit_price` | float | Yes | Price per single unit |
+| `items[].total` | float | Yes | Line total (quantity × unit_price) |
 | `subtotal` | float | Yes | Subtotal amount |
+| `shipping` | float | No | Shipping cost (default: 0) |
 | `tax` | float | Yes | Tax amount |
 | `total` | float | Yes | Total amount (should match payment amount) |
 
@@ -238,7 +246,7 @@ The API returns different response structures based on the parameters you provid
   "payment_name": "Invoice #12345",
   "description": "Payment for Order #12345",
   "amount": 100.50,
-  "currency": "USDT",
+  "currency": "USD",
   "expires_at": "2026-02-01T12:00:00Z",
   "max_uses": 1,
   "customer_id": "AB-001",
@@ -250,22 +258,24 @@ The API returns different response structures based on the parameters you provid
     "items": [
       {
         "name": "Course A",
+        "product_id": "prod_001",
         "quantity": 1,
-        "price": 100.50
+        "unit_price": 100.50,
+        "total": 100.50
       }
     ],
+    "shipping": 0,
     "subtotal": 100.50,
     "tax": 0,
     "total": 100.50
   },
-  "order_id": "ORD-20260226-A1B2C3",
-  "auto_fill": true,
+  "checkout_mode": "redirect",
+  "origin": "https://yoursite.com",
   "success_url": "https://www.success.io/success.html",
   "cancel_url": "https://www.failure.io/cancel.html",
   "webhook_metadata": {
-    "merchant_id": "M-10001",
-    "source": "payment_link",
-    "note": "Test payment"
+    "order_id": "ord_abc123",
+    "demo": true
   }
 }
 ```
@@ -305,18 +315,20 @@ The response structure varies based on the request parameters provided.
 {
   "message": "Payment link created successfully",
   "data": {
-    "id": "fce13397-afb5-4093-84c0-b64178691dbd",
+    "id": "d26ffcc8-f013-464e-893a-d71ee1e849ae",
     "payment_name": "Invoice #12345",
     "description": "Payment for Order #12345",
     "amount": 100.5,
-    "currency": "USDT",
-    "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+    "currency": "USD",
+    "payment_url": "sandboxpay.bitxpay.com/payment_link?payment_id=d26ffcc8-f013-464e-893a-d71ee1e849ae",
     "payment_status": "processing",
     "payment_type": "one_time",
+    "source": "payment_link_api",
     "expires_at": "2026-02-01T12:00:00Z",
     "max_uses": 1,
     "current_uses": 0,
     "is_active": true,
+    "is_test": false,
     "customer_id": "AB-001",
     "customer_name": "John Doe",
     "customer_email": "john@example.com",
@@ -326,10 +338,13 @@ The response structure varies based on the request parameters provided.
       "items": [
         {
           "name": "Course A",
-          "price": 100.5,
-          "quantity": 1
+          "product_id": "prod_001",
+          "quantity": 1,
+          "unit_price": 100.5,
+          "total": 100.5
         }
       ],
+      "shipping": 0,
       "subtotal": 100.5,
       "tax": 0,
       "total": 100.5
@@ -339,12 +354,12 @@ The response structure varies based on the request parameters provided.
     "success_url": "https://www.success.io/success.html",
     "cancel_url": "https://www.failure.io/cancel.html",
     "webhook_metadata": {
-      "merchant_id": "M-10001",
-      "note": "Test payment",
-      "source": "payment_link"
+      "order_id": "ord_abc123",
+      "demo": true
     },
-    "created_at": "2026-03-12T15:23:32.084432Z"
-  }
+    "created_at": "2026-07-05T07:30:05.703759Z"
+  },
+  "order_id": "ord_abc123"
 }
 ```
 
@@ -360,6 +375,8 @@ The response structure varies based on the request parameters provided.
 | `payment_url` | string | URL for customers to complete payment |
 | `payment_status` | string | Status: `processing`, `completed`, `expired`, `cancelled` |
 | `payment_type` | string | Payment type: `one_time`, `recurring` |
+| `source` | string | Origin of the payment link: `payment_link_api` |
+| `is_test` | boolean | Whether this is a test payment |
 | `expires_at` | timestamp | Expiration timestamp |
 | `max_uses` | integer | Maximum number of uses allowed |
 | `current_uses` | integer | Current number of uses |
@@ -376,6 +393,13 @@ The response structure varies based on the request parameters provided.
 | `cancel_url` | string | Cancel redirect URL (if provided) |
 | `webhook_metadata` | object | Custom webhook metadata (if provided) |
 | `created_at` | timestamp | Creation timestamp |
+
+**Top-level response fields (alongside `data`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Human-readable result message |
+| `order_id` | string | The order ID (also echoed inside `data`) |
 
 #### Error Responses
 
@@ -684,13 +708,13 @@ The `summary` object is always included in the response and provides real-time s
 
 ---
 
-### 5. Update Payment Link Status
+### 5. Delete Payment Link
 
-Update the status of a payment link (activate, deactivate, or expire).
+Soft delete a payment link by its ID.
 
 #### Request
 
-**PUT** `/payment_links/{id}/status`
+**DELETE** `/payment_links/{id}`
 
 #### Path Parameters
 
@@ -698,17 +722,11 @@ Update the status of a payment link (activate, deactivate, or expire).
 |-----------|------|-------------|---------|
 | `id` | string | Payment Link ID (UUID) | "22222222-2222-2222-2222-222222222222" |
 
-#### Request Body
-
-| Field | Type | Required | Description | Valid Values |
-|-------|------|----------|-------------|--------------|
-| `status` | string | Yes | New status | active, inactive, expired |
-
 #### Response (200 OK)
 
 ```json
 {
-  "message": "Payment link status updated to active successfully",
+  "message": "Payment link deleted successfully",
   "data": {
     "id": "22222222-2222-2222-2222-222222222222",
     "payment_name": "Invoice #12345",
@@ -740,7 +758,7 @@ Update the status of a payment link (activate, deactivate, or expire).
 
 | Status | Error | Description |
 |--------|-------|-------------|
-| 400 | Bad Request | Invalid status value or payment link ID |
+| 400 | Bad Request | Invalid payment link ID |
 | 401 | Unauthorized | Missing or invalid API key/signature |
 | 404 | Not Found | Payment link not found |
 | 500 | Internal Server Error | Server error |
@@ -781,7 +799,7 @@ For detailed implementation examples in various languages, see the [Merchant API
 - **Create Payment Link:** 10 requests per minute per API key
 - **List Payment Links:** 30 requests per minute per API key
 - **Get Payment Link:** 30 requests per minute per API key
-- **Update Status:** 10 requests per minute per API key
+- **Delete Payment Link:** 10 requests per minute per API key
 
 ---
 
@@ -802,7 +820,7 @@ curl {{ $api.sandbox.baseUrl }}{{ $api.endpoints.currencies }} \
 ### Create a Simple Payment Link
 
 ```bash
-curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }} \
+curl -X POST {{ $api.sandbox.baseUrl }}/payment_links \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -817,7 +835,7 @@ curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }} \
 ### Create Payment Link with Full Details
 
 ```bash
-curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }} \
+curl -X POST {{ $api.sandbox.baseUrl }}/payment_links \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
@@ -837,21 +855,20 @@ curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }} \
 ### List Payment Links with Filters
 
 ```bash
-curl {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }}?status=pending&currency=USDT&limit=10 \
+curl {{ $api.sandbox.baseUrl }}/payment_links?status=pending&currency=USDT&limit=10 \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z"
 ```
 
-### Activate a Payment Link
+### Delete a Payment Link
 
 ```bash
-curl -X PUT {{ $api.sandbox.baseUrl }}{{ $api.endpoints.paymentLinks }}/{id}/status \
+curl -X DELETE {{ $api.sandbox.baseUrl }}/payment_links/{id} \
   -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
-  -H "Content-Type: application/json" \
-  -d '{"status": "active"}'
+  -H "Content-Type: application/json"
 ```
 
 ---
