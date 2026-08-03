@@ -7,7 +7,7 @@ export default defineConfig({
   title: SITE_CONFIG.title,
   description: SITE_CONFIG.description,
 
-  // Base path: root for local dev, /docs/ for production (GitHub Pages repository name)
+  // Base path: root for both local dev and production (custom domain docs.bitxpay.com)
   base: getBasePath(),
 
   // Clean URLs without .html extension

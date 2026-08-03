@@ -13,7 +13,7 @@ export const SITE_CONFIG = {
   // Site URLs
   urls: {
     // Main documentation site
-    docs: 'https://bitx-dev.github.io/docs/',
+    docs: 'https://docs.bitxpay.com/',
     
     // API Server URLs (for examples and responses)
     apiServer: {
@@ -36,15 +36,15 @@ export const SITE_CONFIG = {
     // Support and status
     support: {
       email: 'api-support@bitxpay.com',
-      documentation: 'https://bitx-dev.github.io/docs/',
+      documentation: 'https://docs.bitxpay.com/',
       statusPage: 'https://status.bitxpay.com',
     },
   },
 
   // SEO configuration
   seo: {
-    hostname: 'https://bitx-dev.github.io/docs/',
-    ogImage: 'https://bitx-dev.github.io/docs/og-image.png',
+    hostname: 'https://docs.bitxpay.com/',
+    ogImage: 'https://docs.bitxpay.com/og-image.png',
     twitterHandle: '@bitxpay',
   },
 
@@ -67,7 +67,7 @@ export const SITE_CONFIG = {
   // Base path configuration
   basePath: {
     development: '/',
-    production: '/docs/',
+    production: '/',
   },
 
   // Feature flags
