@@ -22,11 +22,19 @@ export const API_ENDPOINTS = {
   endpoints: {
     // Payment Links
     paymentLinks: '/payment_links',
-    currencies: '/currencies',
+    currencies: '/payment_links/currencies',
     
-    // Subscriptions
+    // Subscriptions — Authenticated (Merchant) Routes
+    subscriptionPlans: '/subscriptions/plans',
+    subscribers: '/subscriber',
+    invitations: '/invitations',
+    subscriptionLinks: '/subscriptions/link',
+
+    // Subscriptions — Public Routes
+    publicSubscriptionPlans: '/public/subscriptions/plans',
+    publicSubscribers: '/public/subscriber',
     subscriptions: '/public/subscriptions/link',
-    subscribers: '/public/subscriber',
+    subscriptionNft: '/public/subscriptions/nft',
     
     // Webhooks
     webhookEndpoints: '/webhook-endpoints',

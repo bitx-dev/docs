@@ -91,7 +91,7 @@ All webhooks follow a consistent structure:
   "data": {
     "id": "pay_abc123",
     "amount": "100.00",
-    "currency": "USD",
+    "currency": "USDT",
     "status": "completed",
     "network": "ethereum",
     "transaction_hash": "0x123...",

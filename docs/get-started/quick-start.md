@@ -7,7 +7,7 @@ Get started with BITXpay in minutes. This guide will walk you through creating y
 Before you begin, ensure you have:
 
 - A BITXpay merchant account ([Sign up here](https://sandbox.bitxpay.com/auth/signup))
-- API credentials (API Key and DSA private key)
+- API credentials (API Key and Ed25519 private key)
 - Basic knowledge of REST APIs
 - A development environment with Node.js, Python, or your preferred language
 
@@ -16,7 +16,7 @@ Before you begin, ensure you have:
 1. Log in to your [BITXpay Dashboard](https://sandbox.bitxpay.com/dashboard)
 2. Navigate to **Developers** → **API Keys**
 3. Click **Create API Key**
-4. Save your API Key (`btxm_xxxxxxxxxx`) and DSA private key securely
+4. Save your API Key (`btxm_test_xxxxxxxxxx`) and Ed25519 private key securely
 
 ::: warning Keep your credentials safe
 Never commit API keys or private keys to version control or expose them in client-side code.
@@ -31,7 +31,7 @@ Test your credentials by fetching your account information:
 ```bash [cURL]
 curl -X GET {{ $api.sandbox.baseUrl }}/account \
   -H "X-API-Key: btxm_xxxxxxxxxxxx" \
-  -H "X-API-Signature: <base64_encoded_dsa_signature>" \
+  -H "X-API-Signature: <base64_encoded_ed25519_signature>" \
   -H "X-API-Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 ```
 
@@ -44,21 +44,14 @@ const apiKey = process.env.MERCHANT_API_KEY; // btxm_xxxxxxxxxxxx
 const privateKey = fs.readFileSync('private-key.pem', 'utf8');
 const timestamp = new Date().toISOString();
 
-function generateDSASignature(privateKeyPEM, method, path, timestamp, body = '') {
+function generateSignature(privateKeyPEM, method, path, timestamp, body = '') {
   const message = `${method}${path}${timestamp}${body}`;
-  // DSA signature using SHA-256
-  const signature = crypto.sign(
-    'sha256',
-    Buffer.from(message, 'utf8'),
-    {
-      key: privateKeyPEM,
-      dsaEncoding: 'der'
-    }
-  );
+  // Ed25519 (EdDSA): pass `null` — Ed25519 hashes the message internally.
+  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
   return signature.toString('base64');
 }
 
-const signature = generateDSASignature(privateKey, 'GET', '/account', timestamp);
+const signature = generateSignature(privateKey, 'GET', '/account', timestamp);
 
 axios.get('{{ $api.sandbox.baseUrl }}/account', {
   headers: {
@@ -73,35 +66,31 @@ axios.get('{{ $api.sandbox.baseUrl }}/account', {
 
 ```python [Python]
 import requests
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 import base64
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 api_key = os.environ.get('MERCHANT_API_KEY')  # btxm_xxxxxxxxxxxx
 
-# Load your DSA private key
+# Load your Ed25519 private key
 with open('private-key.pem', 'r') as f:
     private_key_pem = f.read()
 
 private_key = serialization.load_pem_private_key(
     private_key_pem.encode(),
     password=None,
-    backend=default_backend()
 )
 
-timestamp = datetime.utcnow().isoformat() + 'Z'
+timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
-def generate_dsa_signature(private_key, method, path, timestamp, body=''):
+def generate_signature(private_key, method, path, timestamp, body=''):
     message = f'{method}{path}{timestamp}{body}'
-    signature = private_key.sign(
-        message.encode('utf-8'),
-        hashes.SHA256()
-    )
+    # Ed25519 (EdDSA) — no separate hash argument; Ed25519 hashes internally.
+    signature = private_key.sign(message.encode('utf-8'))
     return base64.b64encode(signature).decode('utf-8')
 
-signature = generate_dsa_signature(private_key, 'GET', '/account', timestamp)
+signature = generate_signature(private_key, 'GET', '/account', timestamp)
 
 response = requests.get(
     '{{ $api.sandbox.baseUrl }}/account',
@@ -136,25 +125,19 @@ const path = '/payment_links';
 const body = JSON.stringify({
   payment_name: 'Test Payment',
   amount: 10,
-  currency: 'USD',
+  currency: 'USDT',
   success_url: 'https://yoursite.com/success',
   cancel_url: 'https://yoursite.com/cancel'
 });
 
-function generateDSASignature(privateKeyPEM, method, path, timestamp, body = '') {
+function generateSignature(privateKeyPEM, method, path, timestamp, body = '') {
   const message = `${method}${path}${timestamp}${body}`;
-  const signature = crypto.sign(
-    'sha256',
-    Buffer.from(message, 'utf8'),
-    {
-      key: privateKeyPEM,
-      dsaEncoding: 'der'
-    }
-  );
+  // Ed25519 (EdDSA): pass `null` — Ed25519 hashes the message internally.
+  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
   return signature.toString('base64');
 }
 
-const signature = generateDSASignature(privateKey, method, path, timestamp, body);
+const signature = generateSignature(privateKey, method, path, timestamp, body);
 
 axios.post(`{{ $api.sandbox.baseUrl }}${path}`, body, {
   headers: {
@@ -166,52 +149,48 @@ axios.post(`{{ $api.sandbox.baseUrl }}${path}`, body, {
 })
 .then(response => {
   console.log('Payment created:', response.data);
-  console.log('Payment URL:', response.data.hosted_url);
+  console.log('Payment URL:', response.data.data.payment_url);
 })
 .catch(error => console.error(error));
 ```
 
 ```python [Python]
 import requests
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 import base64
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import os
 
 api_key = os.environ.get('MERCHANT_API_KEY')
 
-# Load your DSA private key
+# Load your Ed25519 private key
 with open('private-key.pem', 'r') as f:
     private_key_pem = f.read()
 
 private_key = serialization.load_pem_private_key(
     private_key_pem.encode(),
     password=None,
-    backend=default_backend()
 )
 
-timestamp = datetime.utcnow().isoformat() + 'Z'
+timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 method = 'POST'
 path = '/payment_links'
 body = json.dumps({
     'payment_name': 'Test Payment',
     'amount': 10,
-    'currency': 'USD',
+    'currency': 'USDT',
     'success_url': 'https://yoursite.com/success',
     'cancel_url': 'https://yoursite.com/cancel'
 })
 
-def generate_dsa_signature(private_key, method, path, timestamp, body=''):
+def generate_signature(private_key, method, path, timestamp, body=''):
     message = f'{method}{path}{timestamp}{body}'
-    signature = private_key.sign(
-        message.encode('utf-8'),
-        hashes.SHA256()
-    )
+    # Ed25519 (EdDSA) — no separate hash argument; Ed25519 hashes internally.
+    signature = private_key.sign(message.encode('utf-8'))
     return base64.b64encode(signature).decode('utf-8')
 
-signature = generate_dsa_signature(private_key, method, path, timestamp, body)
+signature = generate_signature(private_key, method, path, timestamp, body)
 
 response = requests.post(
     f'{{ $api.sandbox.baseUrl }}{path}',
@@ -226,7 +205,7 @@ response = requests.post(
 
 result = response.json()
 print('Payment created:', result)
-print('Payment URL:', result['hosted_url'])
+print('Payment URL:', result['data']['payment_url'])
 ```
 
 :::
@@ -344,10 +323,10 @@ Now that you've created your first payment, explore more features:
 ### Invalid signature error
 
 Make sure you're:
-- Using the correct DSA private key
+- Using the correct Ed25519 private key
 - Including the timestamp in the signature (ISO 8601 format)
 - Formatting the message string correctly: `${method}${path}${timestamp}${body}` — e.g. `POST/payment_links2026-01-31T12:00:00Z{...}`
-- Using SHA-256 hash with DER encoding
+- Signing with Ed25519 (do **not** pre-hash — Ed25519 hashes internally)
 - Encoding the final signature as Base64
 
 ### Webhook not receiving events

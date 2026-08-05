@@ -7,734 +7,754 @@ description: Create and manage crypto subscription links for recurring cryptocur
 
 ## Overview
 
-The Merchant API Subscriptions endpoints allow you to create, manage, and retrieve subscription links for accepting **recurring cryptocurrency payments**. Unlike traditional payment links (one-time), subscriptions enable automatic billing on a recurring basis - daily, weekly, monthly, quarterly - entirely on-chain and in crypto.
+The Subscriptions API lets you create on-chain recurring billing plans, enroll subscribers, and manage subscription links, payments, and invitations for **recurring cryptocurrency payments**. Billing terms (amount, interval, trial period, grace period) are anchored on-chain via a signed plan digest; a subscription link represents an individual subscriber's enrollment and on-chain approval to be billed.
 
-**Base URL:** `{{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}`
+**Base URL:** `{{ $api.sandbox.baseUrl }}`
 
-**Authentication:** Merchant API Key (Asymmetric DSA)
+The API is split into two route groups with different authentication requirements:
 
----
-
-## What are Crypto Subscriptions?
-
-Crypto Subscriptions allow merchants to charge customers automatically on a recurring basis. Once a customer subscribes, BITXpay handles all billing automatically - no manual intervention needed from the merchant.
-
-### How It Works
-
-1. **Customer Subscribes** - Customer connects their wallet and provides consent for recurring payments
-2. **BITXpay Pulls Payment** - At each billing interval, BITXpay automatically pulls the subscription amount from the customer's wallet
-3. **Merchant Receives Funds** - Payments are automatically settled to the merchant's preferred currency (USDC by default in Q1)
-
-::: tip Competitive Advantage
-Crypto subscriptions eliminate the need for credit cards, bank accounts, or third-party billing providers like Stripe. This is a direct competitive differentiator versus BoomFi and NOWPayments.
-:::
+| Group | Path Prefixes | Authentication |
+|-------|---------------|-----------------|
+| **Authenticated (Merchant) Routes** | `/subscriptions/plans`, `/subscriber`, `/invitations`, `/subscriptions/link` | Merchant API Key + Ed25519 (EdDSA) signature — same scheme as the [Payments API](/api-reference/payments) |
+| **Public Routes** | `/public/subscriptions/plans`, `/public/subscriber`, `/public/subscriptions/link`, `/public/subscriptions/nft` | No merchant signature — called directly from the customer-facing wallet/checkout flow |
 
 ---
 
-## Subscription Types
+## Plan Billing Models
 
-BITXpay supports four subscription types to match different business models:
+When creating a subscription plan, choose one of two billing models:
 
-| Type | Name | Description | Example |
-|------|------|-------------|---------|
-| **FAFT** | Fixed Amount, Fixed Term | Same amount, same billing period | $50/month, always |
-| **VAFT** | Variable Amount, Fixed Term | Usage-based billing, fixed period | Metered billing monthly |
-| **VAOT** | Variable Amount, Open-Ended | Pay-as-you-go, no end date | No commitment billing |
-| **Invoiced** | On-Demand Invoicing | Merchant sends invoice, customer pays | Manual billing cycle |
+- **PlanByAmount** — fixed billing in a specific token: provide `token` + `amount`
+- **PlanByValue** — fixed billing denominated in a currency: provide `currency` + `value`
+
+Provide one pair or the other, not both, in the [Create Subscription Plan](#1-create-subscription-plan) request. The `kind` field (`SubscriptionPlanType`) further classifies the plan.
 
 ---
 
-## Supported Cryptocurrencies
-
-Subscriptions support the same cryptocurrencies as payment links:
-
-| Currency Code | Name | Networks Available |
-|--------------|------|-------------------|
-| **USDC** | USD Coin | 7 networks |
-| **USDT** | Tether USD | 7 networks |
-| **ETH** | Ethereum | 5 networks |
-| **BNB** | BNB | 3 networks |
-| **AVAX** | Avalanche | 2 networks |
-| **LINK** | ChainLink | 6 networks |
-| **WBTC** | Wrapped BTC | 5 networks |
-| **WETH** | Wrapped Ethereum | 6 networks |
-
----
-
-## Subscription Lifecycle
-
-### Subscription Link Statuses
+## Subscription Plan Statuses
 
 | Status | Description |
 |--------|-------------|
-| `active` | Subscription is active and billing will occur |
-| `paused` | Subscription temporarily suspended |
-| `cancelled` | Subscription terminated by customer or merchant |
-| `expired` | Subscription reached its end date |
-| `pending` | Subscription created but not yet confirmed |
+| `active` | Plan is live and can accept new subscribers |
+| `deprecated` | Plan no longer accepts new subscribers (existing subscribers unaffected) |
 
-### Billing Intervals
+## Subscriber Statuses
 
-- `daily` - Billed every day
-- `weekly` - Billed every 7 days
-- `monthly` - Billed every 30 days
-- `quarterly` - Billed every 90 days
-- `yearly` - Billed every 365 days
+| Status | Description |
+|--------|-------------|
+| `invitation_sent` | Subscriber created, awaiting on-chain confirmation |
+| `active` | Subscriber is actively being billed |
+| `inactive` | Subscriber is not currently active |
+| `suspended` | Subscriber billing suspended |
+| `cancelled` | Subscription cancelled |
+
+This is the canonical subscriber status set referenced by every subscriber endpoint on this page.
+
+## Billing Intervals
+
+Plans store `interval`, `trial_period`, `grace_period` (`max_arrears`), `auto_cancel_after_missed`, and `subscribe_deadline` as raw **seconds** on-chain. Common interval values:
+
+| Name | Seconds |
+|------|---------|
+| Daily | 86400 |
+| Weekly | 604800 |
+| Monthly | 2592000 |
+| Quarterly | 7776000 |
+| Yearly | 31536000 |
 
 ---
 
-## Public Endpoints
+## Authenticated (Merchant) Routes
 
-### 1. Create Subscriber & Subscription Link
-
-Create a new subscriber and generate a subscription link they can use to complete the payment setup.
-
-#### Request
-
-**POST** `/subscriptions/subscribers/createlink`
-
-#### Authentication
+All endpoints in this section require Merchant API Key authentication with an Ed25519 (EdDSA) request signature (RSA-PSS accepted for legacy keys):
 
 ```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
+X-API-Key: btxm_test_xxxxxxxxxxxx
+X-API-Signature: <base64_encoded_ed25519_signature>
 X-API-Timestamp: 2026-01-31T12:00:00Z
 Content-Type: application/json
 ```
 
-#### Request Body
+### Subscription Plans — `/subscriptions/plans`
 
-| Field | Type | Required | Description | Example |
-|-------|------|----------|-------------|---------|
-| `subscription_plan_id` | string | Yes | ID of the subscription plan to subscribe to | "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c" |
-| `customer_id` | string | Yes | Your internal customer identifier | "cust-001" |
-| `customer_email` | string | Yes | Customer's email address | "customer@example.com" |
-| `customer_name` | string | Yes | Customer's full name | "John Doe" |
+#### 1. Create Subscription Plan
 
-#### Request Example
+**POST** `/subscriptions/plans/`
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `network_id` | string (UUID) | No | Blockchain network ID |
+| `currency_id` | string (UUID) | No | Currency ID |
+| `merchant` | string | Yes | Merchant on-chain address |
+| `destination` | string | Yes | Destination address for collected funds |
+| `token` | string | Conditional | Token contract address (required with `amount` for **PlanByAmount**) |
+| `amount` | string | Conditional | Billing amount, raw units (required with `token`) |
+| `currency` | string | Conditional | Currency code (required with `value` for **PlanByValue**) |
+| `value` | string | Conditional | Billing value in `currency` (required with `currency`) |
+| `period` | integer | No | Billing period (seconds) |
+| `interval` | integer | No | Billing interval (seconds) |
+| `trial_period` | integer | No | Trial period (seconds) |
+| `max_arrears` | integer | No | Grace period before a missed payment counts as arrears (seconds) |
+| `auto_cancel_after_missed` | integer | No | Number of missed payments before auto-cancellation |
+| `subscribe_deadline` | integer | No | Deadline for the subscriber to complete on-chain enrollment (seconds) |
+| `plan_nonce` | integer | No | On-chain plan nonce |
+| `merchant_sig` | string | Yes | Merchant's on-chain signature over the plan digest |
+| `metadata_uri` | string | No | URI to off-chain plan metadata |
+| `name` | string | Yes | Plan name |
+| `description` | string | No | Plan description |
+| `kind` | string (`SubscriptionPlanType`) | No | Plan type classification |
+
+> Provide either `token` + `amount` (**PlanByAmount**) or `currency` + `value` (**PlanByValue**) — not both.
+
+**Response (`SubscriptionPlanResponse`):**
 
 ```json
 {
-  "subscription_plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
-  "customer_id": "cust-001",
-  "customer_email": "customer@example.com",
-  "customer_name": "John Doe"
+  "id": "uuid",
+  "merchant_id": "uuid",
+  "network_id": "uuid",
+  "chain_id": 0,
+  "network": { "id": "uuid", "name": "string", "chain_id": 0, "symbol": "string", "is_active": true, "created_at": "", "updated_at": "" },
+  "merchant_address": "string",
+  "destination_address": "string",
+  "token": "string",
+  "currency_id": "uuid",
+  "currency": "string",
+  "currency_symbol": "string",
+  "amount": "string",
+  "formatted_amount": "string",
+  "interval": 0,
+  "trial_period": 0,
+  "max_arrears": 0,
+  "auto_cancel_after_missed": 0,
+  "subscribe_deadline": 0,
+  "plan_nonce": 0,
+  "plan_id": "string",
+  "digest": "string",
+  "revoked": false,
+  "source": "string",
+  "metadata_uri": "string",
+  "name": "string",
+  "description": "string",
+  "is_deprecated": false,
+  "deprecated_at": "",
+  "status": "active",
+  "total_subscribers": 0,
+  "active_subscribers": 0,
+  "trial_subscribers": 0,
+  "failed_subscribers": 0,
+  "subscribers": [],
+  "created_at": "",
+  "updated_at": ""
 }
 ```
 
-#### Response (200 OK)
+**Error Responses:**
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 400 | Bad Request | Invalid request payload, or both/neither of `token`+`amount` / `currency`+`value` provided |
+| 401 | Unauthorized | Missing or invalid API key/signature |
+| 500 | Internal Server Error | Server error |
+
+---
+
+#### 2. List Subscription Plans
+
+**GET** `/subscriptions/plans/`
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | integer | Page number |
+| `page_size` | integer | Results per page |
+| `search` | string | Search by plan name |
+| `deprecated` | boolean | Filter by deprecated status |
+| `start_date` | datetime | Filter by creation date range start |
+| `end_date` | datetime | Filter by creation date range end |
+
+**Response (`SubscriptionPlanListResponse`):**
 
 ```json
 {
-  "message": "Subscriber created successfully",
-  "data": {
-    "subscriber": {
-      "id": "e42274f5-1fe9-4a7c-bac1-ebbbdd6cf9e4",
-      "subscription_plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
-      "merchant_user_id": "11111111-1111-1111-1111-111111111111",
-      "customer_id": "cust-001",
-      "customer_name": "John Doe",
-      "customer_email": "customer@example.com",
-      "Status": "invitation_sent",
-      "WebhookMetadata": null,
-      "created_at": "2026-07-05T08:12:45.328215578Z",
-      "updated_at": "2026-07-05T08:12:45.328215578Z"
-    },
-    "subscription_link": "sandboxpay.bitxpay.com/subscriptions/subscription_link?subscription_id=e42274f5-1fe9-4a7c-bac1-ebbbdd6cf9e4"
-  }
+  "plans": [ { "...": "SubscriptionPlanResponse, see #1" } ],
+  "total": 0,
+  "page": 0,
+  "page_size": 0,
+  "total_pages": 0
 }
 ```
 
-**Response Fields (`data.subscriber`):**
+---
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (UUID) | Unique subscriber identifier |
-| `subscription_plan_id` | string (UUID) | The plan the subscriber is enrolled in |
-| `merchant_user_id` | string (UUID) | The merchant account ID |
-| `customer_id` | string | Your internal customer identifier |
-| `customer_name` | string | Customer's full name |
-| `customer_email` | string | Customer's email address |
-| `Status` | string | Subscriber status: `invitation_sent`, `active`, `cancelled` |
-| `WebhookMetadata` | object\|null | Custom metadata passed to webhooks |
-| `created_at` | timestamp | Creation timestamp (ISO 8601) |
-| `updated_at` | timestamp | Last update timestamp (ISO 8601) |
+#### 3. Get Subscription Plan
 
-**Top-level response fields (alongside `data`):**
+**GET** `/subscriptions/plans/:id`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `message` | string | Human-readable result message |
-| `data.subscription_link` | string | URL the customer visits to complete subscription setup |
+**Path Parameters:** `id` (UUID)
 
-#### Error Responses
+**Response:** `SubscriptionPlanResponse` (same shape as [#1](#1-create-subscription-plan))
+
+**Error Responses:**
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 401 | Unauthorized | Missing or invalid API key/signature |
+| 404 | Not Found | Plan not found |
+| 500 | Internal Server Error | Server error |
+
+---
+
+#### 4. Update Subscription Plan
+
+**PUT** `/subscriptions/plans/:id`
+
+**Path Parameters:** `id` (UUID)
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Updated plan name |
+| `metadata_uri` | string | No | Updated metadata URI |
+| `status` | string (`SubscriptionPlanStatus`) | No | `active` or `deprecated` |
+
+**Response:** `SubscriptionPlanResponse` (same shape as [#1](#1-create-subscription-plan))
+
+**Error Responses:**
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 400 | Bad Request | Invalid request payload |
+| 401 | Unauthorized | Missing or invalid API key/signature |
+| 404 | Not Found | Plan not found |
+| 500 | Internal Server Error | Server error |
+
+---
+
+#### 5. Deprecate Subscription Plan
+
+**DELETE** `/subscriptions/plans/:id`
+
+**Path Parameters:** `id` (UUID)
+
+**Request Body:** none
+
+**Response:** Success message confirming the plan was deprecated.
+
+**Error Responses:**
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 401 | Unauthorized | Missing or invalid API key/signature |
+| 404 | Not Found | Plan not found |
+| 500 | Internal Server Error | Server error |
+
+---
+
+### Subscribers — `/subscriber`
+
+#### 6. Create Subscriber
+
+**POST** `/subscriber/`
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `subscription_plan_id` | string (UUID) | Yes | Plan to subscribe to |
+| `customer_id` | string | No | Your internal customer identifier |
+| `customer_name` | string | No | Customer's full name |
+| `customer_email` | string | No | Customer's email address |
+| `webhook_metadata` | object | No | Custom metadata passed to webhooks |
+| `failure_return_url` | string | No | URL to redirect to on failed enrollment |
+| `success_return_url` | string | No | URL to redirect to on successful enrollment |
+
+**Response (`SubscriberResponse`):**
+
+```json
+{
+  "id": "uuid",
+  "subscription_plan_id": "uuid",
+  "merchant_user_id": "uuid",
+  "customer_id": "string",
+  "customer_name": "string",
+  "customer_email": "string",
+  "subscription_link_url": "string",
+  "status": "invitation_sent",
+  "subscription_plan": { "...": "SubscriptionPlan model" },
+  "subscription_link": { "...": "SubscriptionLink model" },
+  "webhook_metadata": {},
+  "created_at": "",
+  "updated_at": ""
+}
+```
+
+**Error Responses:**
 
 | Status | Error | Description |
 |--------|-------|-------------|
 | 400 | Bad Request | Invalid request payload or missing required fields |
 | 401 | Unauthorized | Missing or invalid API key/signature |
 | 404 | Not Found | Subscription plan ID not found |
-| 409 | Conflict | Subscriber already exists for this plan |
 | 500 | Internal Server Error | Server error |
 
 ---
 
-::: warning Endpoints Under Verification
-The following endpoints (3–6) have not yet been verified against the live API. Paths and request/response schemas may differ from the actual implementation. Confirm from Postman before integrating.
-:::
+#### 7. Get Subscribers By Merchant
 
-### 2. Get Subscriptions by Wallet Address
+**GET** `/subscriber/`
 
-Retrieve all active and historical subscription links associated with a specific wallet address. This is a **public endpoint** — no API key or signature required.
+**Query Parameters:**
 
-#### Request
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `plan_id` | string (UUID) | Filter by subscription plan |
+| `search` | string | Search by customer name/email |
+| `start_date` | datetime | Filter by creation date range start |
+| `end_date` | datetime | Filter by creation date range end |
+| `page` | integer | Page number (default 1) |
+| `page_size` | integer | Results per page (default 10) |
 
-**GET** `/public/subscriptions/link/{walletAddress}`
-
-#### Path Parameters
-
-| Parameter | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `walletAddress` | string | Customer's wallet address (checksummed) | "0x7487fAfCAc95dDB5E28417773023B56572dc97C2" |
-
-#### Authentication
-
-No authentication headers required. This is a public endpoint.
-
-#### Response (200 OK)
+**Response (`SubscriberListResponse`):**
 
 ```json
 {
-  "data": [
-    {
-      "id": "5d17b0c4-b32c-40dd-a2e2-8ace612251c7",
-      "merchant_user_id": "11111111-1111-1111-1111-111111111111",
-      "subscription_plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
-      "subscriber_id": "e42274f5-1fe9-4a7c-bac1-ebbbdd6cf9e4",
-      "wallet_address": "0x7487fAfCAc95dDB5E28417773023B56572dc97C2",
-      "subscribe_hash": "0x2b50b6e4d1b2300ad0a4f1c7b8efc8ffab208f456a61607e505eaec0253ab5de",
-      "approval_hash": "0x6ed594bdd9a25b68339372be1dca2eafe2803f3ddb69556ada67508929433f4f",
-      "amount_approved": "100000",
-      "approved_contract": "0x4eb813Ecebc6923AF058F9F54ad7312D14d618d2",
-      "subscription_onchain_id": 73,
-      "status": "active",
-      "failed_attempts": 0,
-      "next_billing_at": "2026-07-05T08:23:51.413272Z",
-      "next_retry_at": null,
-      "is_active": true,
-      "is_on_trial": false,
-      "created_at": "2026-07-05T08:23:51.413551Z",
-      "updated_at": "2026-07-05T08:23:51.413551Z",
-      "subscription_plan": {
-        "ID": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
-        "MerchantID": "11111111-1111-1111-1111-111111111111",
-        "PlanID": "67",
-        "Version": "1",
-        "NetworkID": "0b4f3bab-4354-4373-9821-c8665fffbca3",
-        "CurrencyID": "a2222222-2222-2222-2222-222222222222",
-        "Token": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
-        "Amount": "100000",
-        "FormattedAmount": "0.1",
-        "Interval": 86400,
-        "GracePeriod": 3600,
-        "TrialPeriod": 0,
-        "Name": "saadv5",
-        "Description": "",
-        "Status": "active",
-        "CreatedAt": "2026-04-12T21:20:07.777541Z",
-        "UpdatedAt": "2026-04-12T21:20:07.777541Z"
-      }
-    }
-  ],
-  "total": 2
+  "subscribers": [ { "...": "SubscriberResponse, see #6" } ],
+  "data": [ { "...": "Subscriber model" } ],
+  "total": 0,
+  "page": 0,
+  "page_size": 0,
+  "total_pages": 0
 }
 ```
 
-**Response Fields (`data[]`):**
+---
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (UUID) | Unique subscription link ID |
-| `merchant_user_id` | string (UUID) | Merchant account ID |
-| `subscription_plan_id` | string (UUID) | Associated subscription plan ID |
-| `subscriber_id` | string (UUID) | Subscriber record ID |
-| `wallet_address` | string | Customer's wallet address |
-| `subscribe_hash` | string | On-chain subscription transaction hash |
-| `approval_hash` | string | On-chain token approval transaction hash |
-| `amount_approved` | string | Token amount approved (raw, before decimals) |
-| `approved_contract` | string | Smart contract address that received approval |
-| `subscription_onchain_id` | integer | On-chain subscription ID |
-| `status` | string | Status: `active`, `blocked`, `cancelled`, `expired` |
-| `failed_attempts` | integer | Number of consecutive failed billing attempts |
-| `last_payment_at` | timestamp | Timestamp of last successful payment (if any) |
-| `last_payment_tx_hash` | string | Transaction hash of last payment (if any) |
-| `next_billing_at` | timestamp | Scheduled next billing time |
-| `next_retry_at` | timestamp\|null | Scheduled retry time after failure (if any) |
-| `expires_at` | timestamp\|null | Subscription expiry time (if any) |
-| `is_active` | boolean | Whether subscription is currently active |
-| `is_on_trial` | boolean | Whether subscription is in trial period |
-| `created_at` | timestamp | Creation timestamp |
-| `updated_at` | timestamp | Last update timestamp |
-| `subscription_plan` | object | Embedded plan details (see below) |
+#### 8. Get Subscribers By Plan ID
 
-**`subscription_plan` object fields:**
+**GET** `/subscriber/plan/:plan_id`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `ID` | string (UUID) | Plan ID |
-| `MerchantID` | string (UUID) | Merchant account ID |
-| `TxHash` | string | On-chain plan creation transaction hash |
-| `PlanID` | string | On-chain numeric plan ID |
-| `Version` | string | Plan version |
-| `NetworkID` | string (UUID) | Blockchain network ID |
-| `CurrencyID` | string (UUID) | Currency ID |
-| `Token` | string | Token contract address |
-| `Amount` | string | Billing amount (raw, before decimals) |
-| `FormattedAmount` | string | Human-readable billing amount |
-| `Interval` | integer | Billing interval in seconds (e.g. 86400 = daily) |
-| `GracePeriod` | integer | Grace period in seconds after missed payment |
-| `TrialPeriod` | integer | Trial period in seconds (0 = no trial) |
-| `Name` | string | Plan name |
-| `Description` | string | Plan description |
-| `Status` | string | Plan status: `active`, `deprecated` |
-| `CreatedAt` | timestamp | Plan creation timestamp |
-| `UpdatedAt` | timestamp | Plan last updated timestamp |
+**Path Parameters:** `plan_id` (UUID)
 
-**Top-level response fields:**
+**Response:** `SubscriberListResponse` (same shape as [#7](#7-get-subscribers-by-merchant))
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | array | Array of subscription link objects |
-| `total` | integer | Total number of subscription links for this wallet |
+---
 
-#### Error Responses
+#### 9. Update Subscriber
+
+**PUT** `/subscriber/:id`
+
+**Path Parameters:** `id` (UUID)
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `customer_name` | string | No | Updated customer name |
+| `customer_email` | string | No | Updated customer email |
+| `status` | string (`SubscriberStatus`) | No | New subscriber status |
+
+**Response:** `SubscriberResponse` (same shape as [#6](#6-create-subscriber))
+
+**Error Responses:**
 
 | Status | Error | Description |
 |--------|-------|-------------|
-| 400 | Bad Request | Invalid wallet address format |
+| 400 | Bad Request | Invalid request payload |
 | 401 | Unauthorized | Missing or invalid API key/signature |
+| 404 | Not Found | Subscriber not found |
 | 500 | Internal Server Error | Server error |
 
 ---
 
-### 3. Record Subscription Payment
+#### 10. Get Subscriber By ID
 
-Record a payment that has been made for a subscription link. This endpoint is typically called after confirming an on-chain transaction.
+**GET** `/subscriber/:id`
 
-#### Request
+**Path Parameters:** `id` (UUID)
+
+**Response:** `SubscriberResponse` (same shape as [#6](#6-create-subscriber))
+
+**Error Responses:**
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 401 | Unauthorized | Missing or invalid API key/signature |
+| 404 | Not Found | Subscriber not found |
+| 500 | Internal Server Error | Server error |
+
+---
+
+### Invitations — `/invitations`
+
+#### 11. Get Invitations By Plan ID
+
+**GET** `/invitations/`
+
+**Query Parameters:** `plan_id` (string, UUID)
+
+**Response (`InvitationListResponse`):**
+
+```json
+{
+  "invitations": [ { "...": "SubscriberResponse, see #6" } ],
+  "data": [ { "...": "Subscriber model" } ],
+  "total": 0,
+  "page": 0,
+  "page_size": 0,
+  "total_pages": 0
+}
+```
+
+---
+
+### Subscription Links — `/subscriptions/link`
+
+#### 12. List Subscription Links
+
+**GET** `/subscriptions/link/`
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | integer | Page number |
+| `page_size` | integer | Results per page |
+| `search` | string | Search term |
+| `is_active` | boolean | Filter by active status |
+| `plan_id` | string (UUID) | Filter by subscription plan |
+| `start_date` | datetime | Filter by creation date range start |
+| `end_date` | datetime | Filter by creation date range end |
+
+**Response (`SubscriptionLinkListResponse`):**
+
+```json
+{
+  "links": [ { "...": "SubscriptionLinkResponse, see #13" } ],
+  "total": 0,
+  "page": 0,
+  "page_size": 0,
+  "total_pages": 0
+}
+```
+
+---
+
+#### 13. Get Subscription Link
+
+**GET** `/subscriptions/link/:id`
+
+**Path Parameters:** `id` (UUID)
+
+**Response (`SubscriptionLinkResponse`):**
+
+```json
+{
+  "id": "uuid",
+  "merchant_user_id": "uuid",
+  "subscription_plan_id": "uuid",
+  "subscribed_at": "",
+  "trial_ends_at": "",
+  "wallet_address": "string",
+  "subscribe_hash": "string",
+  "approvals": [ { "...": "ApprovalDetail" } ],
+  "owed": "string",
+  "paid_periods": 0,
+  "locked": false,
+  "customer_id": "string",
+  "customer_email": "string",
+  "customer_name": "string",
+  "expires_at": "",
+  "is_active": true,
+  "subscription_transactions": [ { "...": "SubscriptionResponse, see #21" } ],
+  "plan": { "...": "SubscriptionPlanSummary" },
+  "created_at": "",
+  "updated_at": ""
+}
+```
+
+---
+
+## Public Routes
+
+The endpoints in this section are called directly from the customer-facing wallet/checkout flow and do **not** require `X-API-Key`/`X-API-Signature` headers. [Record Subscription Payment](#21-record-subscription-payment) instead identifies the merchant via a `merchant_key` field in the request body.
+
+### Subscription Plans — `/public/subscriptions/plans`
+
+#### 14. List Public Subscription Plans
+
+**GET** `/public/subscriptions/plans/`
+
+**Response:** `SubscriptionPlanListResponse` (same shape as [#2](#2-list-subscription-plans))
+
+---
+
+#### 15. Get Public Subscription Plan
+
+**GET** `/public/subscriptions/plans/:id`
+
+**Path Parameters:** `id` (UUID)
+
+**Response:** `SubscriptionPlanResponse` (same shape as [#1](#1-create-subscription-plan))
+
+---
+
+### Subscribers — `/public/subscriber`
+
+#### 16. Prepare Subscription
+
+**GET** `/public/subscriber/prepare`
+
+Returns the on-chain parameters (plan digest, approval details, etc.) a customer's wallet needs to sign in order to complete enrollment for a given subscription plan.
+
+---
+
+#### 17. Get Subscriber By ID
+
+**GET** `/public/subscriber/:id`
+
+**Path Parameters:** `id` (UUID)
+
+**Response:** `SubscriberResponse` (same shape as [#6](#6-create-subscriber))
+
+---
+
+#### 18. Update Subscriber
+
+**PUT** `/public/subscriber/:id`
+
+**Path Parameters:** `id` (UUID)
+
+**Request Body:** `UpdateSubscriberRequest` (same shape as [#9](#9-update-subscriber))
+
+**Response:** `SubscriberResponse` (same shape as [#6](#6-create-subscriber))
+
+---
+
+### Subscription Links — `/public/subscriptions/link`
+
+#### 19. Create Subscription Link
+
+**POST** `/public/subscriptions/link/`
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `subscription_plan_id` | string (UUID) | Yes | Plan being subscribed to |
+| `subscriber_id` | string (UUID) | No | Associated subscriber ID |
+| `subscription_onchain_id` | integer | No | On-chain subscription ID |
+| `subscribed_at` | timestamp | No | Subscription start time |
+| `trial_ends_at` | timestamp | No | Trial end time |
+| `wallet_address` | string | Yes | Customer's wallet address |
+| `subscribe_hash` | string | Yes | On-chain subscription transaction hash |
+| `owed` | string | No | Amount currently owed |
+| `paid_periods` | integer | No | Number of billing periods paid |
+| `locked` | boolean | No | Whether the link is locked from further updates |
+| `approvals` | array | Yes | On-chain token approval details (at least 1 required) |
+| `customer_id` | string | No | Your internal customer identifier |
+| `customer_email` | string | No | Customer's email address |
+| `customer_name` | string | No | Customer's full name |
+| `expires_at` | timestamp | No | Link expiration time |
+
+**`approvals[]` fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `approval_hash` | string | No | On-chain approval transaction hash |
+| `token_address` | string | Yes | Approved token contract address |
+| `amount_approved` | string | Yes | Approved amount (raw units) |
+| `network_name` | string | Yes | Blockchain network name |
+| `chain_id` | integer | No | Chain ID |
+| `decimals` | integer | No | Token decimals |
+
+**Response:** `SubscriptionLinkResponse` (same shape as [#13](#13-get-subscription-link))
+
+---
+
+#### 20. Get Subscription Links By Wallet
+
+**GET** `/public/subscriptions/link/:walletAddress`
+
+**Path Parameters:** `walletAddress` (string)
+
+**Response:** `SubscriptionLinkListResponse` (same shape as [#12](#12-list-subscription-links))
+
+---
+
+#### 21. Record Subscription Payment
 
 **POST** `/public/subscriptions/link/payment`
 
-#### Authentication
+**Request Body:**
 
-```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
-X-API-Timestamp: 2026-01-31T12:00:00Z
-Content-Type: application/json
-```
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `sub_link_id` | string (UUID) | Yes | Subscription link ID |
+| `merchant_key` | string | Yes | Merchant identifier used to authenticate this request |
+| `tx_hash` | string | Yes | Blockchain transaction hash |
+| `block_number` | integer | No | Block number the transaction was included in |
+| `block_hash` | string | No | Block hash |
+| `network_id` | string (UUID) | Yes | Blockchain network ID |
+| `currency_id` | string (UUID) | Yes | Currency ID |
+| `amount_paid` | string | Yes | Amount paid |
+| `wallet_used` | string | Yes | Wallet address the payment was made from |
 
-#### Request Body
-
-| Field | Type | Required | Description | Example |
-|-------|------|----------|-------------|---------|
-| `subscription_link_id` | string | Yes | Subscription link ID | "sub_1234567890" |
-| `tx_hash` | string | Yes | Blockchain transaction hash | "0xabc123..." |
-| `amount` | string | Yes | Amount paid | "50.00" |
-| `paid_at` | timestamp | Yes | Payment timestamp (ISO 8601) | "2026-02-01T12:00:00Z" |
-
-#### Request Example
+**Response (`SubscriptionResponse`):**
 
 ```json
 {
-  "subscription_link_id": "sub_1234567890",
-  "tx_hash": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEbD1234567890abcdef",
-  "amount": "50.00",
-  "paid_at": "2026-02-01T12:00:00Z"
+  "id": "uuid",
+  "merchant_id": "uuid",
+  "sub_link_id": "uuid",
+  "tx_hash": "string",
+  "block_number": 0,
+  "block_hash": "string",
+  "confirmations": 0,
+  "currency_id": "uuid",
+  "network_id": "uuid",
+  "amount": "string",
+  "user_wallet_address": "string",
+  "paid_at": "",
+  "status": "string",
+  "starts_at": "",
+  "ends_at": "",
+  "next_billing_at": "",
+  "plan": { "...": "SubscriptionLinkResponse, see #13" },
+  "created_at": "",
+  "updated_at": ""
 }
 ```
-
-#### Response (200 OK)
-
-```json
-{
-  "message": "Payment recorded successfully"
-}
-```
-
-#### Error Responses
-
-| Status | Error | Description |
-|--------|-------|-------------|
-| 400 | Bad Request | Invalid request payload |
-| 401 | Unauthorized | Missing or invalid API key/signature |
-| 404 | Not Found | Subscription link not found |
-| 409 | Conflict | Transaction hash already recorded |
-| 500 | Internal Server Error | Server error |
 
 ---
 
-### 4. Update Subscription Link
+#### 22. Update Subscription Link
 
-Update the status or metadata of an existing subscription link.
+**PUT** `/public/subscriptions/link/:id`
 
-#### Request
+**Path Parameters:** `id` (UUID)
 
-**PUT** `/public/subscriptions/link/{id}`
+**Request Body:**
 
-#### Path Parameters
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `trial_ends_at` | timestamp | No | Updated trial end time |
+| `customer_email` | string | No | Updated customer email |
+| `customer_name` | string | No | Updated customer name |
+| `expires_at` | timestamp | No | Updated expiration time |
+| `is_active` | boolean | No | Updated active status |
+| `locked` | boolean | No | Updated locked status |
+| `owed` | string | No | Updated amount owed |
 
-| Parameter | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `id` | string | Subscription Link ID | "sub_1234567890" |
-
-#### Authentication
-
-```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
-X-API-Timestamp: 2026-01-31T12:00:00Z
-Content-Type: application/json
-```
-
-#### Request Body
-
-| Field | Type | Required | Description | Valid Values |
-|-------|------|----------|-------------|--------------|
-| `status` | string | No | New subscription status | `active`, `paused`, `cancelled` |
-| `metadata` | object | No | Updated metadata | Any valid JSON object |
-
-#### Request Examples
-
-**Pause Subscription:**
-```json
-{
-  "status": "paused"
-}
-```
-
-**Update Metadata:**
-```json
-{
-  "metadata": {
-    "source": "website",
-    "plan_tier": "premium"
-  }
-}
-```
-
-**Cancel Subscription:**
-```json
-{
-  "status": "cancelled"
-}
-```
-
-#### Response (200 OK)
-
-```json
-{
-  "id": "sub_1234567890",
-  "plan_id": "plan_abc123",
-  "wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-  "status": "paused",
-  "updated_at": "2026-02-15T14:30:00Z"
-}
-```
-
-**Response Fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Subscription link ID |
-| `plan_id` | string | Subscription plan ID |
-| `wallet_address` | string | Customer's wallet address |
-| `status` | string | Updated status |
-| `updated_at` | timestamp | Last update timestamp |
-
-#### Error Responses
-
-| Status | Error | Description |
-|--------|-------|-------------|
-| 400 | Bad Request | Invalid request payload or status value |
-| 401 | Unauthorized | Missing or invalid API key/signature |
-| 404 | Not Found | Subscription link not found |
-| 500 | Internal Server Error | Server error |
+**Response:** `SubscriptionLinkResponse` (same shape as [#13](#13-get-subscription-link))
 
 ---
 
-## Subscriber Endpoints
+### NFT Metadata — `/public/subscriptions/nft`
 
-### 5. Get Public Subscriber by ID
+#### 23. Get Subscription NFT Metadata
 
-Retrieve subscriber information by their unique ID.
+**GET** `/public/subscriptions/nft/:plan_id`
 
-#### Request
+**Path Parameters:** `plan_id` (UUID)
 
-**GET** `/public/subscriber/{id}`
-
-#### Path Parameters
-
-| Parameter | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `id` | string | Subscriber ID (UUID) | "550e8400-e29b-41d4-a716-446655440000" |
-
-#### Authentication
-
-```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
-X-API-Timestamp: 2026-01-31T12:00:00Z
-Accept: application/json
-```
-
-#### Response (200 OK)
+**Response (`SubscriptionMetaResponse`):**
 
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-  "status": "active",
-  "created_at": "2026-01-15T10:00:00Z",
-  "updated_at": "2026-02-01T12:00:00Z"
+  "name": "string",
+  "description": "string",
+  "image": "string",
+  "external_url": "string",
+  "attributes": [
+    { "trait_type": "string", "value": "string" }
+  ]
 }
 ```
-
-**Response Fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (UUID) | Unique subscriber identifier |
-| `name` | string | Subscriber name |
-| `email` | string | Subscriber email address |
-| `wallet_address` | string | Subscriber's wallet address |
-| `status` | string | Subscriber status: `active`, `inactive`, `suspended` |
-| `created_at` | timestamp | Creation timestamp |
-| `updated_at` | timestamp | Last update timestamp |
-
-#### Error Responses
-
-| Status | Error | Description |
-|--------|-------|-------------|
-| 400 | Bad Request | Invalid subscriber ID format |
-| 401 | Unauthorized | Missing or invalid API key/signature |
-| 404 | Not Found | Subscriber not found |
-| 500 | Internal Server Error | Server error |
-
----
-
-### 6. Update Subscriber (Public)
-
-Update subscriber information such as name, email, phone, or metadata.
-
-#### Request
-
-**PUT** `/public/subscriber/{id}`
-
-#### Path Parameters
-
-| Parameter | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `id` | string | Subscriber ID (UUID) | "550e8400-e29b-41d4-a716-446655440000" |
-
-#### Authentication
-
-```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
-X-API-Timestamp: 2026-01-31T12:00:00Z
-Content-Type: application/json
-```
-
-#### Request Body
-
-| Field | Type | Required | Description | Example |
-|-------|------|----------|-------------|---------|
-| `name` | string | No | Subscriber name | "John Doe" |
-| `email` | string | No | Subscriber email | "john@example.com" |
-| `phone` | string | No | Subscriber phone number | "+1-555-0123" |
-| `metadata` | object | No | Custom metadata | `{"company": "Acme Inc"}` |
-
-#### Request Example
-
-```json
-{
-  "name": "John Doe",
-  "email": "john.doe@example.com",
-  "phone": "+1-555-0123",
-  "metadata": {
-    "company": "Acme Inc",
-    "tier": "premium"
-  }
-}
-```
-
-#### Response (200 OK)
-
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "name": "John Doe",
-  "email": "john.doe@example.com",
-  "wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-  "status": "active",
-  "updated_at": "2026-02-15T14:30:00Z"
-}
-```
-
-**Response Fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (UUID) | Unique subscriber identifier |
-| `name` | string | Updated subscriber name |
-| `email` | string | Updated email address |
-| `wallet_address` | string | Subscriber's wallet address |
-| `status` | string | Current subscriber status |
-| `updated_at` | timestamp | Last update timestamp |
-
-#### Error Responses
-
-| Status | Error | Description |
-|--------|-------|-------------|
-| 400 | Bad Request | Invalid request payload |
-| 401 | Unauthorized | Missing or invalid API key/signature |
-| 404 | Not Found | Subscriber not found |
-| 409 | Conflict | Email already in use |
-| 500 | Internal Server Error | Server error |
-
----
-
-## Authentication
-
-All subscription API requests require the following headers:
-
-```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
-X-API-Timestamp: 2026-01-31T12:00:00Z
-Content-Type: application/json
-```
-
-### Signing Process
-
-1. **Construct message:**
-   ```
-   message = METHOD + PATH + TIMESTAMP + BODY
-   ```
-
-2. **Sign with DSA:**
-   - Hash using SHA-256
-   - Sign using DSA with DER encoding
-   - Encode as Base64
-
-3. **Include in request headers**
-
-For detailed implementation examples in various languages, see the [Merchant API Authentication Guide](/api-reference/authentication).
-
----
-
-## Product Roadmap
-
-### Q1: MVP (Current)
-- Simple subscription links with automated billing
-- USDC settlement
-- Single currency per subscription
-
-### Q2: Enhanced Subscriptions
-- Multiple currency support
-- Backup wallets for failed payments
-- Customer portal for self-management
-- Email notifications for billing events
-
-### Q3: Enterprise Features
-- Multiple backup wallets per subscription
-- Multiple currencies per subscription
-- Advanced analytics and reporting
-- Webhook enhancements
 
 ---
 
 ## Rate Limiting
 
-- **Create Subscription Link:** 10 requests per minute per API key
-- **Get Subscription Links:** 30 requests per minute per API key
-- **Record Payment:** 30 requests per minute per API key
-- **Update Subscription Link:** 10 requests per minute per API key
-- **Get/Update Subscriber:** 30 requests per minute per API key
+Rate limits are applied per route based on the configured rate limiter (payment-related routes use a stricter limiter than read/default routes). Contact your account team for the current per-route limits applicable to your account.
 
 ---
 
 ## Common Use Cases
 
-### Create a Monthly Subscription
+### Create a Subscription Plan
+
+```bash
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptionPlans }}/ \
+  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
+  -H "X-API-Signature: <base64_encoded_ed25519_signature>" \
+  -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "merchant": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb3",
+    "destination": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb3",
+    "token": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+    "amount": "100000",
+    "interval": 2592000,
+    "merchant_sig": "<merchant_onchain_signature>",
+    "name": "Pro Plan Monthly"
+  }'
+```
+
+### Create a Subscriber
+
+```bash
+curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscribers }}/ \
+  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
+  -H "X-API-Signature: <base64_encoded_ed25519_signature>" \
+  -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "subscription_plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
+    "customer_id": "cust-001",
+    "customer_email": "customer@example.com",
+    "customer_name": "John Doe"
+  }'
+```
+
+### Create a Subscription Link (Public)
 
 ```bash
 curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/ \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
-  -H "X-API-Signature: <signature>" \
-  -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
   -H "Content-Type: application/json" \
   -d '{
-    "plan_id": "plan_monthly_premium",
-    "wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-    "customer_email": "customer@example.com",
-    "metadata": {
-      "source": "checkout_page"
-    }
+    "subscription_plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
+    "wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb3",
+    "subscribe_hash": "0xa1b2c3d4e5f60789a1b2c3d4e5f60789a1b2c3d4e5f60789a1b2c3d4e5f60781",
+    "approvals": [
+      {
+        "token_address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+        "amount_approved": "100000",
+        "network_name": "arbitrum",
+        "chain_id": 42161,
+        "decimals": 6
+      }
+    ]
   }'
 ```
 
-### Get All Subscriptions for a Wallet
-
-```bash
-curl {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
-  -H "X-API-Signature: <signature>" \
-  -H "X-API-Timestamp: 2026-01-31T12:00:00Z"
-```
-
-### Record a Subscription Payment
+### Record a Subscription Payment (Public)
 
 ```bash
 curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/payment \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
-  -H "X-API-Signature: <signature>" \
-  -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
   -H "Content-Type: application/json" \
   -d '{
-    "subscription_link_id": "sub_1234567890",
-    "tx_hash": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEbD1234567890abcdef",
-    "amount": "49.99",
-    "paid_at": "2026-02-01T00:00:00Z"
-  }'
-```
-
-### Pause a Subscription
-
-```bash
-curl -X PUT {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/sub_1234567890 \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
-  -H "X-API-Signature: <signature>" \
-  -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
-  -H "Content-Type: application/json" \
-  -d '{"status": "paused"}'
-```
-
-### Update Subscriber Information
-
-```bash
-curl -X PUT {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscribers }}/550e8400-e29b-41d4-a716-446655440000 \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
-  -H "X-API-Signature: <signature>" \
-  -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Doe",
-    "email": "john.doe@example.com",
-    "phone": "+1-555-0123"
+    "sub_link_id": "5d17b0c4-b32c-40dd-a2e2-8ace612251c7",
+    "merchant_key": "btxm_test_xxxxxxxxxxxx",
+    "tx_hash": "0xa1b2c3d4e5f60789a1b2c3d4e5f60789a1b2c3d4e5f60789a1b2c3d4e5f60785",
+    "network_id": "0b4f3bab-4354-4373-9821-c8665fffbca3",
+    "currency_id": "d4e5f6a7-8b9c-4d1e-9f2a-3b4c5d6e7f80",
+    "amount_paid": "49.99",
+    "wallet_used": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb3"
   }'
 ```
 

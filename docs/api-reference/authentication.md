@@ -5,23 +5,30 @@ description: Learn how to authenticate API requests with BITXpay.
 
 # Authentication
 
-BITXpay supports two authentication methods depending on the API you're using:
+All currently published BITXpay APIs (Payments and Subscriptions) use a single authentication method:
 
-1. **DSA Signature** - For merchant-facing APIs (Payment Links, etc.)
-2. **HMAC-SHA256** - For standard payment APIs
+1. **Signature Authentication (Ed25519 / EdDSA)** - For merchant-facing APIs (Payment Links, etc.)
+
+::: info Planned: HMAC-SHA256
+A second scheme, HMAC-SHA256, is planned for a future set of standard (non-merchant) APIs. It has **no live endpoints today** and is not part of the current contract. It will be documented here once it ships.
+:::
 
 ---
 
-## DSA Signature Authentication (Merchant APIs)
+## Signature Authentication (Merchant APIs)
 
-Merchant-facing APIs use DSA (Digital Signature Algorithm) for enhanced security. DSA is a FIPS 186-4 standard that provides efficient digital signatures with smaller signature sizes, making it ideal for bandwidth-sensitive merchant operations.
+Merchant-facing APIs authenticate requests with an **asymmetric signature** over a canonical message. The current primitive is **Ed25519 (EdDSA)**; **RSA-PSS with SHA-256** is also accepted for legacy keys issued before Ed25519 was adopted.
+
+::: tip Ed25519 vs legacy RSA-PSS
+New merchant keys are **Ed25519**. Ed25519 is deterministic (no per-signature random nonce), produces a fixed 64-byte signature, and hashes the message internally with SHA-512 — you do not pre-hash the message. If your account was provisioned with an older **RSA** key, sign with **RSA-PSS + SHA-256** instead; the request headers and message format are identical.
+:::
 
 ### Required Headers
 
 | Header | Description |
 |--------|-------------|
 | `X-API-Key` | Your merchant API key |
-| `X-API-Signature` | DSA signature of the request (base64-encoded DER format) |
+| `X-API-Signature` | Signature of the canonical message, base64-encoded (raw 64-byte Ed25519 signature, or RSA-PSS signature for legacy keys) |
 | `X-API-Timestamp` | ISO 8601 timestamp (e.g., `2026-01-31T17:53:56Z`) |
 | `Content-Type` | `application/json` |
 
@@ -33,13 +40,17 @@ Merchant-facing APIs use DSA (Digital Signature Algorithm) for enhanced security
 4. Store both securely - the private key is shown only once
 
 Your credentials will include:
-- **API Key:** `btxm_xxxxxxxxxx` (public identifier)
-- **Private Key:** DSA private key in PEM format (keep secret)
-- **Public Key:** DSA public key in PEM format (for verification)
+- **API Key:** `btxm_test_xxxxxxxxxx` in sandbox, `btxm_live_xxxxxxxxxx` in production (public identifier)
+- **Private Key:** Ed25519 private key in PKCS#8 PEM format (keep secret) — RSA private key in PEM for legacy accounts
+- **Public Key:** Ed25519 public key in PEM format (for verification) — RSA public key for legacy accounts
+
+::: warning Match key prefix to environment
+Always pair `btxm_test_*` keys with the sandbox base URL and `btxm_live_*` keys with the production base URL. Mixing them will fail authentication.
+:::
 
 ### Generating the Signature
 
-The signature is created by signing a message with your DSA private key:
+The signature is created by signing the canonical message with your private key:
 
 **Message Format:**
 ```
@@ -48,20 +59,25 @@ METHOD + PATH + TIMESTAMP + BODY
 
 **Example Message:**
 ```
-POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USD","payment_name":"Invoice #12345"}
+POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT","payment_name":"Invoice #12345"}
 ```
 
-**Signature Parameters:**
-- **Algorithm:** DSA (Digital Signature Algorithm)
-- **Hash Function:** SHA-256
-- **Key Size:** 2048 bits (minimum recommended)
-- **Output Format:** DER-encoded signature, base64-encoded for transmission
-- **Standard:** FIPS 186-4
+**Signature Parameters (Ed25519 — default):**
+- **Algorithm:** Ed25519 (EdDSA)
+- **Hashing:** performed internally by Ed25519 (SHA-512) — do **not** pre-hash the message
+- **Signature size:** 64 bytes (fixed)
+- **Output Format:** raw signature bytes, base64-encoded for transmission
+
+**Legacy RSA-PSS keys:**
+- **Algorithm:** RSA-PSS
+- **Hash Function:** SHA-256 (also used for the MGF1 mask)
+- **Key Size:** 2048 bits (minimum)
+- **Output Format:** raw signature bytes, base64-encoded for transmission
 
 **Important Security Notes:**
-- DSA requires a unique random value (k) for each signature
-- Never reuse the k value - this would leak your private key
-- Use cryptographically secure random number generation
+- Ed25519 signing is deterministic — there is no per-signature random nonce to manage, which removes the nonce-reuse key-leak risk of DSA/ECDSA.
+- Keep your private key secret and never ship it in client-side code.
+- Include a fresh `X-API-Timestamp` on every request (see [Timestamp Validation](#timestamp-validation)).
 
 ### Node.js Example
 
@@ -69,19 +85,20 @@ POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USD","payment
 import crypto from 'crypto';
 import fs from 'fs';
 
-function generateDSASignature(privateKeyPEM, method, path, timestamp, body = '') {
+function generateSignature(privateKeyPEM, method, path, timestamp, body = '') {
   const message = `${method}${path}${timestamp}${body}`;
-  
-  // DSA signature using SHA-256
-  const signature = crypto.sign(
-    'sha256',
-    Buffer.from(message, 'utf8'),
-    {
-      key: privateKeyPEM,
-      dsaEncoding: 'der' // DER encoding for DSA signature
-    }
-  );
-  
+
+  // Ed25519 (EdDSA): pass `null` as the algorithm — Ed25519 hashes the message
+  // internally, so the message must NOT be pre-hashed.
+  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
+
+  // Legacy RSA-PSS keys instead use:
+  //   crypto.sign('sha256', Buffer.from(message, 'utf8'), {
+  //     key: privateKeyPEM,
+  //     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+  //     saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
+  //   });
+
   return signature.toString('base64');
 }
 
@@ -95,13 +112,13 @@ const timestamp = new Date().toISOString();
 const body = JSON.stringify({
   payment_name: 'Invoice #12345',
   amount: 100.50,
-  currency: 'USD',
+  currency: 'USDT',
   customer_email: 'john@example.com',
   success_url: 'https://example.com/success',
   cancel_url: 'https://example.com/cancel'
 });
 
-const signature = generateDSASignature(privateKey, method, path, timestamp, body);
+const signature = generateSignature(privateKey, method, path, timestamp, body);
 
 // Make request
 const response = await fetch(`https://sandboxapi.bitxpay.com/api/v1${path}`, {
@@ -119,32 +136,33 @@ const response = await fetch(`https://sandboxapi.bitxpay.com/api/v1${path}`, {
 ### Python Example
 
 ```python
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import dsa
-from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 import base64
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import requests
 import os
 
-def generate_dsa_signature(private_key_pem, method, path, timestamp, body=''):
+def generate_signature(private_key_pem, method, path, timestamp, body=''):
     message = f"{method}{path}{timestamp}{body}"
-    
-    # Load DSA private key
+
     private_key = serialization.load_pem_private_key(
         private_key_pem.encode(),
         password=None,
-        backend=default_backend()
     )
-    
-    # Sign with DSA using SHA-256
-    signature = private_key.sign(
-        message.encode('utf-8'),
-        hashes.SHA256()
-    )
-    
-    # Return base64-encoded DER signature
+
+    # Ed25519 (EdDSA) — no separate hash argument; Ed25519 hashes internally.
+    signature = private_key.sign(message.encode('utf-8'))
+
+    # Legacy RSA-PSS keys instead use:
+    #   from cryptography.hazmat.primitives import hashes
+    #   from cryptography.hazmat.primitives.asymmetric import padding
+    #   signature = private_key.sign(
+    #       message.encode('utf-8'),
+    #       padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
+    #                   salt_length=padding.PSS.DIGEST_LENGTH),
+    #       hashes.SHA256())
+
     return base64.b64encode(signature).decode('utf-8')
 
 # Usage
@@ -155,18 +173,18 @@ api_key = os.environ.get('MERCHANT_API_KEY')
 
 method = 'POST'
 path = '/payment_links'
-timestamp = datetime.utcnow().isoformat() + 'Z'
+timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 body_data = {
     'payment_name': 'Invoice #12345',
     'amount': 100.50,
-    'currency': 'USD',
+    'currency': 'USDT',
     'customer_email': 'john@example.com',
     'success_url': 'https://example.com/success',
     'cancel_url': 'https://example.com/cancel'
 }
 body = json.dumps(body_data)
 
-signature = generate_dsa_signature(private_key, method, path, timestamp, body)
+signature = generate_signature(private_key, method, path, timestamp, body)
 
 # Make request
 response = requests.post(
@@ -191,144 +209,18 @@ Requests with timestamps older than **5 minutes** will be rejected:
 
 ```json
 {
-  "error": "unauthorized",
   "message": "Request timestamp is too old or invalid",
+  "error": "unauthorized",
   "code": 401
 }
 ```
 
 Ensure your system clock is synchronized with NTP servers.
 
----
-
-## HMAC-SHA256 Authentication (Standard APIs)
-
-
-Standard payment APIs use HMAC-based authentication to secure API requests. Every request must include your API key and a signature.
-
-### Required Headers
-
-| Header | Description |
-|--------|-------------|
-| `Authorization` | Bearer token with your API key |
-| `X-Signature` | HMAC-SHA256 signature of the request |
-| `X-Timestamp` | Unix timestamp of the request |
-| `Content-Type` | `application/json` |
-
-### Generating the Signature
-
-The signature is created by signing the request payload with your secret key:
-
-```javascript
-import crypto from 'crypto';
-
-function generateSignature(secretKey, timestamp, method, path, body = '') {
-  const payload = `${timestamp}${method}${path}${body}`;
-
-  return crypto
-    .createHmac('sha256', secretKey)
-    .update(payload)
-    .digest('hex');
-}
-```
-
-### Complete Example
-
-```javascript
-import crypto from 'crypto';
-
-const apiKey = process.env.BITXPAY_API_KEY;
-const secretKey = process.env.BITXPAY_SECRET_KEY;
-
-async function makeRequest(method, path, body = null) {
-  const timestamp = Math.floor(Date.now() / 1000).toString();
-  const bodyString = body ? JSON.stringify(body) : '';
-
-  const signature = crypto
-    .createHmac('sha256', secretKey)
-    .update(`${timestamp}${method}${path}${bodyString}`)
-    .digest('hex');
-
-  const response = await fetch(`{{ $api.sandbox.baseUrl }}${path}`, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'X-Signature': signature,
-      'X-Timestamp': timestamp,
-      'Content-Type': 'application/json'
-    },
-    body: body ? bodyString : undefined
-  });
-
-  return response.json();
-}
-
-// Usage
-const payment = await makeRequest('POST', '/payments', {
-  amount: 100,
-  currency: 'USD',
-  crypto: 'BTC'
-});
-```
-
-### Python Example
-
-```python
-import hmac
-import hashlib
-import time
-import requests
-import json
-
-api_key = os.environ.get('BITXPAY_API_KEY')
-secret_key = os.environ.get('BITXPAY_SECRET_KEY')
-
-def make_request(method, path, body=None):
-    timestamp = str(int(time.time()))
-    body_string = json.dumps(body) if body else ''
-
-    payload = f"{timestamp}{method}{path}{body_string}"
-    signature = hmac.new(
-        secret_key.encode(),
-        payload.encode(),
-        hashlib.sha256
-    ).hexdigest()
-
-    headers = {
-        'Authorization': f'Bearer {api_key}',
-        'X-Signature': signature,
-        'X-Timestamp': timestamp,
-        'Content-Type': 'application/json'
-    }
-
-    response = requests.request(
-        method,
-        f'{{ $api.sandbox.baseUrl }}{path}',
-        headers=headers,
-        json=body
-    )
-
-    return response.json()
-```
-
-### Timestamp Validation
-
-Requests with timestamps older than 5 minutes will be rejected:
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "TIMESTAMP_EXPIRED",
-    "message": "Request timestamp is too old"
-  }
-}
-```
-
 ### Security Best Practices
 
 ::: warning
-Keep your secret key secure and never expose it in client-side code.
+Keep your private key secure and never expose it in client-side code.
 :::
 
 1. **Store keys securely** - Use environment variables or a secrets manager

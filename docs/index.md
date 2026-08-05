@@ -31,7 +31,7 @@ features:
       height: 30
       wrap: true
     title: Enterprise Security
-    details: Bank-grade security with DSA/HMAC authentication, encrypted communications, and regulatory compliance.
+    details: Bank-grade security with Ed25519 signature authentication, encrypted communications, and regulatory compliance.
   - icon:
       src: /icons/realtime-settlement.svg
       alt: Real-Time Settlement

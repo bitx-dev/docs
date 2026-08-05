@@ -1,6 +1,31 @@
 import { defineConfig } from 'vitepress'
 import apiEndpointsPlugin from './plugins/api-endpoints-plugin'
 import { SITE_CONFIG, getBasePath } from './config/site-config'
+import { API_ENDPOINTS } from './config/api-endpoints'
+
+// Resolve a dotted path (e.g. "sandbox.baseUrl") against a source object.
+function resolvePath(source: Record<string, any>, path: string): string {
+  const value = path.split('.').reduce((acc, key) => (acc == null ? acc : acc[key]), source)
+  return value == null ? `{{ MISSING:${path} }}` : String(value)
+}
+
+// Build-time replacement of {{ $api.* }} / {{ $site.* }} template variables.
+// Vue's runtime {{ }} interpolation does not work inside Shiki-highlighted
+// fenced code blocks (the highlighter splits "{{ expr }}" into separate
+// spans), so we substitute these tokens directly in the raw markdown source
+// before it is tokenized/highlighted. This guarantees correct rendering
+// everywhere: prose, inline code, and fenced code blocks alike.
+function apiVarsMarkdownPlugin(md: any) {
+  md.core.ruler.before('normalize', 'bitxpay_api_vars', (state: any) => {
+    state.src = state.src
+      .replace(/\{\{\s*\$api\.([\w.]+)\s*\}\}/g, (_: string, path: string) =>
+        resolvePath(API_ENDPOINTS, path)
+      )
+      .replace(/\{\{\s*\$site\.([\w.]+)\s*\}\}/g, (_: string, path: string) =>
+        resolvePath(SITE_CONFIG, path)
+      )
+  })
+}
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -12,6 +37,9 @@ export default defineConfig({
 
   // Clean URLs without .html extension
   cleanUrls: SITE_CONFIG.features.cleanUrls,
+
+  // Enable git-based "last updated" timestamps (required for themeConfig.lastUpdated to render)
+  lastUpdated: true,
 
   // SEO: Generate sitemap
   sitemap: {
@@ -63,7 +91,7 @@ export default defineConfig({
         items: [
           { text: 'Troubleshooting', link: '/testing/troubleshooting' },
           { text: 'Contribute', link: '/contribution/' },
-          { text: 'NPM Package', link: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTabt=readme' },
+          { text: 'NPM Package', link: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTab=readme' },
           { text: 'Telegram', link: 'https://telegram.me/bitxes' }
         ]
       }
@@ -148,7 +176,7 @@ export default defineConfig({
 
     // Social links
     socialLinks: [
-      { icon: 'github', link: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTabt=readme' }
+      { icon: 'github', link: 'https://www.npmjs.com/package/kentucky-signer-viem?activeTab=readme' }
     ],
 
     // Search configuration (built-in local search)
@@ -193,6 +221,9 @@ export default defineConfig({
     theme: {
       light: 'github-light',
       dark: 'github-dark'
+    },
+    config: (md) => {
+      md.use(apiVarsMarkdownPlugin)
     }
   }
 })

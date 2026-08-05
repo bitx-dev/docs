@@ -33,7 +33,7 @@ https://sandboxapi.bitxpay.com/api/v1
 
 - **Format**: `btxm_*` (Merchant API)
 - **Access**: Full sandbox access — no real funds involved
-- **Authentication**: DSA signature (SHA-256, DER encoding, Base64)
+- **Authentication**: Ed25519 signature (EdDSA, raw bytes, Base64)
 
 ## Production Environment
 
@@ -58,7 +58,7 @@ const bitxpay = new BITXpay({
 - **Format**: `btxm_*` (Merchant API)
 - **Access**: Full production access — real funds
 - **Security**: Store securely, never commit to version control
-- **Authentication**: DSA signature (SHA-256, DER encoding, Base64)
+- **Authentication**: Ed25519 signature (EdDSA, raw bytes, Base64)
 
 ## Testing & Development
 
@@ -96,7 +96,7 @@ Before going live with production traffic:
 try {
   const payment = await bitxpay.payments.create({
     amount: '100.00',
-    currency: 'USD',
+    currency: 'USDT',
     description: 'Order #12345'
   });
   

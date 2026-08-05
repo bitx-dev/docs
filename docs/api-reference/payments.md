@@ -7,11 +7,11 @@ description: Create and manage payment links for accepting cryptocurrency paymen
 
 ## Overview
 
-The Merchant API Payments endpoints allow you to create, manage, and retrieve payment links for accepting cryptocurrency payments. All endpoints require Merchant API Key authentication with DSA signature verification.
+The Merchant API Payments endpoints allow you to create, manage, and retrieve payment links for accepting cryptocurrency payments. All endpoints require Merchant API Key authentication with an Ed25519 (EdDSA) request signature (RSA-PSS accepted for legacy keys).
 
 **Base URL:** `{{ $api.sandbox.baseUrl }}`
 
-**Authentication:** Merchant API Key (Asymmetric DSA)
+**Authentication:** Merchant API Key (asymmetric Ed25519 / EdDSA signature)
 
 ---
 
@@ -73,22 +73,18 @@ Retrieve the complete list of supported cryptocurrencies with their network deta
 
 #### Request
 
-**GET** `/currencies?currency_type=string`
+**GET** `/payment_links/currencies`
 
 #### Authentication
 
 ```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
+X-API-Key: btxm_test_xxxxxxxxxxxx
+X-API-Signature: <base64_encoded_ed25519_signature>
 X-API-Timestamp: 2026-01-31T12:00:00Z
 Accept: application/json
 ```
 
-#### Query Parameters
-
-| Parameter | Type | Required | Description | Example |
-|-----------|------|----------|-------------|------|
-| `currency_type` | string | No | Filter by currency type | "string" |
+This endpoint takes no query parameters; it always returns the full supported currency list.
 
 #### Response (200 OK)
 
@@ -120,12 +116,12 @@ Accept: application/json
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | string (UUID) | Unique network identifier for the currency |
+| `id` | string (UUID) | Unique identifier for the currency record |
 | `code` | string | Currency code (use this when creating payment links) |
 | `name` | string | Full currency name |
 
 ::: warning Multiple Networks
-Some currencies like USDT and ETH are available on multiple networks (Ethereum, BSC, Polygon, etc.). Each network has a unique `id`. When creating a payment link, you only need to specify the `code` - the system will handle network selection.
+Some currencies like USDT and ETH are available on multiple networks (Ethereum, BSC, Polygon, etc.). This endpoint returns one entry per currency `code`; network selection is handled automatically server-side. When creating a payment link, you only need to specify the `code`.
 :::
 
 #### Error Responses
@@ -138,8 +134,8 @@ Some currencies like USDT and ETH are available on multiple networks (Ethereum, 
 #### Example Request
 
 ```bash
-curl --location '{{ $api.sandbox.baseUrl }}{{ $api.endpoints.currencies }}?currency_type=string' \
-  --header 'X-API-Key: btxm_live_xxxxxxxxxxxx' \
+curl --location '{{ $api.sandbox.baseUrl }}{{ $api.endpoints.currencies }}' \
+  --header 'X-API-Key: btxm_test_xxxxxxxxxxxx' \
   --header 'X-API-Signature: <signature>' \
   --header 'X-API-Timestamp: 2026-01-31T12:00:00Z' \
   --header 'Accept: application/json'
@@ -158,8 +154,8 @@ Creates a new payment link for accepting payments.
 #### Authentication
 
 ```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_signature>
+X-API-Key: btxm_test_xxxxxxxxxxxx
+X-API-Signature: <base64_encoded_ed25519_signature>
 X-API-Timestamp: 2026-01-31T12:00:00Z
 Content-Type: application/json
 ```
@@ -246,7 +242,7 @@ The API returns different response structures based on the parameters you provid
   "payment_name": "Invoice #12345",
   "description": "Payment for Order #12345",
   "amount": 100.50,
-  "currency": "USD",
+  "currency": "USDT",
   "expires_at": "2026-02-01T12:00:00Z",
   "max_uses": 1,
   "customer_id": "AB-001",
@@ -274,7 +270,7 @@ The API returns different response structures based on the parameters you provid
   "success_url": "https://www.success.io/success.html",
   "cancel_url": "https://www.failure.io/cancel.html",
   "webhook_metadata": {
-    "order_id": "ord_abc123",
+    "merchant_id": "M-10001",
     "demo": true
   }
 }
@@ -294,8 +290,8 @@ The response structure varies based on the request parameters provided.
     "payment_name": "Invoice #12345",
     "amount": 100.5,
     "currency": "USDT",
-    "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
-    "payment_status": "processing",
+    "payment_url": "https://sandboxpay.bitxpay.com/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_status": "pending",
     "payment_type": "one_time",
     "expires_at": "2026-03-13T15:21:12.988351519+05:00",
     "max_uses": 1,
@@ -319,9 +315,9 @@ The response structure varies based on the request parameters provided.
     "payment_name": "Invoice #12345",
     "description": "Payment for Order #12345",
     "amount": 100.5,
-    "currency": "USD",
-    "payment_url": "sandboxpay.bitxpay.com/payment_link?payment_id=d26ffcc8-f013-464e-893a-d71ee1e849ae",
-    "payment_status": "processing",
+    "currency": "USDT",
+    "payment_url": "https://sandboxpay.bitxpay.com/payment_link?payment_id=d26ffcc8-f013-464e-893a-d71ee1e849ae",
+    "payment_status": "pending",
     "payment_type": "one_time",
     "source": "payment_link_api",
     "expires_at": "2026-02-01T12:00:00Z",
@@ -354,12 +350,11 @@ The response structure varies based on the request parameters provided.
     "success_url": "https://www.success.io/success.html",
     "cancel_url": "https://www.failure.io/cancel.html",
     "webhook_metadata": {
-      "order_id": "ord_abc123",
+      "merchant_id": "M-10001",
       "demo": true
     },
     "created_at": "2026-07-05T07:30:05.703759Z"
-  },
-  "order_id": "ord_abc123"
+  }
 }
 ```
 
@@ -373,7 +368,7 @@ The response structure varies based on the request parameters provided.
 | `amount` | float | Payment amount |
 | `currency` | string | Currency code |
 | `payment_url` | string | URL for customers to complete payment |
-| `payment_status` | string | Status: `processing`, `completed`, `expired`, `cancelled` |
+| `payment_status` | string | Status: `pending`, `processing`, `completed`, `expired`, `cancelled` |
 | `payment_type` | string | Payment type: `one_time`, `recurring` |
 | `source` | string | Origin of the payment link: `payment_link_api` |
 | `is_test` | boolean | Whether this is a test payment |
@@ -399,7 +394,6 @@ The response structure varies based on the request parameters provided.
 | Field | Type | Description |
 |-------|------|-------------|
 | `message` | string | Human-readable result message |
-| `order_id` | string | The order ID (also echoed inside `data`) |
 
 #### Error Responses
 
@@ -423,7 +417,7 @@ Retrieve all payment links for the authenticated merchant with filtering, search
 
 #### Request
 
-**GET** `/payment_links?page=1&limit=20&status=pending&currency=USD&sort_by=created_at&sort_order=desc`
+**GET** `/payment_links?page=1&limit=20&status=pending&currency=USDT&sort_by=created_at&sort_order=desc`
 
 #### Query Parameters
 
@@ -431,9 +425,9 @@ Retrieve all payment links for the authenticated merchant with filtering, search
 |-----------|------|---------|-------------|---------|
 | `page` | integer | 1 | Page number (min: 1) | 1 |
 | `limit` | integer | 20 | Items per page (max: 100) | 20 |
-| `status` | string | - | Filter by status: pending, completed, expired, cancelled | "pending" |
+| `status` | string | - | Filter by status: pending, processing, completed, expired, cancelled | "pending" |
 | `is_active` | boolean | - | Filter by active status | true |
-| `currency` | string | - | Filter by currency (3-10 chars) | "USD" |
+| `currency` | string | - | Filter by currency (3-10 chars) | "USDT" |
 | `min_amount` | float | - | Minimum amount filter (must be > 0) | 10.00 |
 | `max_amount` | float | - | Maximum amount filter (must be > 0) | 1000.00 |
 | `created_from` | timestamp | - | Filter from date (ISO 8601) | "2026-01-01T00:00:00Z" |
@@ -457,8 +451,8 @@ The response includes an array of payment links with varying detail levels based
         "description": "Payment for Order #12345",
         "amount": 100.5,
         "currency": "USDT",
-        "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
-        "payment_status": "processing",
+        "payment_url": "https://sandboxpay.bitxpay.com/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+        "payment_status": "expired",
         "payment_type": "one_time",
         "expires_at": "2026-02-01T12:00:00Z",
         "max_uses": 1,
@@ -474,10 +468,13 @@ The response includes an array of payment links with varying detail levels based
           "items": [
             {
               "name": "Course A",
-              "price": 100.5,
-              "quantity": 1
+              "product_id": "prod_001",
+              "quantity": 1,
+              "unit_price": 100.5,
+              "total": 100.5
             }
           ],
+          "shipping": 0,
           "subtotal": 100.5,
           "tax": 0,
           "total": 100.5
@@ -498,7 +495,7 @@ The response includes an array of payment links with varying detail levels based
         "payment_name": "Invoice #12345",
         "amount": 100.5,
         "currency": "USDT",
-        "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+        "payment_url": "https://sandboxpay.bitxpay.com/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
         "payment_status": "processing",
         "payment_type": "one_time",
         "expires_at": "2026-03-13T15:21:12.988351Z",
@@ -572,8 +569,8 @@ The response structure varies based on how the payment link was created.
     "description": "Payment for Order #12345",
     "amount": 100.5,
     "currency": "USDT",
-    "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
-    "payment_status": "processing",
+    "payment_url": "https://sandboxpay.bitxpay.com/payment_link?payment_id=fce13397-afb5-4093-84c0-b64178691dbd",
+    "payment_status": "expired",
     "payment_type": "one_time",
     "expires_at": "2026-02-01T12:00:00Z",
     "max_uses": 1,
@@ -589,10 +586,13 @@ The response structure varies based on how the payment link was created.
       "items": [
         {
           "name": "Course A",
-          "price": 100.5,
-          "quantity": 1
+          "product_id": "prod_001",
+          "quantity": 1,
+          "unit_price": 100.5,
+          "total": 100.5
         }
       ],
+      "shipping": 0,
       "subtotal": 100.5,
       "tax": 0,
       "total": 100.5
@@ -630,7 +630,7 @@ The response structure varies based on how the payment link was created.
     "payment_name": "Invoice #12345",
     "amount": 100.5,
     "currency": "USDT",
-    "payment_url": "{{ $site.urls.apiServer.sandbox }}/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_url": "https://sandboxpay.bitxpay.com/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
     "payment_status": "processing",
     "payment_type": "one_time",
     "expires_at": "2026-03-13T15:21:12.988351Z",
@@ -665,13 +665,13 @@ The response structure varies based on how the payment link was created.
 | `amount` | float | Payment amount |
 | `currency` | string | Currency code |
 | `payment_url` | string | URL for customers to complete payment |
-| `payment_status` | string | Status: `processing`, `completed`, `expired`, `cancelled` |
+| `payment_status` | string | Status: `pending`, `processing`, `completed`, `expired`, `cancelled` |
 | `payment_type` | string | Payment type: `one_time`, `recurring` |
 | `expires_at` | timestamp | Expiration timestamp |
 | `max_uses` | integer | Maximum number of uses allowed |
 | `current_uses` | integer | Current number of uses |
-| `is_active` | boolean | Whether the payment link is active |
-| `is_expired` | boolean | Whether the payment link has expired |
+| `is_active` | boolean | Whether the payment link is active (merchant-controlled; distinct from `is_expired`) |
+| `is_expired` | boolean | Whether the payment link's `expires_at` has passed |
 | `customer_id` | string | Customer ID (auto-generated or provided) |
 | `customer_name` | string | Customer name (if provided) |
 | `customer_email` | string | Customer email (if provided) |
@@ -732,14 +732,14 @@ Soft delete a payment link by its ID.
     "payment_name": "Invoice #12345",
     "description": "Payment for Order #12345",
     "amount": 100.50,
-    "currency": "USD",
-    "payment_url": "https://pay.bitxpay.com/p/22222222-2222-2222-2222-222222222222",
-    "payment_status": "pending",
+    "currency": "USDT",
+    "payment_url": "https://sandboxpay.bitxpay.com/payment_link?payment_id=22222222-2222-2222-2222-222222222222",
+    "payment_status": "cancelled",
     "payment_type": "one_time",
     "expires_at": "2026-02-01T12:00:00Z",
     "max_uses": 1,
     "current_uses": 0,
-    "is_active": true,
+    "is_active": false,
     "is_expired": false,
     "customer_id": "AB-001",
     "customer_name": "John Doe",
@@ -770,8 +770,8 @@ Soft delete a payment link by its ID.
 All requests require the following headers:
 
 ```
-X-API-Key: btxm_live_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
+X-API-Key: btxm_test_xxxxxxxxxxxx      # btxm_live_xxxxxxxxxxxx in production
+X-API-Signature: <base64_encoded_ed25519_signature>
 X-API-Timestamp: 2026-01-31T12:00:00Z
 Content-Type: application/json
 ```
@@ -783,10 +783,11 @@ Content-Type: application/json
    message = METHOD + PATH + TIMESTAMP + BODY
    ```
 
-2. **Sign with DSA:**
-   - Hash using SHA-256
-   - Sign using DSA with DER encoding
+2. **Sign with Ed25519 (EdDSA):**
+   - Do not pre-hash — Ed25519 hashes the message internally (SHA-512)
+   - Produce the raw 64-byte signature
    - Encode as Base64
+   - *(Legacy RSA keys: sign with RSA-PSS + SHA-256 instead, then Base64-encode)*
 
 3. **Include in request headers**
 
@@ -811,7 +812,7 @@ Before creating a payment link, fetch the list of supported currencies:
 
 ```bash
 curl {{ $api.sandbox.baseUrl }}{{ $api.endpoints.currencies }} \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
+  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
   -H "Accept: application/json"
@@ -821,7 +822,7 @@ curl {{ $api.sandbox.baseUrl }}{{ $api.endpoints.currencies }} \
 
 ```bash
 curl -X POST {{ $api.sandbox.baseUrl }}/payment_links \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
+  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
   -H "Content-Type: application/json" \
@@ -836,7 +837,7 @@ curl -X POST {{ $api.sandbox.baseUrl }}/payment_links \
 
 ```bash
 curl -X POST {{ $api.sandbox.baseUrl }}/payment_links \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
+  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
   -H "Content-Type: application/json" \
@@ -856,7 +857,7 @@ curl -X POST {{ $api.sandbox.baseUrl }}/payment_links \
 
 ```bash
 curl {{ $api.sandbox.baseUrl }}/payment_links?status=pending&currency=USDT&limit=10 \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
+  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z"
 ```
@@ -865,7 +866,7 @@ curl {{ $api.sandbox.baseUrl }}/payment_links?status=pending&currency=USDT&limit
 
 ```bash
 curl -X DELETE {{ $api.sandbox.baseUrl }}/payment_links/{id} \
-  -H "X-API-Key: btxm_live_xxxxxxxxxxxx" \
+  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
   -H "Content-Type: application/json"

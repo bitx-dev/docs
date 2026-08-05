@@ -247,15 +247,15 @@ Message = METHOD + PATH + TIMESTAMP + BODY
 
 **Example:**
 ```
-POST/payment_links2026-01-31T17:53:56Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USD"}
+POST/payment_links2026-01-31T17:53:56Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USDT"}
 ```
 
 This message is then signed using:
-- **Algorithm:** DSA (Digital Signature Algorithm) — FIPS 186-4
-- **Hash Function:** SHA-256
-- **Output Format:** DER-encoded signature, base64-encoded for transmission
-- **Key Size:** 2048 bits (minimum recommended)
-- **Library:** Node.js built-in `crypto` module
+- **Algorithm:** Ed25519 (EdDSA)
+- **Hashing:** performed internally by Ed25519 (SHA-512) — the message is **not** pre-hashed
+- **Output Format:** raw 64-byte signature, base64-encoded for transmission
+- **Key:** Ed25519 private key (PKCS8, `Ed25519:`-prefixed base64 in the environment variable)
+- **Library:** TweetNaCl (`nacl.sign.detached`), loaded via CDN in the pre-request script
 
 ## Creating Your First Request
 
@@ -280,7 +280,7 @@ This message is then signed using:
 {
   "payment_name": "Test Payment",
   "amount": 10,
-  "currency": "USD",
+  "currency": "USDT",
   "success_url": "https://example.com/success",
   "cancel_url": "https://example.com/cancel"
 }
@@ -290,23 +290,30 @@ This message is then signed using:
 
 ### Expected Response
 
+The response follows the documented `{ message, data }` envelope (see [Payments API](/api-reference/payments#_2-create-payment-link)):
+
 ```json
 {
-  "payment_reference": "SDF-453672-PMT",
-  "name": "Test Payment",
-  "order_currency": "USD",
-  "order_amount": 10,
-  "payment_status": "processing",
-  "expiry_date": "2026-02-01T03:57:22Z",
-  "hosted_url": "https://pay.bitxpay.com/link/SDF-453672-PMT",
-  "token_type": "x-api-key",
-  "expires_in": 1499,
-  "is_active": true,
-  "max_uses": 1,
-  "current_uses": 0,
-  "notify_secret": "Cf9mx4nAvRuy5vwBY2FCtaKr"
+  "message": "Payment link created successfully",
+  "data": {
+    "id": "f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_name": "Test Payment",
+    "amount": 10,
+    "currency": "USDT",
+    "payment_url": "https://sandboxpay.bitxpay.com/payment_link?payment_id=f7a9ff0a-678f-45ba-a918-dcafc5d479e9",
+    "payment_status": "pending",
+    "payment_type": "one_time",
+    "max_uses": 1,
+    "current_uses": 0,
+    "is_active": true,
+    "created_at": "2026-03-12T15:21:12.988356Z"
+  }
 }
 ```
+
+::: warning Verify against live output
+The exact field set may vary by request parameters. If your sandbox returns a different shape (e.g. flat, non-enveloped), report it — the [Payments API reference](/api-reference/payments) is the canonical contract and should be reconciled with the backend.
+:::
 
 ## Viewing Console Logs
 
@@ -352,7 +359,7 @@ Body: None
 ```
 
 ::: tip
-All `/payment_links` endpoints use the same DSA authentication headers: `X-API-Key`, `X-API-Signature`, and `X-API-Timestamp`.
+All `/payment_links` endpoints use the same Ed25519 signature authentication headers: `X-API-Key`, `X-API-Signature`, and `X-API-Timestamp`.
 :::
 
 ## Advanced Configuration

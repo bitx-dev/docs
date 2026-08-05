@@ -75,7 +75,7 @@ app.post('/webhooks/bitxpay', express.raw({ type: 'application/json' }), (req, r
   "data": {
     "paymentId": "pay_abc123",
     "amount": 100.00,
-    "currency": "USD",
+    "currency": "USDT",
     "cryptoAmount": 0.0025,
     "crypto": "BTC",
     "status": "completed",

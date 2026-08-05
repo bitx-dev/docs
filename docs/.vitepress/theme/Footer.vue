@@ -24,7 +24,7 @@ import { withBase } from "vitepress";
         </p>
         <div class="footer-social">
           <a
-            href="https://www.npmjs.com/package/kentucky-signer-viem?activeTabt=readme"
+            href="https://www.npmjs.com/package/kentucky-signer-viem?activeTab=readme"
             target="_blank"
             rel="noopener"
             aria-label="GitHub"

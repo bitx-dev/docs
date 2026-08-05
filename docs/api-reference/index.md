@@ -23,38 +23,64 @@ https://sandboxapi.bitxpay.com/api/v1
 
 ## Authentication
 
-All API requests must include authentication headers. See [Authentication](/api-reference/authentication) for details.
+All merchant API requests must include signature authentication headers. Merchant endpoints (Payment Links) use **Ed25519 (EdDSA) signature authentication** (RSA-PSS accepted for legacy keys). See [Authentication](/api-reference/authentication) for details.
 
-**Merchant APIs (DSA):**
+**Merchant APIs (Ed25519 signature):**
 ```bash
-X-API-Key: btxm_xxxxxxxxxxxx
-X-API-Signature: <base64_encoded_dsa_signature>
+X-API-Key: btxm_test_xxxxxxxxxxxx      # use btxm_live_xxxxxxxxxxxx in production
+X-API-Signature: <base64_encoded_ed25519_signature>
 X-API-Timestamp: 2026-01-31T12:00:00Z
 ```
 
-**Standard APIs (HMAC-SHA256):**
-```bash
-Authorization: Bearer YOUR_API_KEY
-X-Signature: HMAC_SIGNATURE
-X-Timestamp: UNIX_TIMESTAMP
-```
+::: info HMAC authentication
+An HMAC-SHA256 authentication scheme is planned for a future set of standard (non-merchant) APIs. It is **not yet available** — no live endpoints use it today. It will be documented here once those endpoints ship.
+:::
 
 ## Endpoints
 
 ### Payments (Merchant API)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/currencies` | Get supported currencies |
+| `GET` | `/payment_links/currencies` | Get supported currencies |
 | `GET` | `/payment_links` | List all payment links |
 | `POST` | `/payment_links` | Create a payment link |
 | `GET` | `/payment_links/:id` | Get payment link by ID |
 | `DELETE` | `/payment_links/:id` | Delete a payment link |
 
-### Subscriptions
+### Subscriptions — Authenticated (Merchant) Routes
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/subscriptions/subscribers/createlink` | Create subscriber and generate subscription link |
-| `GET` | `/public/subscriptions/link/{walletAddress}` | Get subscriptions by wallet address |
+| `POST` | `/subscriptions/plans/` | Create a subscription plan |
+| `GET` | `/subscriptions/plans/` | List subscription plans |
+| `GET` | `/subscriptions/plans/:id` | Get subscription plan by ID |
+| `PUT` | `/subscriptions/plans/:id` | Update a subscription plan |
+| `DELETE` | `/subscriptions/plans/:id` | Deprecate a subscription plan |
+| `POST` | `/subscriber/` | Create a subscriber |
+| `GET` | `/subscriber/` | Get subscribers by merchant |
+| `GET` | `/subscriber/plan/:plan_id` | Get subscribers by plan ID |
+| `PUT` | `/subscriber/:id` | Update a subscriber |
+| `GET` | `/subscriber/:id` | Get subscriber by ID |
+| `GET` | `/invitations/` | Get invitations by plan ID |
+| `GET` | `/subscriptions/link/` | List subscription links |
+| `GET` | `/subscriptions/link/:id` | Get subscription link by ID |
+
+These routes require Merchant API Key authentication (`X-API-Key`/`X-API-Signature` with Ed25519), same as the Payments API.
+
+### Subscriptions — Public Routes
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/public/subscriptions/plans/` | List public subscription plans |
+| `GET` | `/public/subscriptions/plans/:id` | Get public subscription plan by ID |
+| `GET` | `/public/subscriber/prepare` | Prepare subscription enrollment |
+| `GET` | `/public/subscriber/:id` | Get subscriber by ID |
+| `PUT` | `/public/subscriber/:id` | Update subscriber |
+| `POST` | `/public/subscriptions/link/` | Create a subscription link |
+| `GET` | `/public/subscriptions/link/:walletAddress` | Get subscription links by wallet address |
+| `POST` | `/public/subscriptions/link/payment` | Record a subscription payment |
+| `PUT` | `/public/subscriptions/link/:id` | Update a subscription link |
+| `GET` | `/public/subscriptions/nft/:plan_id` | Get subscription NFT metadata |
+
+These routes do not require merchant signature headers — they are called directly from the customer-facing wallet/checkout flow. See [Subscriptions](/api-reference/subscriptions) for full request/response details.
 
 ## Response Format
 
@@ -62,31 +88,30 @@ All responses follow a consistent format:
 
 ```json
 {
-  "success": true,
+  "message": "Human-readable result message",
   "data": {
     // Response data
-  },
-  "meta": {
-    "requestId": "req_abc123",
-    "timestamp": "2024-01-15T10:30:00Z"
   }
 }
 ```
 
 ## Error Handling
 
-Errors return appropriate HTTP status codes with details:
+Errors return appropriate HTTP status codes with a consistent error body:
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "INVALID_AMOUNT",
-    "message": "Amount must be greater than 0",
-    "field": "amount"
-  }
+  "message": "Amount must be greater than 0",
+  "error": "invalid_amount",
+  "code": 400
 }
 ```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Human-readable description of the error |
+| `error` | string | Machine-readable error slug (snake_case) |
+| `code` | integer | HTTP status code, duplicated in the body for convenience |
 
 ### Error Codes
 
@@ -101,10 +126,14 @@ Errors return appropriate HTTP status codes with details:
 
 ## Rate Limits
 
-| Environment | Limit |
+Rate limits are enforced **per API key, per endpoint**. See the Rate Limiting section on the [Payments](/api-reference/payments#rate-limiting) page for exact limits (typically 10-30 requests/minute); for Subscriptions, see the [Rate Limiting](/api-reference/subscriptions#rate-limiting) note and contact your account team for current per-route limits.
+
+| Environment | Account-level ceiling |
 |-------------|-------|
 | Sandbox | 100 requests/minute |
 | Production | 1000 requests/minute |
+
+The account-level ceiling above is a hard cap across all endpoints combined; the per-endpoint limits documented on each page are typically the binding (lower) limit you will hit first.
 
 Rate limit headers are included in every response:
 

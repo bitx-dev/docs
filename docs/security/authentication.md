@@ -62,20 +62,24 @@ const apiKeys = [
 
 ### Signature Generation
 
-Always generate signatures server-side:
+Merchant API requests are signed with your **Ed25519 (EdDSA)** private key — **not** HMAC. Always generate signatures server-side. Note the canonical message order is `METHOD + PATH + TIMESTAMP + BODY`:
 
 ```javascript
 import crypto from 'crypto';
 
-function signRequest(secretKey, timestamp, method, path, body) {
-  const payload = `${timestamp}${method}${path}${body}`;
+function signRequest(privateKeyPEM, method, path, timestamp, body = '') {
+  const message = `${method}${path}${timestamp}${body}`;
 
-  return crypto
-    .createHmac('sha256', secretKey)
-    .update(payload)
-    .digest('hex');
+  // Ed25519 (EdDSA): pass `null` — Ed25519 hashes the message internally.
+  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
+
+  return signature.toString('base64');
 }
 ```
+
+::: tip HMAC is for webhooks only
+HMAC-SHA256 is used to **verify inbound webhooks** (see below), not to sign your outbound API requests. Don't confuse the two: outbound requests use the Ed25519 signature above. For the full signing guide, see [Authentication](/api-reference/authentication).
+:::
 
 ### Timestamp Validation
 
@@ -118,20 +122,11 @@ app.post('/webhooks', express.raw({ type: 'application/json' }), (req, res) => {
 
 ## IP Whitelisting
 
-For additional security, whitelist your server IPs:
+::: info Coming Soon
+IP whitelisting is not yet available. This section describes planned functionality and will be updated once the feature ships.
+:::
 
-1. Go to **Dashboard** → **Settings** → **Security**
-2. Enable IP Whitelisting
-3. Add your server IP addresses
-
-```
-Production IPs:
-- 203.0.113.10
-- 203.0.113.11
-
-Staging IPs:
-- 198.51.100.5
-```
+For additional security, you will be able to whitelist your server IPs from the **Dashboard** → **Settings** → **Security** page, restricting API access to a set of known server IP addresses.
 
 ## Common Vulnerabilities
 

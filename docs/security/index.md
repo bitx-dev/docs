@@ -21,11 +21,11 @@ BITXpay provides several security features out of the box:
 
 | Feature | Description |
 |---------|-------------|
-| **HMAC Authentication** | Every request is signed with your secret key |
+| **Ed25519 Request Signing** | Every merchant API request is signed with your private key |
 | **TLS Encryption** | All communications use TLS 1.3 |
-| **Webhook Signatures** | Verify webhook authenticity |
+| **Webhook Signatures** | Verify webhook authenticity (HMAC-SHA256) |
 | **Rate Limiting** | Protection against abuse |
-| **IP Whitelisting** | Optional IP-based access control |
+| **IP Whitelisting** | Optional IP-based access control *(coming soon)* |
 | **2FA** | Two-factor authentication for dashboard |
 
 ## Security Compliance

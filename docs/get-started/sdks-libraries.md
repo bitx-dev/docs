@@ -331,7 +331,7 @@ curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.payments }} \
   -H "Content-Type: application/json" \
   -d '{
     "amount": "100.00",
-    "currency": "USD",
+    "currency": "USDT",
     "description": "Order #1234"
   }'
 ```

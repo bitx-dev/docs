@@ -69,23 +69,23 @@ Incorrect: Bearer btxm_live_xxxxxxxxxxxx (for X-API-Key header)
 const message = `${METHOD}${PATH}${TIMESTAMP}${BODY}`;
 
 // Example
-"POST/payment_links2026-01-31T17:53:56Z{\"payment_name\":\"Invoice #12345\",\"amount\":100.50,\"currency\":\"USD\"}"
+"POST/payment_links2026-01-31T17:53:56Z{\"payment_name\":\"Invoice #12345\",\"amount\":100.50,\"currency\":\"USDT\"}"
 ```
 
 ✅ **Check signature parameters:**
-- Algorithm: DSA (Digital Signature Algorithm)
-- Hash: SHA-256
-- Encoding: DER format
-- Key size: 2048 bits minimum
+- Algorithm: Ed25519 (EdDSA)
+- Hash: None (built into Ed25519)
+- Encoding: raw signature bytes, base64-encoded
+- Key format: PKCS#8 PEM
 
 ✅ **Validate private key format:**
 ```
------BEGIN DSA PRIVATE KEY-----
-MIIBuwIBAAKBgQD...
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIH...
 (base64 encoded key)
-...
------END DSA PRIVATE KEY-----
+-----END PRIVATE KEY-----
 ```
+(Ed25519 keys use PKCS#8 format with `PRIVATE KEY` header, not `DSA PRIVATE KEY`)
 
 ✅ **Debug signature generation:**
 
@@ -109,10 +109,10 @@ Use this test case to verify your signature generation:
 const method = 'POST';
 const path = '/payment_links';
 const timestamp = '2026-01-31T12:00:00Z';
-const body = '{"payment_name":"Invoice #12345","amount":100.50,"currency":"USD"}';
+const body = '{"payment_name":"Invoice #12345","amount":100.50,"currency":"USDT"}';
 
 // Expected message
-const expectedMessage = 'POST/payment_links2026-01-31T12:00:00Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USD"}';
+const expectedMessage = 'POST/payment_links2026-01-31T12:00:00Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USDT"}';
 
 // Verify your message matches
 console.assert(message === expectedMessage, 'Message format incorrect');
@@ -230,10 +230,10 @@ For Create Payment Link:
 ✅ **Validate field formats:**
 
 ```javascript
-// Currency: 3-letter ISO 4217 code
-order_currency: "USD" // ✅
-order_currency: "usd" // ❌ (must be uppercase)
-order_currency: "Dollar" // ❌
+// Currency: uppercase crypto currency code
+order_currency: "USDT" // ✅
+order_currency: "usdt" // ❌ (must be uppercase)
+order_currency: "USD" // ❌ (fiat not supported, use USDT or USDC)
 
 // Email: Valid email format
 payer_email: "test@example.com" // ✅
@@ -369,7 +369,7 @@ Wrong: merchant_api_key, Merchant_Api_Key
 
 **Option 1: Use `\n` for newlines**
 ```
------BEGIN DSA PRIVATE KEY-----\nMIIBuwIBAAKBgQD...\n-----END DSA PRIVATE KEY-----
+-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIH...\n-----END PRIVATE KEY-----
 ```
 
 **Option 2: Use actual newlines**
@@ -379,18 +379,18 @@ Wrong: merchant_api_key, Merchant_Api_Key
 ✅ **Remove extra spaces:**
 ```
 // ❌ Wrong - extra spaces
------BEGIN DSA PRIVATE KEY-----  
-MIIBuwIBAAKBgQD...
+-----BEGIN PRIVATE KEY-----  
+MC4CAQAwBQYDK2VwBCIEIH...
 
 // ✅ Correct - no trailing spaces
------BEGIN DSA PRIVATE KEY-----
-MIIBuwIBAAKBgQD...
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIH...
 ```
 
 ✅ **Verify key markers:**
 ```
-Correct: -----BEGIN DSA PRIVATE KEY-----
-Also acceptable: -----BEGIN PRIVATE KEY----- (PKCS#8 format)
+Correct: -----BEGIN PRIVATE KEY----- (PKCS#8 format for Ed25519)
+Wrong: -----BEGIN DSA PRIVATE KEY-----
 Wrong: -----BEGIN RSA PRIVATE KEY-----
 ```
 

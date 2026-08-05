@@ -5,7 +5,7 @@ description: Test BITXpay APIs using various tools including cURL, Insomnia, HTT
 
 # API Testing Tools
 
-While Postman is our recommended tool, you can test BITXpay APIs using various other tools. This guide covers popular alternatives with DSA signature generation examples.
+While Postman is our recommended tool, you can test BITXpay APIs using various other tools. This guide covers popular alternatives with Ed25519 signature generation examples.
 
 ## cURL
 
@@ -34,8 +34,8 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 # Create message to sign
 MESSAGE="${METHOD}${ENDPOINT}${TIMESTAMP}${BODY}"
 
-# Generate signature using OpenSSL (DSA)
-SIGNATURE=$(echo -n "$MESSAGE" | openssl dgst -sha256 -sign "$PRIVATE_KEY_FILE" | base64 -w 0)
+# Generate signature using OpenSSL (Ed25519)
+SIGNATURE=$(printf '%s' "$MESSAGE" | openssl pkeyutl -sign -inkey "$PRIVATE_KEY_FILE" -rawin | base64 -w 0)
 
 # Make request
 if [ -z "$BODY" ]; then
@@ -60,7 +60,7 @@ fi
 chmod +x bitxpay-curl.sh
 
 # Create payment link
-./bitxpay-curl.sh POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USD","success_url":"https://example.com/success","cancel_url":"https://example.com/cancel"}'
+./bitxpay-curl.sh POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USDT","success_url":"https://example.com/success","cancel_url":"https://example.com/cancel"}'
 
 # Get payment details
 ./bitxpay-curl.sh GET /payment_links/payment-id-here
@@ -68,7 +68,7 @@ chmod +x bitxpay-curl.sh
 
 ### Node.js Helper for cURL
 
-If OpenSSL version doesn't support PSS, use this Node.js helper:
+If your OpenSSL CLI doesn't support Ed25519, use this Node.js helper:
 
 ```javascript
 #!/usr/bin/env node
@@ -84,9 +84,8 @@ const [method, endpoint, body = ''] = process.argv.slice(2);
 const timestamp = new Date().toISOString();
 const message = `${method}${endpoint}${timestamp}${body}`;
 
-const signature = crypto.sign('sha256', Buffer.from(message, 'utf8'), {
-  key: privateKey,
-  dsaEncoding: 'der'
+const signature = crypto.sign(null, Buffer.from(message, 'utf8'), {
+  key: privateKey
 }).toString('base64');
 
 const curlCmd = body
@@ -100,7 +99,7 @@ Save as `bitxpay-request.js` and use:
 
 ```bash
 chmod +x bitxpay-request.js
-./bitxpay-request.js POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USD",...}'
+./bitxpay-request.js POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USDT",...}'
 ```
 
 ---
@@ -123,7 +122,7 @@ Create an environment with:
 {
   "base_url": "https://sandboxapi.bitxpay.com/api/v1",
   "api_key": "your_api_key",
-  "private_key": "-----BEGIN DSA PRIVATE KEY-----\n...\n-----END DSA PRIVATE KEY-----"
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIH...\n-----END PRIVATE KEY-----"
 }
 ```
 
@@ -154,9 +153,8 @@ module.exports.requestHooks = [
     
     const message = `${method}${path}${timestamp}${body}`;
     
-    const signature = crypto.sign('sha256', Buffer.from(message, 'utf8'), {
-      key: privateKey,
-      dsaEncoding: 'der'
+    const signature = crypto.sign(null, Buffer.from(message, 'utf8'), {
+      key: privateKey
     }).toString('base64');
     
     request.setHeader('X-API-Key', apiKey);
@@ -211,7 +209,7 @@ BODY=$3
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 MESSAGE="${METHOD}${ENDPOINT}${TIMESTAMP}${BODY}"
 
-SIGNATURE=$(echo -n "$MESSAGE" | openssl dgst -sha256 -sign "$PRIVATE_KEY_FILE" | base64 -w 0)
+SIGNATURE=$(printf '%s' "$MESSAGE" | openssl pkeyutl -sign -inkey "$PRIVATE_KEY_FILE" -rawin | base64 -w 0)
 
 if [ -z "$BODY" ]; then
   http "$METHOD" "${BASE_URL}${ENDPOINT}" \
@@ -232,7 +230,7 @@ fi
 chmod +x bitxpay-http.sh
 
 # Create payment
-./bitxpay-http.sh POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USD",...}'
+./bitxpay-http.sh POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USDT",...}'
 ```
 
 ---
@@ -268,7 +266,7 @@ Content-Type: application/json
 {
   "payment_name": "Test Payment",
   "amount": 10,
-  "currency": "USD",
+  "currency": "USDT",
   "success_url": "https://example.com/success",
   "cancel_url": "https://example.com/cancel"
 }
@@ -317,9 +315,8 @@ Thunder Client is a lightweight REST client for VS Code.
    
    const message = `${method}${path}${timestamp}${body}`;
    
-   const signature = crypto.sign('sha256', Buffer.from(message, 'utf8'), {
-     key: privateKey,
-     dsaEncoding: 'der'
+   const signature = crypto.sign(null, Buffer.from(message, 'utf8'), {
+     key: privateKey
    }).toString('base64');
    
    tc.setVar('signature', signature);
@@ -341,9 +338,8 @@ For Python developers, here's a reusable class:
 import os
 import json
 import base64
-from datetime import datetime
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
+from datetime import datetime, timezone
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 import requests
 
@@ -363,14 +359,13 @@ class BITXpayClient:
         message = f"{method}{path}{timestamp}{body}"
         
         signature = self.private_key.sign(
-            message.encode('utf-8'),
-            hashes.SHA256()
+            message.encode('utf-8')
         )
         
         return base64.b64encode(signature).decode('utf-8')
     
     def request(self, method, path, data=None):
-        timestamp = datetime.utcnow().isoformat() + 'Z'
+        timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
         body = json.dumps(data) if data else ''
         
         signature = self._generate_signature(method, path, timestamp, body)
@@ -411,7 +406,7 @@ client = BITXpayClient(
 payment = client.create_payment_link({
     'payment_name': 'Test Payment',
     'amount': 10,
-    'currency': 'USD',
+    'currency': 'USDT',
     'success_url': 'https://example.com/success',
     'cancel_url': 'https://example.com/cancel'
 })
@@ -446,7 +441,7 @@ class BITXpayClient {
             $message,
             $signature,
             $this->privateKey,
-            OPENSSL_ALGO_SHA256
+            OPENSSL_ALGO_NONE
         );
         
         return base64_encode($signature);
@@ -494,7 +489,7 @@ $client = new BITXpayClient(
 $payment = $client->createPaymentLink([
     'payment_name' => 'Test Payment',
     'amount' => 10,
-    'currency' => 'USD',
+    'currency' => 'USDT',
     'success_url' => 'https://example.com/success',
     'cancel_url' => 'https://example.com/cancel'
 ]);
