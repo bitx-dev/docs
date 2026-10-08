@@ -9,14 +9,22 @@ This guide covers common issues you might encounter when testing BITXpay APIs an
 
 ## Authentication Errors
 
-### Error: "Missing or invalid access token"
+### Error: "API key required" / "invalid API key"
 
 **Error Response:**
 ```json
 {
   "error": "unauthorized",
-  "message": "Missing or invalid access token",
-  "code": 401
+  "message": "API key required. Provide via X-API-Key header or Authorization header",
+  "code": "API_KEY_REQUIRED"
+}
+```
+or
+```json
+{
+  "error": "unauthorized",
+  "message": "invalid API key",
+  "code": "INVALID_API_KEY"
 }
 ```
 
@@ -28,14 +36,15 @@ This guide covers common issues you might encounter when testing BITXpay APIs an
 **Solutions:**
 
 ✅ **Check header name:**
-- For merchant APIs: Use `X-API-Key` (not `Authorization`)
-- For standard APIs: Use `Authorization: Bearer {token}`
+- Use `X-API-Key: btxm_…` (or `Authorization: Bearer btxm_…`)
 
 ✅ **Verify API key format:**
 ```
-Correct: btxm_live_xxxxxxxxxxxx or btxm_xxxxxxxxxxxx
-Incorrect: Bearer btxm_live_xxxxxxxxxxxx (for X-API-Key header)
+Correct: btxm_9b451fa04a2e      (btxm_ + 12 hex characters)
 ```
+
+✅ **Use the key in the environment that issued it:**
+- A sandbox key only works against `{{ $api.sandbox.baseUrl }}`; a production key only against `{{ $api.production.baseUrl }}`. Otherwise you get `INVALID_API_KEY`.
 
 ✅ **Ensure key is active:**
 - Log in to dashboard
@@ -44,22 +53,30 @@ Incorrect: Bearer btxm_live_xxxxxxxxxxxx (for X-API-Key header)
 
 ---
 
-### Error: "Invalid signature"
+### Error: "signature verification failed"
 
 **Error Response:**
 ```json
 {
   "error": "unauthorized",
-  "message": "Invalid signature",
-  "code": 401
+  "message": "signature verification failed: Ed25519 signature verification failed",
+  "code": "SIGNATURE_VERIFICATION_FAILED",
+  "debug": {
+    "method": "POST",
+    "path": "/api/v1/payment_links",
+    "body_length": 71,
+    "message_hash": ""
+  }
 }
 ```
 
+The `debug` object shows the method, path and body length the **server** signed over. Compare them with what you signed.
+
 **Possible Causes:**
-1. Incorrect private key
-2. Wrong signature algorithm
-3. Message format mismatch
-4. Character encoding issues
+1. Signed path missing the `/api/v1` prefix (by far the most common)
+2. Body re-serialised by your HTTP client after signing (whitespace / key order changed)
+3. Incorrect private key, or key loaded in the wrong format
+4. Wrong signature algorithm
 
 **Solutions:**
 
@@ -68,24 +85,21 @@ Incorrect: Bearer btxm_live_xxxxxxxxxxxx (for X-API-Key header)
 // Correct format
 const message = `${METHOD}${PATH}${TIMESTAMP}${BODY}`;
 
-// Example
-"POST/payment_links2026-01-31T17:53:56Z{\"payment_name\":\"Invoice #12345\",\"amount\":100.50,\"currency\":\"USDT\"}"
+// Example — PATH includes /api/v1
+"POST/api/v1/payment_links2026-01-31T17:53:56Z{\"payment_name\":\"Invoice #12345\",\"amount\":100.50,\"currency\":\"USDT\"}"
 ```
 
 ✅ **Check signature parameters:**
 - Algorithm: Ed25519 (EdDSA)
 - Hash: None (built into Ed25519)
 - Encoding: raw signature bytes, base64-encoded
-- Key format: PKCS#8 PEM
+- Key format: `Ed25519:<base64 PKCS#8 DER>` as issued by the dashboard
 
 ✅ **Validate private key format:**
 ```
------BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEIH...
-(base64 encoded key)
------END PRIVATE KEY-----
+Ed25519:MC4CAQAwBQYDK2VwBCIEI...
 ```
-(Ed25519 keys use PKCS#8 format with `PRIVATE KEY` header, not `DSA PRIVATE KEY`)
+Strip the `Ed25519:` prefix, base64-decode the rest and load it as a PKCS#8 **DER** key (`crypto.createPrivateKey({key, format: 'der', type: 'pkcs8'})` in Node, `load_der_private_key` in Python). Passing the raw string to a PEM loader fails.
 
 ✅ **Debug signature generation:**
 
@@ -107,12 +121,12 @@ Use this test case to verify your signature generation:
 ```javascript
 // Test inputs
 const method = 'POST';
-const path = '/payment_links';
+const path = '/api/v1/payment_links';
 const timestamp = '2026-01-31T12:00:00Z';
 const body = '{"payment_name":"Invoice #12345","amount":100.50,"currency":"USDT"}';
 
 // Expected message
-const expectedMessage = 'POST/payment_links2026-01-31T12:00:00Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USDT"}';
+const expectedMessage = 'POST/api/v1/payment_links2026-01-31T12:00:00Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USDT"}';
 
 // Verify your message matches
 console.assert(message === expectedMessage, 'Message format incorrect');
@@ -120,16 +134,18 @@ console.assert(message === expectedMessage, 'Message format incorrect');
 
 ---
 
-### Error: "Request timestamp is too old or invalid"
+### Error: "request timestamp expired"
 
 **Error Response:**
 ```json
 {
   "error": "unauthorized",
-  "message": "Request timestamp is too old or invalid",
-  "code": 401
+  "message": "request timestamp expired. Maximum allowed time difference is 5 minutes",
+  "code": "TIMESTAMP_EXPIRED",
+  "time_diff_seconds": 360.4
 }
 ```
+(`INVALID_TIMESTAMP_FORMAT` if the value is not RFC 3339, `TIMESTAMP_REQUIRED` if the header is missing.)
 
 **Possible Causes:**
 1. System clock out of sync
@@ -230,10 +246,10 @@ For Create Payment Link:
 ✅ **Validate field formats:**
 
 ```javascript
-// Currency: uppercase crypto currency code
-order_currency: "USDT" // ✅
-order_currency: "usdt" // ❌ (must be uppercase)
-order_currency: "USD" // ❌ (fiat not supported, use USDT or USDC)
+// Currency: any code from GET /payment_links/currencies (case-insensitive)
+currency: "USDT" // ✅
+currency: "usdt" // ✅ (normalised to USDT)
+currency: "XYZ"  // ❌ 400 invalid currency code 'XYZ': currency not found
 
 // Email: Valid email format
 payer_email: "test@example.com" // ✅

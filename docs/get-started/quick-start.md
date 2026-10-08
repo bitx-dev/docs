@@ -16,7 +16,7 @@ Before you begin, ensure you have:
 1. Log in to your [BITXpay Dashboard](https://sandbox.bitxpay.com/dashboard)
 2. Navigate to **Developers** → **API Keys**
 3. Click **Create API Key**
-4. Save your API Key (`btxm_test_xxxxxxxxxx`) and Ed25519 private key securely
+4. Save your API Key (`btxm_xxxxxxxxxxxx`) and private key (`Ed25519:…`, shown only once) securely
 
 ::: warning Keep your credentials safe
 Never commit API keys or private keys to version control or expose them in client-side code.
@@ -24,87 +24,68 @@ Never commit API keys or private keys to version control or expose them in clien
 
 ## Step 2: Make your first API call
 
-Test your credentials by fetching your account information:
+Test your credentials by fetching the currencies your payment links can use. Every request is signed over `METHOD + PATH + TIMESTAMP + BODY`, where `PATH` is the **full path including `/api/v1`** and the private key is loaded straight from the `Ed25519:…` string the dashboard gave you.
 
 ::: code-group
 
-```bash [cURL]
-curl -X GET {{ $api.sandbox.baseUrl }}/account \
-  -H "X-API-Key: btxm_xxxxxxxxxxxx" \
-  -H "X-API-Signature: <base64_encoded_ed25519_signature>" \
-  -H "X-API-Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-```
-
 ```javascript [Node.js]
-const axios = require('axios');
-const crypto = require('crypto');
-const fs = require('fs');
+import crypto from 'crypto';
 
-const apiKey = process.env.MERCHANT_API_KEY; // btxm_xxxxxxxxxxxx
-const privateKey = fs.readFileSync('private-key.pem', 'utf8');
+const apiKey = process.env.MERCHANT_API_KEY;              // btxm_xxxxxxxxxxxx
+const raw = process.env.MERCHANT_PRIVATE_KEY;             // Ed25519:MC4CAQAw...
+const privateKey = crypto.createPrivateKey({
+  key: Buffer.from(raw.slice('Ed25519:'.length), 'base64'),
+  format: 'der',
+  type: 'pkcs8',
+});
+
+const host = 'https://sandboxapi.bitxpay.com';
+const path = '/api/v1/payment_links/currencies';          // full path is signed
 const timestamp = new Date().toISOString();
+const message = `GET${path}${timestamp}`;                 // no body for GET
+const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKey).toString('base64');
 
-function generateSignature(privateKeyPEM, method, path, timestamp, body = '') {
-  const message = `${method}${path}${timestamp}${body}`;
-  // Ed25519 (EdDSA): pass `null` — Ed25519 hashes the message internally.
-  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
-  return signature.toString('base64');
-}
-
-const signature = generateSignature(privateKey, 'GET', '/account', timestamp);
-
-axios.get('{{ $api.sandbox.baseUrl }}/account', {
+const res = await fetch(host + path, {
   headers: {
     'X-API-Key': apiKey,
     'X-API-Signature': signature,
-    'X-API-Timestamp': timestamp
-  }
-})
-.then(response => console.log(response.data))
-.catch(error => console.error(error));
+    'X-API-Timestamp': timestamp,
+    'Accept': 'application/json',
+  },
+});
+console.log(res.status, await res.json());
 ```
 
 ```python [Python]
+import base64, os
+from datetime import datetime, timezone
 import requests
 from cryptography.hazmat.primitives import serialization
-import base64
-from datetime import datetime, timezone
-import os
 
-api_key = os.environ.get('MERCHANT_API_KEY')  # btxm_xxxxxxxxxxxx
-
-# Load your Ed25519 private key
-with open('private-key.pem', 'r') as f:
-    private_key_pem = f.read()
-
-private_key = serialization.load_pem_private_key(
-    private_key_pem.encode(),
-    password=None,
+api_key = os.environ["MERCHANT_API_KEY"]                    # btxm_xxxxxxxxxxxx
+raw = os.environ["MERCHANT_PRIVATE_KEY"]                    # Ed25519:MC4CAQAw...
+private_key = serialization.load_der_private_key(
+    base64.b64decode(raw[len("Ed25519:"):]), password=None
 )
 
-timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+host = "https://sandboxapi.bitxpay.com"
+path = "/api/v1/payment_links/currencies"                   # full path is signed
+timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+message = f"GET{path}{timestamp}"                           # no body for GET
+signature = base64.b64encode(private_key.sign(message.encode())).decode()
 
-def generate_signature(private_key, method, path, timestamp, body=''):
-    message = f'{method}{path}{timestamp}{body}'
-    # Ed25519 (EdDSA) — no separate hash argument; Ed25519 hashes internally.
-    signature = private_key.sign(message.encode('utf-8'))
-    return base64.b64encode(signature).decode('utf-8')
-
-signature = generate_signature(private_key, 'GET', '/account', timestamp)
-
-response = requests.get(
-    '{{ $api.sandbox.baseUrl }}/account',
-    headers={
-        'X-API-Key': api_key,
-        'X-API-Signature': signature,
-        'X-API-Timestamp': timestamp
-    }
-)
-
-print(response.json())
+res = requests.get(host + path, headers={
+    "X-API-Key": api_key,
+    "X-API-Signature": signature,
+    "X-API-Timestamp": timestamp,
+    "Accept": "application/json",
+})
+print(res.status_code, res.json())
 ```
 
 :::
+
+A `200` with `{"message": "Currencies retrieved successfully", "data": [...]}` means your key and signing are correct. A `401` with `code: "SIGNATURE_VERIFICATION_FAILED"` almost always means the signed path is missing the `/api/v1` prefix.
 
 ## Step 3: Create a payment
 
@@ -112,103 +93,13 @@ Create your first payment request:
 
 ::: code-group
 
-```javascript [Node.js]
-const axios = require('axios');
-const crypto = require('crypto');
-const fs = require('fs');
+<<< @/snippets/sign.mjs{javascript} [Node.js]
 
-const apiKey = process.env.MERCHANT_API_KEY;
-const privateKey = fs.readFileSync('private-key.pem', 'utf8');
-const timestamp = new Date().toISOString();
-const method = 'POST';
-const path = '/payment_links';
-const body = JSON.stringify({
-  payment_name: 'Test Payment',
-  amount: 10,
-  currency: 'USDT',
-  success_url: 'https://yoursite.com/success',
-  cancel_url: 'https://yoursite.com/cancel'
-});
-
-function generateSignature(privateKeyPEM, method, path, timestamp, body = '') {
-  const message = `${method}${path}${timestamp}${body}`;
-  // Ed25519 (EdDSA): pass `null` — Ed25519 hashes the message internally.
-  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
-  return signature.toString('base64');
-}
-
-const signature = generateSignature(privateKey, method, path, timestamp, body);
-
-axios.post(`{{ $api.sandbox.baseUrl }}${path}`, body, {
-  headers: {
-    'X-API-Key': apiKey,
-    'X-API-Signature': signature,
-    'X-API-Timestamp': timestamp,
-    'Content-Type': 'application/json'
-  }
-})
-.then(response => {
-  console.log('Payment created:', response.data);
-  console.log('Payment URL:', response.data.data.payment_url);
-})
-.catch(error => console.error(error));
-```
-
-```python [Python]
-import requests
-from cryptography.hazmat.primitives import serialization
-import base64
-from datetime import datetime, timezone
-import json
-import os
-
-api_key = os.environ.get('MERCHANT_API_KEY')
-
-# Load your Ed25519 private key
-with open('private-key.pem', 'r') as f:
-    private_key_pem = f.read()
-
-private_key = serialization.load_pem_private_key(
-    private_key_pem.encode(),
-    password=None,
-)
-
-timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
-method = 'POST'
-path = '/payment_links'
-body = json.dumps({
-    'payment_name': 'Test Payment',
-    'amount': 10,
-    'currency': 'USDT',
-    'success_url': 'https://yoursite.com/success',
-    'cancel_url': 'https://yoursite.com/cancel'
-})
-
-def generate_signature(private_key, method, path, timestamp, body=''):
-    message = f'{method}{path}{timestamp}{body}'
-    # Ed25519 (EdDSA) — no separate hash argument; Ed25519 hashes internally.
-    signature = private_key.sign(message.encode('utf-8'))
-    return base64.b64encode(signature).decode('utf-8')
-
-signature = generate_signature(private_key, method, path, timestamp, body)
-
-response = requests.post(
-    f'{{ $api.sandbox.baseUrl }}{path}',
-    headers={
-        'X-API-Key': api_key,
-        'X-API-Signature': signature,
-        'X-API-Timestamp': timestamp,
-        'Content-Type': 'application/json'
-    },
-    data=body
-)
-
-result = response.json()
-print('Payment created:', result)
-print('Payment URL:', result['data']['payment_url'])
-```
+<<< @/snippets/sign.py{python} [Python]
 
 :::
+
+The response is `201 Created` with the link in `data`; the customer-facing checkout URL is `data.payment_url` (currently returned without a scheme, so prefix `https://`). New links start in `payment_status: "processing"`.
 
 ## Step 4: Handle webhooks
 
@@ -326,7 +217,7 @@ Make sure you're:
 - Using the correct Ed25519 private key
 - Including the timestamp in the signature (ISO 8601 format)
 - Formatting the message string correctly: `${method}${path}${timestamp}${body}` — e.g. `POST/payment_links2026-01-31T12:00:00Z{...}`
-- Signing with Ed25519 (do **not** pre-hash — Ed25519 hashes internally)
+- Signing with Ed25519 over `METHOD + /api/v1/... + TIMESTAMP + BODY` (do **not** pre-hash — Ed25519 hashes internally)
 - Encoding the final signature as Base64
 
 ### Webhook not receiving events

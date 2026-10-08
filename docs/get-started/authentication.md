@@ -38,14 +38,19 @@ These keys are for server side use only. If a secret key is exposed, delete it i
 4. Store both securely — the private key is shown only once
 
 Your credentials will include:
-- **API Key:** `btxm_test_xxxxxxxxxx` in sandbox, `btxm_live_xxxxxxxxxx` in production (public identifier)
-- **Private Key:** Ed25519 private key in PKCS#8 PEM format (keep secret) — RSA private key in PEM for legacy accounts
-- **Public Key:** Ed25519 public key in PEM format (for verification) — RSA public key for legacy accounts
+
+| Credential | Format | Example |
+|---|---|---|
+| **API Key** (public identifier) | `btxm_` + 12 hex characters, same shape in sandbox and production | `btxm_9b451fa04a2e` |
+| **Private Key** (keep secret) | `Ed25519:` + base64 of the PKCS#8 DER key (not PEM) | `Ed25519:MC4CAQAwBQYDK2VwBCIEI…` |
+| **Public Key** | `Ed25519:` + base64 of the SubjectPublicKeyInfo DER key | `Ed25519:MCowBQYDK2VwAyEA…` |
+
+Legacy accounts have an RSA key pair in PEM format instead. A key only works in the environment whose dashboard issued it.
 
 ### Required headers
 
 ```http
-X-API-Key: btxm_test_xxxxxxxxxxxx
+X-API-Key: btxm_9b451fa04a2e
 X-API-Signature: <base64_encoded_ed25519_signature>
 X-API-Timestamp: 2026-01-31T17:53:56Z
 Content-Type: application/json
@@ -60,9 +65,15 @@ The signature is created by signing the canonical message with your private key:
 METHOD + PATH + TIMESTAMP + BODY
 ```
 
+`PATH` is the **full request path including `/api/v1`** (no host, no query string); `BODY` is the exact raw body string you send (empty for GET). There are no separators.
+
+::: danger Sign the full path
+Signing `/payment_links` while calling `{{ $api.sandbox.baseUrl }}/payment_links` fails with `SIGNATURE_VERIFICATION_FAILED`. Sign `/api/v1/payment_links`.
+:::
+
 **Example Message:**
 ```
-POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT","payment_name":"Invoice #12345"}
+POST/api/v1/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT","payment_name":"Invoice #12345"}
 ```
 
 **Signature Parameters (Ed25519 — default):**
@@ -77,104 +88,13 @@ POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT","paymen
 
 ::: code-group
 
-```javascript [Node.js]
-import crypto from 'crypto';
-import fs from 'fs';
+<<< @/snippets/sign.mjs{javascript} [Node.js]
 
-function generateSignature(privateKeyPEM, method, path, timestamp, body = '') {
-  const message = `${method}${path}${timestamp}${body}`;
-
-  // Ed25519 (EdDSA): pass `null` as the algorithm — Ed25519 hashes the message
-  // internally, so the message must NOT be pre-hashed.
-  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
-
-  return signature.toString('base64');
-}
-
-// Usage
-const privateKey = fs.readFileSync('private-key.pem', 'utf8');
-const apiKey = process.env.MERCHANT_API_KEY;
-
-const method = 'POST';
-const path = '/payment_links';
-const timestamp = new Date().toISOString();
-const body = JSON.stringify({
-  payment_name: 'Invoice #12345',
-  amount: 100.50,
-  currency: 'USDT',
-  success_url: 'https://example.com/success',
-  cancel_url: 'https://example.com/cancel'
-});
-
-const signature = generateSignature(privateKey, method, path, timestamp, body);
-
-// Make request
-const response = await fetch(`{{ $api.sandbox.baseUrl }}${path}`, {
-  method,
-  headers: {
-    'X-API-Key': apiKey,
-    'X-API-Signature': signature,
-    'X-API-Timestamp': timestamp,
-    'Content-Type': 'application/json'
-  },
-  body
-});
-```
-
-```python [Python]
-from cryptography.hazmat.primitives import serialization
-import base64
-from datetime import datetime, timezone
-import json
-import requests
-import os
-
-def generate_signature(private_key_pem, method, path, timestamp, body=''):
-    message = f"{method}{path}{timestamp}{body}"
-
-    private_key = serialization.load_pem_private_key(
-        private_key_pem.encode(),
-        password=None,
-    )
-
-    # Ed25519 (EdDSA) — no separate hash argument; Ed25519 hashes internally.
-    signature = private_key.sign(message.encode('utf-8'))
-
-    return base64.b64encode(signature).decode('utf-8')
-
-# Usage
-with open('private-key.pem', 'r') as f:
-    private_key = f.read()
-
-api_key = os.environ.get('MERCHANT_API_KEY')
-
-method = 'POST'
-path = '/payment_links'
-timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
-body = json.dumps({
-    'payment_name': 'Invoice #12345',
-    'amount': 100.50,
-    'currency': 'USDT',
-    'success_url': 'https://example.com/success',
-    'cancel_url': 'https://example.com/cancel'
-})
-
-signature = generate_signature(private_key, method, path, timestamp, body)
-
-# Make request
-response = requests.post(
-    f'{{ $api.sandbox.baseUrl }}{path}',
-    headers={
-        'X-API-Key': api_key,
-        'X-API-Signature': signature,
-        'X-API-Timestamp': timestamp,
-        'Content-Type': 'application/json'
-    },
-    data=body
-)
-```
+<<< @/snippets/sign.py{python} [Python]
 
 :::
+
+Both samples were run as-is against the sandbox. The private key is loaded straight from the `Ed25519:…` string the dashboard shows.
 
 ## HMAC-SHA256 — planned
 

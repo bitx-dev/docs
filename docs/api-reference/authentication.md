@@ -1,11 +1,11 @@
 ---
 title: Authentication
-description: Learn how to authenticate API requests with BITXpay.
+description: How to authenticate Merchant API requests with an Ed25519 signature.
 ---
 
 # Authentication
 
-All currently published BITXpay APIs (Payments and Subscriptions) use a single authentication method:
+All currently published BITXpay Merchant APIs (Payments and Subscriptions) use a single authentication method:
 
 1. **Signature Authentication (Ed25519 / EdDSA)** - For merchant-facing APIs (Payment Links, etc.)
 
@@ -27,10 +27,14 @@ New merchant keys are **Ed25519**. Ed25519 is deterministic (no per-signature ra
 
 | Header | Description |
 |--------|-------------|
-| `X-API-Key` | Your merchant API key |
+| `X-API-Key` | Your merchant API key, e.g. `btxm_9b451fa04a2e` |
 | `X-API-Signature` | Signature of the canonical message, base64-encoded (raw 64-byte Ed25519 signature, or RSA-PSS signature for legacy keys) |
-| `X-API-Timestamp` | ISO 8601 timestamp (e.g., `2026-01-31T17:53:56Z`) |
-| `Content-Type` | `application/json` |
+| `X-API-Timestamp` | RFC 3339 / ISO 8601 timestamp in UTC (e.g., `2026-01-31T17:53:56Z`). Fractional seconds are accepted. |
+| `Content-Type` | `application/json` (requests with a body) |
+
+::: details Alternative: `Authorization: Bearer`
+The API key may also be sent as `Authorization: Bearer btxm_…` instead of `X-API-Key`. `X-API-Key` takes precedence when both are present. The signature and timestamp headers are still required.
+:::
 
 ### Obtaining Your Keys
 
@@ -40,12 +44,21 @@ New merchant keys are **Ed25519**. Ed25519 is deterministic (no per-signature ra
 4. Store both securely - the private key is shown only once
 
 Your credentials will include:
-- **API Key:** `btxm_test_xxxxxxxxxx` in sandbox, `btxm_live_xxxxxxxxxx` in production (public identifier)
-- **Private Key:** Ed25519 private key in PKCS#8 PEM format (keep secret) — RSA private key in PEM for legacy accounts
-- **Public Key:** Ed25519 public key in PEM format (for verification) — RSA public key for legacy accounts
 
-::: warning Match key prefix to environment
-Always pair `btxm_test_*` keys with the sandbox base URL and `btxm_live_*` keys with the production base URL. Mixing them will fail authentication.
+| Credential | Format | Example |
+|---|---|---|
+| **API Key** (public identifier) | `btxm_` + 12 hex characters | `btxm_9b451fa04a2e` |
+| **Private Key** (keep secret) | `Ed25519:` + base64 of the PKCS#8 DER key | `Ed25519:MC4CAQAwBQYDK2VwBCIEI…` |
+| **Public Key** (for your records) | `Ed25519:` + base64 of the SubjectPublicKeyInfo DER key | `Ed25519:MCowBQYDK2VwAyEA…` |
+
+Legacy accounts have an RSA key pair in PEM format instead (`-----BEGIN PRIVATE KEY-----`).
+
+::: warning The private key is not PEM
+The issued private key is the `Ed25519:<base64>` string above, **not** a PEM file. Decode the base64 part and load it as a PKCS#8 DER key (see the examples below), or wrap it in `-----BEGIN PRIVATE KEY-----` / `-----END PRIVATE KEY-----` lines (base64 lines of 64 characters) if your library only accepts PEM. Both encode the same key.
+:::
+
+::: warning Keys are bound to an environment
+The API key looks the same in sandbox and production (`btxm_…`). A key created in the sandbox dashboard only authenticates against `{{ $api.sandbox.baseUrl }}`; a key created in the production dashboard only against `{{ $api.production.baseUrl }}`. Using a key against the other environment fails with `INVALID_API_KEY`.
 :::
 
 ### Generating the Signature
@@ -57,10 +70,27 @@ The signature is created by signing the canonical message with your private key:
 METHOD + PATH + TIMESTAMP + BODY
 ```
 
+| Part | Value |
+|---|---|
+| `METHOD` | Upper-case HTTP method, e.g. `POST` |
+| `PATH` | The **full request path including the `/api/v1` prefix**, without host or query string, e.g. `/api/v1/payment_links` |
+| `TIMESTAMP` | The exact string sent in `X-API-Timestamp` |
+| `BODY` | The exact raw request body string sent on the wire (empty string for requests without a body) |
+
+There are no separators between the parts.
+
 **Example Message:**
 ```
-POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT","payment_name":"Invoice #12345"}
+POST/api/v1/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT","payment_name":"Invoice #12345"}
 ```
+
+::: danger Sign the full path
+The server verifies the signature against the path it received, which includes `/api/v1`. Signing `/payment_links` while calling `{{ $api.sandbox.baseUrl }}/payment_links` fails with `SIGNATURE_VERIFICATION_FAILED`. Query strings (`?page=1`) are **not** part of the signed path.
+:::
+
+::: warning Body must match byte-for-byte
+Sign the exact string you send. Serialise the JSON once, sign that string, and send that same string. Do not let your HTTP client re-serialise the object (for example use `data=body` rather than `json=body` in Python `requests`).
+:::
 
 **Signature Parameters (Ed25519 — default):**
 - **Algorithm:** Ed25519 (EdDSA)
@@ -71,6 +101,7 @@ POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT","paymen
 **Legacy RSA-PSS keys:**
 - **Algorithm:** RSA-PSS
 - **Hash Function:** SHA-256 (also used for the MGF1 mask)
+- **Salt length:** equal to the digest length (32 bytes)
 - **Key Size:** 2048 bits (minimum)
 - **Output Format:** raw signature bytes, base64-encoded for transmission
 
@@ -81,123 +112,13 @@ POST/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT","paymen
 
 ### Node.js Example
 
-```javascript
-import crypto from 'crypto';
-import fs from 'fs';
+Both examples below were run as-is against the sandbox.
 
-function generateSignature(privateKeyPEM, method, path, timestamp, body = '') {
-  const message = `${method}${path}${timestamp}${body}`;
-
-  // Ed25519 (EdDSA): pass `null` as the algorithm — Ed25519 hashes the message
-  // internally, so the message must NOT be pre-hashed.
-  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
-
-  // Legacy RSA-PSS keys instead use:
-  //   crypto.sign('sha256', Buffer.from(message, 'utf8'), {
-  //     key: privateKeyPEM,
-  //     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-  //     saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
-  //   });
-
-  return signature.toString('base64');
-}
-
-// Usage
-const privateKey = fs.readFileSync('private-key.pem', 'utf8');
-const apiKey = process.env.MERCHANT_API_KEY;
-
-const method = 'POST';
-const path = '/payment_links';
-const timestamp = new Date().toISOString();
-const body = JSON.stringify({
-  payment_name: 'Invoice #12345',
-  amount: 100.50,
-  currency: 'USDT',
-  customer_email: 'john@example.com',
-  success_url: 'https://example.com/success',
-  cancel_url: 'https://example.com/cancel'
-});
-
-const signature = generateSignature(privateKey, method, path, timestamp, body);
-
-// Make request
-const response = await fetch(`https://sandboxapi.bitxpay.com/api/v1${path}`, {
-  method,
-  headers: {
-    'X-API-Key': apiKey,
-    'X-API-Signature': signature,
-    'X-API-Timestamp': timestamp,
-    'Content-Type': 'application/json'
-  },
-  body
-});
-```
+<<< @/snippets/sign.mjs{javascript}
 
 ### Python Example
 
-```python
-from cryptography.hazmat.primitives import serialization
-import base64
-from datetime import datetime, timezone
-import json
-import requests
-import os
-
-def generate_signature(private_key_pem, method, path, timestamp, body=''):
-    message = f"{method}{path}{timestamp}{body}"
-
-    private_key = serialization.load_pem_private_key(
-        private_key_pem.encode(),
-        password=None,
-    )
-
-    # Ed25519 (EdDSA) — no separate hash argument; Ed25519 hashes internally.
-    signature = private_key.sign(message.encode('utf-8'))
-
-    # Legacy RSA-PSS keys instead use:
-    #   from cryptography.hazmat.primitives import hashes
-    #   from cryptography.hazmat.primitives.asymmetric import padding
-    #   signature = private_key.sign(
-    #       message.encode('utf-8'),
-    #       padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
-    #                   salt_length=padding.PSS.DIGEST_LENGTH),
-    #       hashes.SHA256())
-
-    return base64.b64encode(signature).decode('utf-8')
-
-# Usage
-with open('private-key.pem', 'r') as f:
-    private_key = f.read()
-
-api_key = os.environ.get('MERCHANT_API_KEY')
-
-method = 'POST'
-path = '/payment_links'
-timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
-body_data = {
-    'payment_name': 'Invoice #12345',
-    'amount': 100.50,
-    'currency': 'USDT',
-    'customer_email': 'john@example.com',
-    'success_url': 'https://example.com/success',
-    'cancel_url': 'https://example.com/cancel'
-}
-body = json.dumps(body_data)
-
-signature = generate_signature(private_key, method, path, timestamp, body)
-
-# Make request
-response = requests.post(
-    f'{{ $api.sandbox.baseUrl }}{path}',
-    headers={
-        'X-API-Key': api_key,
-        'X-API-Signature': signature,
-        'X-API-Timestamp': timestamp,
-        'Content-Type': 'application/json'
-    },
-    data=body
-)
-```
+<<< @/snippets/sign.py{python}
 
 ### Testing with Postman
 
@@ -205,17 +126,54 @@ For easy testing with Postman, see our [Postman Setup Guide](/testing/postman-se
 
 ### Timestamp Validation
 
-Requests with timestamps older than **5 minutes** will be rejected:
+`X-API-Timestamp` must parse as RFC 3339 and be within **5 minutes** of the server clock, in either direction. Requests outside that window are rejected:
 
 ```json
 {
-  "message": "Request timestamp is too old or invalid",
   "error": "unauthorized",
-  "code": 401
+  "message": "request timestamp expired. Maximum allowed time difference is 5 minutes",
+  "code": "TIMESTAMP_EXPIRED",
+  "time_diff_seconds": 360.4
 }
 ```
 
 Ensure your system clock is synchronized with NTP servers.
+
+### Authentication Errors
+
+All authentication failures return a JSON body with `error`, `message` and a string `code`:
+
+| HTTP | `code` | When |
+|---|---|---|
+| 401 | `API_KEY_REQUIRED` | Neither `X-API-Key` nor `Authorization` is present |
+| 401 | `INVALID_API_KEY_FORMAT` | Key does not start with `btxm_` |
+| 401 | `INVALID_API_KEY_LENGTH` | Key shorter than 17 characters |
+| 401 | `INVALID_API_KEY` | Key unknown in this environment, or deactivated |
+| 401 | `API_KEY_EXPIRED` | Key past its expiry date |
+| 401 | `SIGNATURE_REQUIRED` | `X-API-Signature` missing |
+| 401 | `TIMESTAMP_REQUIRED` | `X-API-Timestamp` missing |
+| 401 | `INVALID_TIMESTAMP_FORMAT` | Timestamp is not RFC 3339 |
+| 401 | `TIMESTAMP_EXPIRED` | Timestamp more than 5 minutes from server time |
+| 401 | `SIGNATURE_VERIFICATION_FAILED` | Signature does not verify against the key's public key |
+| 403 | `MERCHANT_ACCOUNT_INACTIVE` | The merchant account is not active |
+| 403 | `DOMAIN_NOT_AUTHORIZED` | Key is restricted to a domain and the request `Origin`/`Referer` does not match |
+| 403 | `INSUFFICIENT_SCOPES` | Key lacks a scope required by the endpoint |
+
+A failed signature check also echoes what the server signed over, which is the quickest way to spot a path or body mismatch:
+
+```json
+{
+  "error": "unauthorized",
+  "message": "signature verification failed: Ed25519 signature verification failed",
+  "code": "SIGNATURE_VERIFICATION_FAILED",
+  "debug": {
+    "method": "POST",
+    "path": "/api/v1/payment_links",
+    "body_length": 71,
+    "message_hash": ""
+  }
+}
+```
 
 ### Security Best Practices
 
@@ -226,5 +184,5 @@ Keep your private key secure and never expose it in client-side code.
 1. **Store keys securely** - Use environment variables or a secrets manager
 2. **Use HTTPS** - All API requests must use HTTPS
 3. **Rotate keys periodically** - Generate new API keys regularly
-4. **Limit key permissions** - Use keys with minimal required permissions
+4. **Limit key permissions** - Use keys with minimal required scopes, and set a domain restriction where applicable
 5. **Monitor API usage** - Check your dashboard for unusual activity

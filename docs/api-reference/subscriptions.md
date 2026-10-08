@@ -69,7 +69,7 @@ Plans store `interval`, `trial_period`, `grace_period` (`max_arrears`), `auto_ca
 All endpoints in this section require Merchant API Key authentication with an Ed25519 (EdDSA) request signature (RSA-PSS accepted for legacy keys):
 
 ```
-X-API-Key: btxm_test_xxxxxxxxxxxx
+X-API-Key: btxm_9b451fa04a2e
 X-API-Signature: <base64_encoded_ed25519_signature>
 X-API-Timestamp: 2026-01-31T12:00:00Z
 Content-Type: application/json
@@ -690,7 +690,7 @@ Rate limits are applied per route based on the configured rate limiter (payment-
 
 ```bash
 curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptionPlans }}/ \
-  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
+  -H "X-API-Key: btxm_9b451fa04a2e" \
   -H "X-API-Signature: <base64_encoded_ed25519_signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
   -H "Content-Type: application/json" \
@@ -709,7 +709,7 @@ curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptionPlans }}/ \
 
 ```bash
 curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscribers }}/ \
-  -H "X-API-Key: btxm_test_xxxxxxxxxxxx" \
+  -H "X-API-Key: btxm_9b451fa04a2e" \
   -H "X-API-Signature: <base64_encoded_ed25519_signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z" \
   -H "Content-Type: application/json" \
@@ -749,7 +749,7 @@ curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/paymen
   -H "Content-Type: application/json" \
   -d '{
     "sub_link_id": "5d17b0c4-b32c-40dd-a2e2-8ace612251c7",
-    "merchant_key": "btxm_test_xxxxxxxxxxxx",
+    "merchant_key": "btxm_9b451fa04a2e",
     "tx_hash": "0xa1b2c3d4e5f60789a1b2c3d4e5f60789a1b2c3d4e5f60789a1b2c3d4e5f60785",
     "network_id": "0b4f3bab-4354-4373-9821-c8665fffbca3",
     "currency_id": "d4e5f6a7-8b9c-4d1e-9f2a-3b4c5d6e7f80",
