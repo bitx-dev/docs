@@ -27,7 +27,7 @@ All merchant API requests must include signature authentication headers. Merchan
 
 **Merchant APIs (Ed25519 signature):**
 ```bash
-X-API-Key: btxm_test_xxxxxxxxxxxx      # use btxm_live_xxxxxxxxxxxx in production
+X-API-Key: btxm_9b451fa04a2e           # same format in sandbox and production
 X-API-Signature: <base64_encoded_ed25519_signature>
 X-API-Timestamp: 2026-01-31T12:00:00Z
 ```

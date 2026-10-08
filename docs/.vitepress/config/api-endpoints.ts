@@ -23,6 +23,8 @@ export const API_ENDPOINTS = {
     // Payment Links
     paymentLinks: '/payment_links',
     currencies: '/payment_links/currencies',
+    catalog: '/payment_links/catalog',
+    paymentLinkStatus: '/payment_links/{id}/status',
     
     // Subscriptions — Authenticated (Merchant) Routes
     subscriptionPlans: '/subscriptions/plans',

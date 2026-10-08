@@ -19,8 +19,8 @@ Choose your preferred testing method:
 
 Before testing, you'll need:
 
-1. **Merchant API Key** - Your unique API key (format: `btxm_xxxxxxxx`)
-2. **Merchant Private Key** - Ed25519 private key in PKCS#8 PEM format
+1. **Merchant API Key** - Your unique API key (format: `btxm_` + 12 hex characters, e.g. `btxm_9b451fa04a2e`)
+2. **Merchant Private Key** - Ed25519 private key as issued: `Ed25519:<base64 PKCS#8 DER>`
 3. **API Testing Tool** - Postman, Insomnia, cURL, etc.
 
 ## Getting Your API Keys

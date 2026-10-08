@@ -7,6 +7,11 @@ description: Test BITXpay APIs using various tools including cURL, Insomnia, HTT
 
 While Postman is our recommended tool, you can test BITXpay APIs using various other tools. This guide covers popular alternatives with Ed25519 signature generation examples.
 
+::: warning Two things every helper below gets right
+1. The signed path is the **full request path including `/api/v1`** (`POST/api/v1/payment_links…`), never just `/payment_links`.
+2. The private key is used exactly as the dashboard issued it: `Ed25519:<base64 PKCS#8 DER>`. Tools that need PEM get the base64 part wrapped in `-----BEGIN PRIVATE KEY-----` / `-----END PRIVATE KEY-----`.
+:::
+
 ## cURL
 
 cURL is a command-line tool available on most systems. Here's how to test with cURL using a helper script.
@@ -19,33 +24,38 @@ Create a bash script `bitxpay-curl.sh`:
 #!/bin/bash
 
 # Configuration
-API_KEY="your_api_key_here"
-PRIVATE_KEY_FILE="private-key.pem"
-BASE_URL="https://sandboxapi.bitxpay.com/api/v1"
+API_KEY="${MERCHANT_API_KEY:?set MERCHANT_API_KEY}"            # btxm_xxxxxxxxxxxx
+PRIVATE_KEY="${MERCHANT_PRIVATE_KEY:?set MERCHANT_PRIVATE_KEY}" # Ed25519:MC4CAQAw... as issued
+HOST="https://sandboxapi.bitxpay.com"
+PREFIX="/api/v1"
 
 # Get request details
 METHOD=$1
-ENDPOINT=$2
-BODY=$3
+ENDPOINT=$2      # e.g. /payment_links  (the /api/v1 prefix is added below)
+BODY=${3:-}
 
 # Generate timestamp
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-# Create message to sign
-MESSAGE="${METHOD}${ENDPOINT}${TIMESTAMP}${BODY}"
+# Create message to sign: METHOD + FULL PATH + TIMESTAMP + BODY
+MESSAGE="${METHOD}${PREFIX}${ENDPOINT}${TIMESTAMP}${BODY}"
 
-# Generate signature using OpenSSL (Ed25519)
-SIGNATURE=$(printf '%s' "$MESSAGE" | openssl pkeyutl -sign -inkey "$PRIVATE_KEY_FILE" -rawin | base64 -w 0)
+# Wrap the issued key as PEM for OpenSSL and sign (Ed25519, OpenSSL >= 3).
+# pkeyutl -rawin needs real files, so use a temporary directory.
+WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
+printf -- '-----BEGIN PRIVATE KEY-----\n%s\n-----END PRIVATE KEY-----\n' "${PRIVATE_KEY#Ed25519:}" > "$WORK/key.pem"
+printf '%s' "$MESSAGE" > "$WORK/message"
+SIGNATURE=$(openssl pkeyutl -sign -inkey "$WORK/key.pem" -rawin -in "$WORK/message" | base64 -w 0)
 
 # Make request
 if [ -z "$BODY" ]; then
-  curl -X "$METHOD" "${BASE_URL}${ENDPOINT}" \
+  curl -X "$METHOD" "${HOST}${PREFIX}${ENDPOINT}" \
     -H "X-API-Key: $API_KEY" \
     -H "X-API-Signature: $SIGNATURE" \
     -H "X-API-Timestamp: $TIMESTAMP" \
-    -H "Content-Type: application/json"
+    -H "Accept: application/json"
 else
-  curl -X "$METHOD" "${BASE_URL}${ENDPOINT}" \
+  curl -X "$METHOD" "${HOST}${PREFIX}${ENDPOINT}" \
     -H "X-API-Key: $API_KEY" \
     -H "X-API-Signature: $SIGNATURE" \
     -H "X-API-Timestamp: $TIMESTAMP" \
@@ -58,6 +68,8 @@ fi
 
 ```bash
 chmod +x bitxpay-curl.sh
+export MERCHANT_API_KEY=btxm_xxxxxxxxxxxx
+export MERCHANT_PRIVATE_KEY='Ed25519:MC4CAQAw...'
 
 # Create payment link
 ./bitxpay-curl.sh POST /payment_links '{"payment_name":"Test Payment","amount":10,"currency":"USDT","success_url":"https://example.com/success","cancel_url":"https://example.com/cancel"}'
@@ -73,24 +85,28 @@ If your OpenSSL CLI doesn't support Ed25519, use this Node.js helper:
 ```javascript
 #!/usr/bin/env node
 const crypto = require('crypto');
-const fs = require('fs');
 const { execSync } = require('child_process');
 
-const apiKey = process.env.MERCHANT_API_KEY;
-const privateKey = fs.readFileSync('private-key.pem', 'utf8');
-const baseUrl = 'https://sandboxapi.bitxpay.com/api/v1';
+const apiKey = process.env.MERCHANT_API_KEY;                    // btxm_xxxxxxxxxxxx
+const issued = process.env.MERCHANT_PRIVATE_KEY;                // Ed25519:MC4CAQAw...
+const privateKey = crypto.createPrivateKey({
+  key: Buffer.from(issued.slice('Ed25519:'.length), 'base64'),
+  format: 'der',
+  type: 'pkcs8',
+});
+const host = 'https://sandboxapi.bitxpay.com';
+const prefix = '/api/v1';
 
-const [method, endpoint, body = ''] = process.argv.slice(2);
+const [method, endpoint, body = ''] = process.argv.slice(2);  // endpoint e.g. /payment_links
+const path = prefix + endpoint;                                 // the FULL path is signed
 const timestamp = new Date().toISOString();
-const message = `${method}${endpoint}${timestamp}${body}`;
+const message = `${method}${path}${timestamp}${body}`;
 
-const signature = crypto.sign(null, Buffer.from(message, 'utf8'), {
-  key: privateKey
-}).toString('base64');
+const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKey).toString('base64');
 
 const curlCmd = body
-  ? `curl -X ${method} "${baseUrl}${endpoint}" -H "X-API-Key: ${apiKey}" -H "X-API-Signature: ${signature}" -H "X-API-Timestamp: ${timestamp}" -H "Content-Type: application/json" -d '${body}'`
-  : `curl -X ${method} "${baseUrl}${endpoint}" -H "X-API-Key: ${apiKey}" -H "X-API-Signature: ${signature}" -H "X-API-Timestamp: ${timestamp}"`;
+  ? `curl -X ${method} "${host}${path}" -H "X-API-Key: ${apiKey}" -H "X-API-Signature: ${signature}" -H "X-API-Timestamp: ${timestamp}" -H "Content-Type: application/json" -d '${body}'`
+  : `curl -X ${method} "${host}${path}" -H "X-API-Key: ${apiKey}" -H "X-API-Signature: ${signature}" -H "X-API-Timestamp: ${timestamp}"`;
 
 console.log(execSync(curlCmd).toString());
 ```
@@ -122,7 +138,7 @@ Create an environment with:
 {
   "base_url": "https://sandboxapi.bitxpay.com/api/v1",
   "api_key": "your_api_key",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIH...\n-----END PRIVATE KEY-----"
+  "private_key": "Ed25519:MC4CAQAwBQYDK2VwBCIEI..."
 }
 ```
 
@@ -142,20 +158,23 @@ const crypto = require('crypto');
 module.exports.requestHooks = [
   (context) => {
     const { request } = context;
-    const privateKey = context.environment.private_key;
+    const issued = context.environment.private_key;          // Ed25519:... as issued
     const apiKey = context.environment.api_key;
+    const privateKey = crypto.createPrivateKey({
+      key: Buffer.from(issued.slice('Ed25519:'.length), 'base64'),
+      format: 'der',
+      type: 'pkcs8',
+    });
     
     const method = request.getMethod();
     const url = new URL(request.getUrl());
-    const path = url.pathname;
+    const path = url.pathname;                                // full path incl. /api/v1 (base_url contains it)
     const timestamp = new Date().toISOString();
     const body = request.getBodyText() || '';
     
     const message = `${method}${path}${timestamp}${body}`;
     
-    const signature = crypto.sign(null, Buffer.from(message, 'utf8'), {
-      key: privateKey
-    }).toString('base64');
+    const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKey).toString('base64');
     
     request.setHeader('X-API-Key', apiKey);
     request.setHeader('X-API-Signature', signature);
@@ -198,26 +217,30 @@ Create `bitxpay-http.sh`:
 ```bash
 #!/bin/bash
 
-API_KEY="your_api_key"
-PRIVATE_KEY_FILE="private-key.pem"
-BASE_URL="https://sandboxapi.bitxpay.com/api/v1"
+API_KEY="${MERCHANT_API_KEY:?}"              # btxm_xxxxxxxxxxxx
+PRIVATE_KEY="${MERCHANT_PRIVATE_KEY:?}"      # Ed25519:MC4CAQAw... as issued
+HOST="https://sandboxapi.bitxpay.com"
+PREFIX="/api/v1"
 
 METHOD=$1
 ENDPOINT=$2
-BODY=$3
+BODY=${3:-}
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-MESSAGE="${METHOD}${ENDPOINT}${TIMESTAMP}${BODY}"
+MESSAGE="${METHOD}${PREFIX}${ENDPOINT}${TIMESTAMP}${BODY}"   # full path is signed
 
-SIGNATURE=$(printf '%s' "$MESSAGE" | openssl pkeyutl -sign -inkey "$PRIVATE_KEY_FILE" -rawin | base64 -w 0)
+WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
+printf -- '-----BEGIN PRIVATE KEY-----\n%s\n-----END PRIVATE KEY-----\n' "${PRIVATE_KEY#Ed25519:}" > "$WORK/key.pem"
+printf '%s' "$MESSAGE" > "$WORK/message"
+SIGNATURE=$(openssl pkeyutl -sign -inkey "$WORK/key.pem" -rawin -in "$WORK/message" | base64 -w 0)
 
 if [ -z "$BODY" ]; then
-  http "$METHOD" "${BASE_URL}${ENDPOINT}" \
+  http "$METHOD" "${HOST}${PREFIX}${ENDPOINT}" \
     "X-API-Key:$API_KEY" \
     "X-API-Signature:$SIGNATURE" \
     "X-API-Timestamp:$TIMESTAMP"
 else
-  echo "$BODY" | http "$METHOD" "${BASE_URL}${ENDPOINT}" \
+  printf '%s' "$BODY" | http "$METHOD" "${HOST}${PREFIX}${ENDPOINT}" \
     "X-API-Key:$API_KEY" \
     "X-API-Signature:$SIGNATURE" \
     "X-API-Timestamp:$TIMESTAMP"
@@ -306,18 +329,21 @@ Thunder Client is a lightweight REST client for VS Code.
    const crypto = require('crypto');
    
    const apiKey = tc.getVar('api_key');
-   const privateKey = tc.getVar('private_key');
+   const issued = tc.getVar('private_key');                 // Ed25519:... as issued
+   const privateKey = crypto.createPrivateKey({
+     key: Buffer.from(issued.slice('Ed25519:'.length), 'base64'),
+     format: 'der',
+     type: 'pkcs8',
+   });
    const method = tc.request.method;
    const url = new URL(tc.request.url);
-   const path = url.pathname;
+   const path = url.pathname;                                // full path incl. /api/v1
    const timestamp = new Date().toISOString();
    const body = tc.request.body || '';
    
    const message = `${method}${path}${timestamp}${body}`;
    
-   const signature = crypto.sign(null, Buffer.from(message, 'utf8'), {
-     key: privateKey
-   }).toString('base64');
+   const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKey).toString('base64');
    
    tc.setVar('signature', signature);
    tc.setVar('timestamp', timestamp);
@@ -344,18 +370,16 @@ from cryptography.hazmat.backends import default_backend
 import requests
 
 class BITXpayClient:
-    def __init__(self, api_key, private_key_path, base_url=None):
-        self.api_key = api_key
-        self.base_url = base_url or 'https://sandboxapi.bitxpay.com/api/v1'
-        
-        with open(private_key_path, 'r') as f:
-            self.private_key = serialization.load_pem_private_key(
-                f.read().encode(),
-                password=None,
-                backend=default_backend()
-            )
+    def __init__(self, api_key, private_key, host='https://sandboxapi.bitxpay.com', prefix='/api/v1'):
+        self.api_key = api_key              # btxm_xxxxxxxxxxxx
+        self.host = host
+        self.prefix = prefix
+        # private_key is the "Ed25519:<base64 PKCS#8 DER>" string shown in the dashboard
+        der = base64.b64decode(private_key[len('Ed25519:'):])
+        self.private_key = serialization.load_der_private_key(der, password=None, backend=default_backend())
     
     def _generate_signature(self, method, path, timestamp, body=''):
+        # path is the FULL request path, e.g. /api/v1/payment_links
         message = f"{method}{path}{timestamp}{body}"
         
         signature = self.private_key.sign(
@@ -364,8 +388,9 @@ class BITXpayClient:
         
         return base64.b64encode(signature).decode('utf-8')
     
-    def request(self, method, path, data=None):
-        timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+    def request(self, method, endpoint, data=None):
+        path = self.prefix + endpoint
+        timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
         body = json.dumps(data) if data else ''
         
         signature = self._generate_signature(method, path, timestamp, body)
@@ -377,7 +402,7 @@ class BITXpayClient:
             'Content-Type': 'application/json'
         }
         
-        url = f"{self.base_url}{path}"
+        url = f"{self.host}{path}"
         
         response = requests.request(
             method,
@@ -400,7 +425,7 @@ class BITXpayClient:
 # Usage
 client = BITXpayClient(
     api_key=os.environ['MERCHANT_API_KEY'],
-    private_key_path='private-key.pem'
+    private_key=os.environ['MERCHANT_PRIVATE_KEY']   # 'Ed25519:MC4CAQAw...'
 )
 
 payment = client.create_payment_link({
@@ -426,28 +451,30 @@ For PHP developers:
 class BITXpayClient {
     private $apiKey;
     private $privateKey;
-    private $baseUrl;
     
-    public function __construct($apiKey, $privateKeyPath, $baseUrl = null) {
-        $this->apiKey = $apiKey;
-        $this->privateKey = openssl_pkey_get_private(file_get_contents($privateKeyPath));
-        $this->baseUrl = $baseUrl ?: 'https://sandboxapi.bitxpay.com/api/v1';
+    private $host = 'https://sandboxapi.bitxpay.com';
+    private $prefix = '/api/v1';
+    
+    public function __construct($apiKey, $issuedPrivateKey) {
+        $this->apiKey = $apiKey;   // btxm_xxxxxxxxxxxx
+        // $issuedPrivateKey is the "Ed25519:<base64 PKCS#8 DER>" string from the dashboard.
+        // Ed25519 signing needs the sodium extension; convert PKCS#8 DER -> 32-byte seed -> sodium secret key.
+        $der = base64_decode(substr($issuedPrivateKey, strlen('Ed25519:')));
+        $seed = substr($der, -32);                       // last 32 bytes of the PKCS#8 structure
+        $this->privateKey = sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed));
     }
     
     private function generateSignature($method, $path, $timestamp, $body = '') {
+        // $path is the FULL request path, e.g. /api/v1/payment_links
         $message = $method . $path . $timestamp . $body;
         
-        openssl_sign(
-            $message,
-            $signature,
-            $this->privateKey,
-            OPENSSL_ALGO_NONE
-        );
+        $signature = sodium_crypto_sign_detached($message, $this->privateKey);
         
         return base64_encode($signature);
     }
     
-    public function request($method, $path, $data = null) {
+    public function request($method, $endpoint, $data = null) {
+        $path = $this->prefix . $endpoint;
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $body = $data ? json_encode($data) : '';
         
@@ -460,7 +487,7 @@ class BITXpayClient {
             'Content-Type: application/json'
         ];
         
-        $ch = curl_init($this->baseUrl . $path);
+        $ch = curl_init($this->host . $path);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -483,7 +510,7 @@ class BITXpayClient {
 // Usage
 $client = new BITXpayClient(
     getenv('MERCHANT_API_KEY'),
-    'private-key.pem'
+    getenv('MERCHANT_PRIVATE_KEY')   // 'Ed25519:MC4CAQAw...'
 );
 
 $payment = $client->createPaymentLink([

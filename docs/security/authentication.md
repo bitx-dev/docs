@@ -67,11 +67,14 @@ Merchant API requests are signed with your **Ed25519 (EdDSA)** private key — *
 ```javascript
 import crypto from 'crypto';
 
-function signRequest(privateKeyPEM, method, path, timestamp, body = '') {
+// privateKey: crypto.createPrivateKey({ key: Buffer.from(issued.slice(8), 'base64'), format: 'der', type: 'pkcs8' })
+// where `issued` is the "Ed25519:..." string from the dashboard.
+function signRequest(privateKey, method, path, timestamp, body = '') {
+  // path must be the full request path, e.g. '/api/v1/payment_links'
   const message = `${method}${path}${timestamp}${body}`;
 
   // Ed25519 (EdDSA): pass `null` — Ed25519 hashes the message internally.
-  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKeyPEM);
+  const signature = crypto.sign(null, Buffer.from(message, 'utf8'), privateKey);
 
   return signature.toString('base64');
 }
@@ -86,9 +89,9 @@ HMAC-SHA256 is used to **verify inbound webhooks** (see below), not to sign your
 Include a current timestamp and handle clock skew:
 
 ```javascript
-const timestamp = Math.floor(Date.now() / 1000);
+const timestamp = new Date().toISOString(); // RFC 3339 string, not a Unix epoch
 
-// Requests older than 5 minutes are rejected
+// Requests more than 5 minutes from server time (either direction) are rejected
 // Ensure your server's clock is synchronized (use NTP)
 ```
 
