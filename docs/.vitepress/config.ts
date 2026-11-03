@@ -65,6 +65,7 @@ export default defineConfig({
   themeConfig: {
     // Site logo
     logo: SITE_CONFIG.theme.logo,
+    siteTitle: false, // logo.svg already contains the wordmark
 
     // Navigation bar
     nav: [
