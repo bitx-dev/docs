@@ -371,8 +371,7 @@ body {
 }
 
 .VPNavBarTitle .logo {
-  border-radius: 8px;
-  width: 42px !important;
+  width: auto !important;
   height: 42px !important;
   transition: transform 0.3s ease !important;
 }
@@ -725,7 +724,7 @@ body {
   }
 
   .VPNavBarTitle .logo {
-    width: 34px !important;
+    width: auto !important;
     height: 34px !important;
   }
 
@@ -2465,8 +2464,8 @@ table {
   }
 
   .VPNavBarTitle .logo {
-    width: 34px;
-    height: 34px;
+    width: auto !important;
+    height: 34px !important;
   }
   .VPNavBarTitle .title {
     font-size: 20px;
