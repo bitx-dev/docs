@@ -1,0 +1,1262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BITXpay merchant webhook delivery",
+  "description": "Generated from notification payload DTOs and event constants. Optional fields may be omitted; consumers should tolerate new fields.",
+  "oneOf": [
+    {
+      "title": "payment.succeeded",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "payment.succeeded"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "payment.succeeded"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name when supplied by the producer."
+            },
+            "link_id": {
+              "type": "string",
+              "description": "Payment link UUID for link creation; INV-... display reference for engine payment status events."
+            },
+            "payment_id": {
+              "type": "string",
+              "description": "Payment link UUID for engine payment events; dispute UUID for refund events. See event notes."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "transaction_hash": {
+              "type": "string",
+              "description": "Transaction hash when available; may be an empty string."
+            },
+            "network": {
+              "type": "string",
+              "description": "Network name, or chain ID as a string when a name cannot be resolved."
+            },
+            "asset": {
+              "type": "string",
+              "description": "Producer-supplied asset/network label; currently empty for engine success/failure notifications."
+            },
+            "fees": {
+              "type": "string",
+              "description": "Producer-supplied fee string; currently empty for engine success/failure notifications."
+            },
+            "received_at": {
+              "type": "string",
+              "description": "Producer event time; engine success uses Go Time.String(), not the outer RFC 3339 format."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "link_id",
+            "payment_id",
+            "amount",
+            "currency",
+            "transaction_hash",
+            "network",
+            "asset",
+            "fees",
+            "received_at"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "payment.failed",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "payment.failed"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "payment.failed"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name when supplied by the producer."
+            },
+            "link_id": {
+              "type": "string",
+              "description": "Payment link UUID for link creation; INV-... display reference for engine payment status events."
+            },
+            "payment_id": {
+              "type": "string",
+              "description": "Payment link UUID for engine payment events; dispute UUID for refund events. See event notes."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "transaction_hash": {
+              "type": "string",
+              "description": "Transaction hash when available; may be an empty string."
+            },
+            "network": {
+              "type": "string",
+              "description": "Network name, or chain ID as a string when a name cannot be resolved."
+            },
+            "asset": {
+              "type": "string",
+              "description": "Producer-supplied asset/network label; currently empty for engine success/failure notifications."
+            },
+            "fees": {
+              "type": "string",
+              "description": "Producer-supplied fee string; currently empty for engine success/failure notifications."
+            },
+            "failed_at": {
+              "type": "string",
+              "description": "Producer failure time; may use Go Time.String() rather than RFC 3339."
+            },
+            "payment_url": {
+              "type": "string",
+              "description": "Hosted checkout URL when supplied."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "link_id",
+            "payment_id",
+            "amount",
+            "currency",
+            "transaction_hash",
+            "network",
+            "asset",
+            "fees",
+            "failed_at"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "payment.partial_succeeded",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "payment.partial_succeeded"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "payment.partial_succeeded"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name when supplied by the producer."
+            },
+            "link_id": {
+              "type": "string",
+              "description": "Payment link UUID for link creation; INV-... display reference for engine payment status events."
+            },
+            "payment_id": {
+              "type": "string",
+              "description": "Payment link UUID for engine payment events; dispute UUID for refund events. See event notes."
+            },
+            "total_amount": {
+              "type": "string",
+              "description": "Quoted total amount; engine partial-payment events use display token units."
+            },
+            "partial_amount": {
+              "type": "string",
+              "description": "Amount received so far in the same denomination as total_amount."
+            },
+            "remaining_amount": {
+              "type": "string",
+              "description": "Positive difference between total and received amounts."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "network": {
+              "type": "string",
+              "description": "Network name, or chain ID as a string when a name cannot be resolved."
+            },
+            "payment_url": {
+              "type": "string",
+              "description": "Hosted checkout URL when supplied."
+            },
+            "payment_date_time": {
+              "type": "string",
+              "description": "Payment detection time; current engine/partial producers use RFC 3339."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "link_id",
+            "total_amount",
+            "partial_amount",
+            "remaining_amount",
+            "currency"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "transaction.overpaid",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "transaction.overpaid"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "transaction.overpaid"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name when supplied by the producer."
+            },
+            "link_id": {
+              "type": "string",
+              "description": "Payment link UUID for link creation; INV-... display reference for engine payment status events."
+            },
+            "payment_id": {
+              "type": "string",
+              "description": "Payment link UUID for engine payment events; dispute UUID for refund events. See event notes."
+            },
+            "expected_amount": {
+              "type": "string",
+              "description": "Expected amount; engine overpayment events use display token units."
+            },
+            "received_amount": {
+              "type": "string",
+              "description": "Received amount in the same denomination as expected_amount."
+            },
+            "overpaid_amount": {
+              "type": "string",
+              "description": "Positive excess above the expected amount."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "network": {
+              "type": "string",
+              "description": "Network name, or chain ID as a string when a name cannot be resolved."
+            },
+            "refund_link": {
+              "type": "string",
+              "description": "Payer-facing refund/checkout link supplied by the producer."
+            },
+            "dispute_id": {
+              "type": "string",
+              "description": "Dispute UUID when created; can be empty for an order-status notification."
+            },
+            "frontend_url": {
+              "type": "string",
+              "description": "Legacy producer frontend URL; serialized as an empty string when unset."
+            },
+            "transaction_hash": {
+              "type": "string",
+              "description": "Transaction hash when available; may be an empty string."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "link_id",
+            "expected_amount",
+            "received_amount",
+            "overpaid_amount",
+            "currency",
+            "refund_link",
+            "dispute_id",
+            "frontend_url"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "payment_link.created",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "payment_link.created"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "payment_link.created"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "link_id": {
+              "type": "string",
+              "description": "Payment link UUID for link creation; INV-... display reference for engine payment status events."
+            },
+            "name": {
+              "type": "string",
+              "description": "Payment link name (the payload uses name, while REST creation accepts payment_name)."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "description": {
+              "type": "string",
+              "description": "Optional payment link description."
+            },
+            "payment_url": {
+              "type": "string",
+              "description": "Hosted checkout URL when supplied."
+            },
+            "payment_status": {
+              "type": "string",
+              "description": "Payment link status at notification creation."
+            },
+            "payment_type": {
+              "type": "string",
+              "description": "Payment link type."
+            },
+            "starts_at": {
+              "type": "string",
+              "description": "Link start time; the merchant create producer uses YYYY-MM-DD HH:mm:ss."
+            },
+            "expires_at": {
+              "type": "string",
+              "description": "Link/invitation expiry; format and availability depend on the producer."
+            },
+            "max_uses": {
+              "type": "integer",
+              "description": "Configured maximum number of uses, when present."
+            },
+            "current_uses": {
+              "type": "integer",
+              "description": "Payment link usage count."
+            },
+            "is_active": {
+              "type": "boolean",
+              "description": "Payment link active flag."
+            },
+            "product_name": {
+              "type": "string",
+              "description": "Optional product name."
+            },
+            "product_description": {
+              "type": "string",
+              "description": "Optional product description."
+            },
+            "success_url": {
+              "type": "string",
+              "description": "Optional success redirect URL."
+            },
+            "cancel_url": {
+              "type": "string",
+              "description": "Optional cancellation redirect URL."
+            },
+            "cart": {
+              "type": "object",
+              "description": "Optional original shopping-cart object."
+            },
+            "webhook_metadata": {
+              "type": "object",
+              "description": "Custom metadata copied by this producer; only payloads declaring this field carry it."
+            },
+            "merchant_customer_id": {
+              "type": "string",
+              "description": "Internal merchant-customer record UUID, when provided."
+            },
+            "customer_id": {
+              "type": "string",
+              "description": "Merchant-supplied/generated customer reference, when provided."
+            },
+            "created_at": {
+              "type": "string",
+              "description": "Producer creation time; it can be empty or use a non-RFC-3339 display format."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "link_id",
+            "name",
+            "amount",
+            "currency",
+            "payment_url",
+            "payment_status",
+            "payment_type",
+            "starts_at",
+            "expires_at",
+            "current_uses",
+            "is_active",
+            "created_at"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "payment.expired",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "payment.expired"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "payment.expired"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name when supplied by the producer."
+            },
+            "link_id": {
+              "type": "string",
+              "description": "Payment link UUID for link creation; INV-... display reference for engine payment status events."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "expires_at": {
+              "type": "string",
+              "description": "Link/invitation expiry; format and availability depend on the producer."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "link_id"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "refund.initiated",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "refund.initiated"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "refund.initiated"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name when supplied by the producer."
+            },
+            "payment_id": {
+              "type": "string",
+              "description": "Payment link UUID for engine payment events; dispute UUID for refund events. See event notes."
+            },
+            "refund_amount": {
+              "type": "string",
+              "description": "Refund amount in the stated currency."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "reason": {
+              "type": "string",
+              "description": "Refund request or renewal failure reason."
+            },
+            "submitted_at": {
+              "type": "string",
+              "description": "Refund request time when available; current payer-request path uses RFC 3339."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "payment_id",
+            "refund_amount",
+            "currency",
+            "reason"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "refund.succeeded",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "refund.succeeded"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "refund.succeeded"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name when supplied by the producer."
+            },
+            "payment_id": {
+              "type": "string",
+              "description": "Payment link UUID for engine payment events; dispute UUID for refund events. See event notes."
+            },
+            "refund_amount": {
+              "type": "string",
+              "description": "Refund amount in the stated currency."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "transaction_hash": {
+              "type": "string",
+              "description": "Transaction hash when available; may be an empty string."
+            },
+            "asset": {
+              "type": "string",
+              "description": "Producer-supplied asset/network label; currently empty for engine success/failure notifications."
+            },
+            "destination_address": {
+              "type": "string",
+              "description": "Refund recipient wallet address when known; may be empty."
+            },
+            "refunded_at": {
+              "type": "string",
+              "description": "Optional refund time; some dispute producers leave it unset."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "payment_id",
+            "refund_amount",
+            "currency",
+            "transaction_hash",
+            "asset",
+            "destination_address"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "subscription_plan.created",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "subscription_plan.created"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "subscription_plan.created"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "plan_id": {
+              "type": "string",
+              "description": "Subscription plan database UUID."
+            },
+            "plan_name": {
+              "type": "string",
+              "description": "Plan name when populated; some producers serialize an empty string."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "interval": {
+              "type": "string",
+              "description": "String billing interval; some producers leave it empty. This payload field is not an integer."
+            },
+            "trial_period": {
+              "type": "string",
+              "description": "Optional trial period string."
+            },
+            "created_at": {
+              "type": "string",
+              "description": "Producer creation time; it can be empty or use a non-RFC-3339 display format."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "plan_id",
+            "plan_name",
+            "amount",
+            "currency",
+            "interval",
+            "created_at"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "subscription.created",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "subscription.created"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "subscription.created"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "subscription_id": {
+              "type": "string",
+              "description": "Subscription reference; merchant subscriber creation uses an INV-... display reference."
+            },
+            "plan_id": {
+              "type": "string",
+              "description": "Subscription plan database UUID."
+            },
+            "plan_name": {
+              "type": "string",
+              "description": "Plan name when populated; some producers serialize an empty string."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "interval": {
+              "type": "string",
+              "description": "String billing interval; some producers leave it empty. This payload field is not an integer."
+            },
+            "trial_expiry": {
+              "type": "string",
+              "description": "Optional trial expiry string."
+            },
+            "subscribed_at": {
+              "type": "string",
+              "description": "Subscription event time; merchant subscriber creation leaves this as an empty string."
+            },
+            "webhook_metadata": {
+              "type": "object",
+              "description": "Custom metadata copied by this producer; only payloads declaring this field carry it."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "subscription_id",
+            "plan_id",
+            "plan_name",
+            "amount",
+            "currency",
+            "interval",
+            "subscribed_at"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "subscription.renewed",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "subscription.renewed"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "subscription.renewed"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "subscription_id": {
+              "type": "string",
+              "description": "Subscription reference; merchant subscriber creation uses an INV-... display reference."
+            },
+            "plan_id": {
+              "type": "string",
+              "description": "Subscription plan database UUID."
+            },
+            "plan_name": {
+              "type": "string",
+              "description": "Plan name when populated; some producers serialize an empty string."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "transaction_hash": {
+              "type": "string",
+              "description": "Transaction hash when available; may be an empty string."
+            },
+            "network": {
+              "type": "string",
+              "description": "Network name, or chain ID as a string when a name cannot be resolved."
+            },
+            "next_renewal_at": {
+              "type": "string",
+              "description": "Next renewal time supplied by the producer."
+            },
+            "renewed_at": {
+              "type": "string",
+              "description": "Renewal time supplied by the producer."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "subscription_id",
+            "plan_id",
+            "plan_name",
+            "amount",
+            "currency",
+            "transaction_hash",
+            "network",
+            "next_renewal_at",
+            "renewed_at"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "subscription.renewal_failed",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "subscription.renewal_failed"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "subscription.renewal_failed"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "subscription_id": {
+              "type": "string",
+              "description": "Subscription reference; merchant subscriber creation uses an INV-... display reference."
+            },
+            "plan_id": {
+              "type": "string",
+              "description": "Subscription plan database UUID."
+            },
+            "plan_name": {
+              "type": "string",
+              "description": "Plan name when populated; some producers serialize an empty string."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "reason": {
+              "type": "string",
+              "description": "Refund request or renewal failure reason."
+            },
+            "grace_deadline": {
+              "type": "string",
+              "description": "Grace deadline supplied by the producer."
+            },
+            "failed_at": {
+              "type": "string",
+              "description": "Producer failure time; may use Go Time.String() rather than RFC 3339."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "subscription_id",
+            "plan_id",
+            "plan_name",
+            "amount",
+            "currency",
+            "reason",
+            "grace_deadline",
+            "failed_at"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "subscription_invitation.created",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "event_type": {
+          "const": "subscription_invitation.created"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "event_code": {
+              "type": "string",
+              "description": "Same event code as the outer event_type.",
+              "const": "subscription_invitation.created"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "Notification recipient email; may be the latest payer, customer, or merchant depending on the producer."
+            },
+            "customer_name": {
+              "type": "string",
+              "description": "Notification recipient display name."
+            },
+            "invitation_id": {
+              "type": "string",
+              "description": "Subscriber invitation UUID (the Go field is named LinkID)."
+            },
+            "plan_id": {
+              "type": "string",
+              "description": "Subscription plan database UUID."
+            },
+            "plan_name": {
+              "type": "string",
+              "description": "Plan name when populated; some producers serialize an empty string."
+            },
+            "amount": {
+              "type": "string",
+              "description": "Amount string in this event's currency; see event notes for denomination."
+            },
+            "currency": {
+              "type": "string",
+              "description": "Amount denomination, which can be an invoice currency or a paid token symbol depending on the event."
+            },
+            "interval": {
+              "type": "string",
+              "description": "String billing interval; some producers leave it empty. This payload field is not an integer."
+            },
+            "invitation_url": {
+              "type": "string",
+              "description": "Customer enrollment URL."
+            },
+            "expires_at": {
+              "type": "string",
+              "description": "Link/invitation expiry; format and availability depend on the producer."
+            },
+            "created_at": {
+              "type": "string",
+              "description": "Producer creation time; it can be empty or use a non-RFC-3339 display format."
+            },
+            "message": {
+              "type": "string",
+              "description": "Optional invitation message."
+            },
+            "webhook_metadata": {
+              "type": "object",
+              "description": "Custom metadata copied by this producer; only payloads declaring this field carry it."
+            }
+          },
+          "required": [
+            "event_code",
+            "customer_email",
+            "customer_name",
+            "invitation_id",
+            "plan_id",
+            "plan_name",
+            "amount",
+            "currency",
+            "interval",
+            "invitation_url",
+            "expires_at",
+            "created_at"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "event_type",
+        "event_id",
+        "timestamp",
+        "data"
+      ],
+      "additionalProperties": true
+    }
+  ]
+}

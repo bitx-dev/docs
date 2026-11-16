@@ -1,0 +1,275 @@
+{
+  "payment.succeeded": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "payment.succeeded",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "payment.succeeded",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "link_id": "INV-EIRCEI-DQ",
+      "payment_id": "22222222-2222-2222-2222-222222222222",
+      "amount": "100.50",
+      "currency": "USD",
+      "transaction_hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "network": "Ethereum",
+      "asset": "",
+      "fees": "",
+      "received_at": "2026-11-16 12:00:00 +0000 UTC"
+    }
+  },
+  "payment.failed": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "payment.failed",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "payment.failed",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "link_id": "INV-EIRCEI-DQ",
+      "payment_id": "22222222-2222-2222-2222-222222222222",
+      "amount": "100.50",
+      "currency": "USD",
+      "transaction_hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "network": "Ethereum",
+      "asset": "",
+      "fees": "",
+      "failed_at": "2026-11-16 12:00:00 +0000 UTC"
+    }
+  },
+  "payment.partial_succeeded": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "payment.partial_succeeded",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "payment.partial_succeeded",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "merchant_name": "Example Shop",
+      "link_id": "INV-EIRCEI-DQ",
+      "payment_id": "22222222-2222-2222-2222-222222222222",
+      "total_amount": "100.50",
+      "partial_amount": "40.25",
+      "remaining_amount": "60.25",
+      "currency": "USDC",
+      "network": "Ethereum",
+      "payment_url": "https://pay.bitxpay.com/payment_link?payment_id=22222222-2222-2222-2222-222222222222",
+      "payment_date_time": "2026-11-16T12:00:00Z"
+    }
+  },
+  "transaction.overpaid": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "transaction.overpaid",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "transaction.overpaid",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "merchant_name": "Example Shop",
+      "link_id": "INV-EIRCEI-DQ",
+      "payment_id": "22222222-2222-2222-2222-222222222222",
+      "expected_amount": "100.50",
+      "received_amount": "105.50",
+      "overpaid_amount": "5.00",
+      "currency": "USDC",
+      "network": "Ethereum",
+      "refund_link": "https://pay.bitxpay.com/payment_link?payment_id=22222222-2222-2222-2222-222222222222",
+      "dispute_id": "",
+      "frontend_url": "",
+      "transaction_hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "payment_link.created": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "payment_link.created",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "payment_link.created",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "link_id": "22222222-2222-2222-2222-222222222222",
+      "name": "Order #1234",
+      "amount": "100.50",
+      "currency": "USD",
+      "description": "Payment for Order #1234",
+      "payment_url": "https://pay.bitxpay.com/payment_link?payment_id=22222222-2222-2222-2222-222222222222",
+      "payment_status": "processing",
+      "payment_type": "one_time",
+      "starts_at": "2026-11-16 12:00:00",
+      "expires_at": "2026-11-17 12:00:00",
+      "max_uses": 1,
+      "current_uses": 0,
+      "is_active": true,
+      "cart": {
+        "items": [
+          {
+            "name": "Example Product",
+            "quantity": 1,
+            "unit_price": 100.5,
+            "total": 100.5
+          }
+        ],
+        "total": 100.5
+      },
+      "webhook_metadata": {
+        "order_ref": "order-1234"
+      },
+      "merchant_customer_id": "33333333-3333-3333-3333-333333333333",
+      "created_at": "2026-11-16 12:00:00"
+    }
+  },
+  "payment.expired": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "payment.expired",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "payment.expired",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "link_id": "INV-EIRCEI-DQ",
+      "amount": "100.50",
+      "currency": "USD",
+      "expires_at": "2026-11-17T12:00:00Z"
+    }
+  },
+  "refund.initiated": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "refund.initiated",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "refund.initiated",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "payment_id": "44444444-4444-4444-4444-444444444444",
+      "refund_amount": "5.00",
+      "currency": "USDC",
+      "reason": "Customer requested refund",
+      "submitted_at": "2026-11-16T12:00:00Z"
+    }
+  },
+  "refund.succeeded": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "refund.succeeded",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "refund.succeeded",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "payment_id": "44444444-4444-4444-4444-444444444444",
+      "refund_amount": "5.00",
+      "currency": "USDC",
+      "transaction_hash": "",
+      "asset": "Ethereum",
+      "destination_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb3"
+    }
+  },
+  "subscription_plan.created": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "subscription_plan.created",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "subscription_plan.created",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
+      "plan_name": "Pro Monthly",
+      "amount": "100.50",
+      "currency": "USD",
+      "interval": "2592000",
+      "trial_period": "604800",
+      "created_at": "2026-11-16 12:00:00"
+    }
+  },
+  "subscription.created": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "subscription.created",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "subscription.created",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "subscription_id": "INV-LUL3BR-MX",
+      "plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
+      "plan_name": "",
+      "amount": "",
+      "currency": "",
+      "interval": "",
+      "subscribed_at": "",
+      "webhook_metadata": {
+        "order_ref": "order-1234"
+      }
+    }
+  },
+  "subscription.renewed": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "subscription.renewed",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "subscription.renewed",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "subscription_id": "INV-LUL3BR-MX",
+      "plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
+      "plan_name": "Pro Monthly",
+      "amount": "10.00",
+      "currency": "USDC",
+      "transaction_hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "network": "Ethereum",
+      "next_renewal_at": "2026-12-16T12:00:00Z",
+      "renewed_at": "2026-11-16T12:00:00Z"
+    }
+  },
+  "subscription.renewal_failed": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "subscription.renewal_failed",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "subscription.renewal_failed",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "subscription_id": "INV-LUL3BR-MX",
+      "plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
+      "plan_name": "Pro Monthly",
+      "amount": "10.00",
+      "currency": "USDC",
+      "reason": "Charge could not be collected",
+      "grace_deadline": "2026-11-19T12:00:00Z",
+      "failed_at": "2026-11-16 12:00:00 +0000 UTC"
+    }
+  },
+  "subscription_invitation.created": {
+    "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+    "event_type": "subscription_invitation.created",
+    "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+    "timestamp": "2026-11-16T12:00:00Z",
+    "data": {
+      "event_code": "subscription_invitation.created",
+      "customer_email": "customer@example.com",
+      "customer_name": "Alex Customer",
+      "invitation_id": "5d17b0c4-b32c-40dd-a2e2-8ace612251c7",
+      "plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
+      "plan_name": "Pro Monthly",
+      "amount": "10000000",
+      "currency": "",
+      "interval": "",
+      "invitation_url": "https://pay.bitxpay.com/subscriptions/subscription_link?subscription_id=5d17b0c4-b32c-40dd-a2e2-8ace612251c7",
+      "expires_at": "",
+      "created_at": "",
+      "webhook_metadata": {
+        "order_ref": "order-1234"
+      }
+    }
+  }
+}
