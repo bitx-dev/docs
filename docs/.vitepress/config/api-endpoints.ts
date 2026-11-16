@@ -26,11 +26,15 @@ export const API_ENDPOINTS = {
     catalog: '/payment_links/catalog',
     paymentLinkStatus: '/payment_links/{id}/status',
     
+    // Payer checkout (no merchant signature)
+    publicPaymentLinks: '/public/payments/links',
+    engineCheckout: '/public/payments/engine/links',
+
     // Subscriptions — Authenticated (Merchant) Routes
-    subscriptionPlans: '/subscriptions/plans',
-    subscribers: '/subscriber',
-    invitations: '/invitations',
-    subscriptionLinks: '/subscriptions/link',
+    subscriptionPlans: '/merchant/subscription_plans',
+    subscribers: '/merchant/subscribers',
+    invitations: '/merchant/subscribers/invitations',
+    subscriptionLinks: '/merchant/subscription_links',
 
     // Subscriptions — Public Routes
     publicSubscriptionPlans: '/public/subscriptions/plans',
@@ -38,8 +42,8 @@ export const API_ENDPOINTS = {
     subscriptions: '/public/subscriptions/link',
     subscriptionNft: '/public/subscriptions/nft',
     
-    // Webhooks
-    webhookEndpoints: '/webhook-endpoints',
+    // Webhook management (dashboard session required)
+    webhookEndpoints: '/webhooks',
     
     // Account
     account: '/account',

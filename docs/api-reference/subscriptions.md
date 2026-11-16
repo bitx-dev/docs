@@ -15,19 +15,14 @@ The API is split into two route groups with different authentication requirement
 
 | Group | Path Prefixes | Authentication |
 |-------|---------------|-----------------|
-| **Authenticated (Merchant) Routes** | `/subscriptions/plans`, `/subscriber`, `/invitations`, `/subscriptions/link` | Merchant API Key + Ed25519 (EdDSA) signature — same scheme as the [Payments API](/api-reference/payments) |
+| **Authenticated (Merchant) Routes** | `/merchant/subscription_plans`, `/merchant/subscribers`, `/merchant/subscribers/invitations`, `/merchant/subscription_links` | Merchant API Key + Ed25519 (EdDSA) signature — same scheme as the [Payments API](/api-reference/payments) |
 | **Public Routes** | `/public/subscriptions/plans`, `/public/subscriber`, `/public/subscriptions/link`, `/public/subscriptions/nft` | No merchant signature — called directly from the customer-facing wallet/checkout flow |
 
 ---
 
 ## Plan Billing Models
 
-When creating a subscription plan, choose one of two billing models:
-
-- **PlanByAmount** — fixed billing in a specific token: provide `token` + `amount`
-- **PlanByValue** — fixed billing denominated in a currency: provide `currency` + `value`
-
-Provide one pair or the other, not both, in the [Create Subscription Plan](#1-create-subscription-plan) request. The `kind` field (`SubscriptionPlanType`) further classifies the plan.
+The merchant create-plan service currently registers token-based plans using `token` and `amount` (a string in token base units). Although the shared request DTO also contains `currency`, `value`, `period`, `currency_id`, and `kind`, the merchant service does not use those fields to register a value-based plan. A request without `token` is rejected.
 
 ---
 
@@ -36,23 +31,25 @@ Provide one pair or the other, not both, in the [Create Subscription Plan](#1-cr
 | Status | Description |
 |--------|-------------|
 | `active` | Plan is live and can accept new subscribers |
-| `deprecated` | Plan no longer accepts new subscribers (existing subscribers unaffected) |
+| `inactive` | Plan is inactive |
+
+Deprecation is represented separately by `is_deprecated` and `deprecated_at`. The Merchant API does not mount a DELETE/deprecate route.
 
 ## Subscriber Statuses
 
 | Status | Description |
 |--------|-------------|
 | `invitation_sent` | Subscriber created, awaiting on-chain confirmation |
-| `active` | Subscriber is actively being billed |
-| `inactive` | Subscriber is not currently active |
-| `suspended` | Subscriber billing suspended |
+| `subscribed` | Subscriber accepted the invitation |
+| `rejected` | Subscriber rejected the invitation |
+| `expired` | Invitation expired |
 | `cancelled` | Subscription cancelled |
 
 This is the canonical subscriber status set referenced by every subscriber endpoint on this page.
 
 ## Billing Intervals
 
-Plans store `interval`, `trial_period`, `grace_period` (`max_arrears`), `auto_cancel_after_missed`, and `subscribe_deadline` as raw **seconds** on-chain. Common interval values:
+`interval` and `trial_period` are durations in **seconds**. `max_arrears` and `auto_cancel_after_missed` are counts, and `subscribe_deadline` is an integer enrollment deadline. Common interval values:
 
 | Name | Seconds |
 |------|---------|
@@ -75,40 +72,43 @@ X-API-Timestamp: 2026-01-31T12:00:00Z
 Content-Type: application/json
 ```
 
-### Subscription Plans — `/subscriptions/plans`
+Success responses in this section wrap the documented response object in `{"message": "...", "data": ...}`. Creation returns HTTP `201`; reads and updates return `200`. Paths are relative to `/api/v1`; sign the full actual path, including any trailing slash.
+
+### Subscription Plans — `/merchant/subscription_plans`
 
 #### 1. Create Subscription Plan
 
-**POST** `/subscriptions/plans/`
+**POST** `/merchant/subscription_plans/`
 
 **Request Body:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `network_id` | string (UUID) | No | Blockchain network ID |
-| `currency_id` | string (UUID) | No | Currency ID |
+| `currency_id` | string (UUID) | No | Present in the shared DTO; not persisted by the merchant create service |
 | `merchant` | string | Yes | Merchant on-chain address |
 | `destination` | string | Yes | Destination address for collected funds |
-| `token` | string | Conditional | Token contract address (required with `amount` for **PlanByAmount**) |
-| `amount` | string | Conditional | Billing amount, raw units (required with `token`) |
-| `currency` | string | Conditional | Currency code (required with `value` for **PlanByValue**) |
-| `value` | string | Conditional | Billing value in `currency` (required with `currency`) |
-| `period` | integer | No | Billing period (seconds) |
-| `interval` | integer | No | Billing interval (seconds) |
+| `token` | string | Yes | Token contract address |
+| `amount` | string | Yes | Billing amount in token base units |
+| `currency` | string | No | Not used by the merchant create service |
+| `value` | string | No | Not used by the merchant create service |
+| `period` | integer | No | Present in the shared DTO; use `interval` for merchant plans |
+| `interval` | integer | Yes | Billing interval (seconds) |
 | `trial_period` | integer | No | Trial period (seconds) |
-| `max_arrears` | integer | No | Grace period before a missed payment counts as arrears (seconds) |
+| `max_arrears` | integer | Yes | Maximum arrears count, 1–255 |
 | `auto_cancel_after_missed` | integer | No | Number of missed payments before auto-cancellation |
 | `subscribe_deadline` | integer | No | Deadline for the subscriber to complete on-chain enrollment (seconds) |
-| `plan_nonce` | integer | No | On-chain plan nonce |
+| `plan_nonce` | integer | Yes | Non-zero on-chain plan nonce; unique per merchant |
 | `merchant_sig` | string | Yes | Merchant's on-chain signature over the plan digest |
 | `metadata_uri` | string | No | URI to off-chain plan metadata |
 | `name` | string | Yes | Plan name |
 | `description` | string | No | Plan description |
-| `kind` | string (`SubscriptionPlanType`) | No | Plan type classification |
+| `kind` | string (`SubscriptionPlanType`) | No | Present in the shared DTO; not persisted by the merchant create service |
 
-> Provide either `token` + `amount` (**PlanByAmount**) or `currency` + `value` (**PlanByValue**) — not both.
+> Use `token` + `amount` for this merchant endpoint. Include the required signed plan fields even when a client SDK has older plan types.
 
-**Response (`SubscriptionPlanResponse`):**
+**Response data (`SubscriptionPlanResponse`):** Optional fields such as `network`, `token`, `currency_id`, `plan_id`, `digest`, `source`, and `deprecated_at` are omitted when unavailable. The merchant service does not populate on-chain identifiers merely by registering the plan.
+
 
 ```json
 {
@@ -155,7 +155,7 @@ Content-Type: application/json
 
 | Status | Error | Description |
 |--------|-------|-------------|
-| 400 | Bad Request | Invalid request payload, or both/neither of `token`+`amount` / `currency`+`value` provided |
+| 400 | Bad Request | Invalid request payload, missing token, or duplicate merchant plan nonce |
 | 401 | Unauthorized | Missing or invalid API key/signature |
 | 500 | Internal Server Error | Server error |
 
@@ -163,7 +163,7 @@ Content-Type: application/json
 
 #### 2. List Subscription Plans
 
-**GET** `/subscriptions/plans/`
+**GET** `/merchant/subscription_plans/`
 
 **Query Parameters:**
 
@@ -192,11 +192,11 @@ Content-Type: application/json
 
 #### 3. Get Subscription Plan
 
-**GET** `/subscriptions/plans/:id`
+**GET** `/merchant/subscription_plans/:id`
 
 **Path Parameters:** `id` (UUID)
 
-**Response:** `SubscriptionPlanResponse` (same shape as [#1](#1-create-subscription-plan))
+**Response:** `SubscriptionPlanResponse` (same shape as [#1](#_1-create-subscription-plan))
 
 **Error Responses:**
 
@@ -210,7 +210,7 @@ Content-Type: application/json
 
 #### 4. Update Subscription Plan
 
-**PUT** `/subscriptions/plans/:id`
+**PUT** `/merchant/subscription_plans/:id`
 
 **Path Parameters:** `id` (UUID)
 
@@ -220,9 +220,9 @@ Content-Type: application/json
 |-------|------|----------|-------------|
 | `name` | string | No | Updated plan name |
 | `metadata_uri` | string | No | Updated metadata URI |
-| `status` | string (`SubscriptionPlanStatus`) | No | `active` or `deprecated` |
+| `status` | string (`SubscriptionPlanStatus`) | No | `active` or `inactive` |
 
-**Response:** `SubscriptionPlanResponse` (same shape as [#1](#1-create-subscription-plan))
+**Response:** `SubscriptionPlanResponse` (same shape as [#1](#_1-create-subscription-plan))
 
 **Error Responses:**
 
@@ -235,31 +235,17 @@ Content-Type: application/json
 
 ---
 
-#### 5. Deprecate Subscription Plan
+#### 5. Plan Deprecation
 
-**DELETE** `/subscriptions/plans/:id`
-
-**Path Parameters:** `id` (UUID)
-
-**Request Body:** none
-
-**Response:** Success message confirming the plan was deprecated.
-
-**Error Responses:**
-
-| Status | Error | Description |
-|--------|-------|-------------|
-| 401 | Unauthorized | Missing or invalid API key/signature |
-| 404 | Not Found | Plan not found |
-| 500 | Internal Server Error | Server error |
+The Merchant API mounts POST, GET, and PUT for plans. Deprecation through `DELETE /subscriptions/plans/:id` belongs to the dashboard session API and is not available with merchant API-key authentication.
 
 ---
 
-### Subscribers — `/subscriber`
+### Subscribers — `/merchant/subscribers`
 
 #### 6. Create Subscriber
 
-**POST** `/subscriber/`
+**POST** `/merchant/subscribers/`
 
 **Request Body:**
 
@@ -269,11 +255,32 @@ Content-Type: application/json
 | `customer_id` | string | No | Your internal customer identifier |
 | `customer_name` | string | No | Customer's full name |
 | `customer_email` | string | No | Customer's email address |
-| `webhook_metadata` | object | No | Custom metadata passed to webhooks |
+| `webhook_metadata` | object | No | Copied to subscription creation/invitation events; not automatically included in renewal event DTOs |
 | `failure_return_url` | string | No | URL to redirect to on failed enrollment |
 | `success_return_url` | string | No | URL to redirect to on successful enrollment |
 
-**Response (`SubscriberResponse`):**
+**Create response (201):** `data` contains `subscriber` (the stored subscriber model) and `subscription_link` (the customer enrollment URL). The raw model uses capitalized `Status` and `WebhookMetadata`; customer fields, return URLs, and timestamps use snake_case. Single-subscriber get/update endpoints also return this raw model. List endpoints use the `SubscriberResponse` DTO shown below.
+
+```json
+{
+  "message": "Subscriber created successfully",
+  "data": {
+    "subscriber": {
+      "id": "5d17b0c4-b32c-40dd-a2e2-8ace612251c7",
+      "subscription_plan_id": "6f03697c-eb8d-49f2-9ac1-bca1cbe58a4c",
+      "merchant_user_id": "11111111-1111-1111-1111-111111111111",
+      "customer_name": "John Doe",
+      "customer_email": "customer@example.com",
+      "Status": "invitation_sent"
+    },
+    "subscription_link": "https://pay.bitxpay.com/subscriptions/subscription_link?subscription_id=5d17b0c4-b32c-40dd-a2e2-8ace612251c7"
+  }
+}
+```
+
+The example omits other stored model fields. Include `customer_name` and `customer_email` for merchant creation: the notification service currently reads both values without a nil check, despite their being optional in the shared DTO.
+
+**List item data (`SubscriberResponse`):**
 
 ```json
 {
@@ -306,7 +313,7 @@ Content-Type: application/json
 
 #### 7. Get Subscribers By Merchant
 
-**GET** `/subscriber/`
+**GET** `/merchant/subscribers/`
 
 **Query Parameters:**
 
@@ -324,7 +331,7 @@ Content-Type: application/json
 ```json
 {
   "subscribers": [ { "...": "SubscriberResponse, see #6" } ],
-  "data": [ { "...": "Subscriber model" } ],
+  "data": null,
   "total": 0,
   "page": 0,
   "page_size": 0,
@@ -336,17 +343,17 @@ Content-Type: application/json
 
 #### 8. Get Subscribers By Plan ID
 
-**GET** `/subscriber/plan/:plan_id`
+**GET** `/merchant/subscribers/plan/:plan_id`
 
 **Path Parameters:** `plan_id` (UUID)
 
-**Response:** `SubscriberListResponse` (same shape as [#7](#7-get-subscribers-by-merchant))
+**Response:** `data` is a `SubscriberListResponse` object with `subscribers` and `total`. It returns all matches; `page`, `page_size`, and `total_pages` are zero, and the unused legacy `data` field is null.
 
 ---
 
 #### 9. Update Subscriber
 
-**PUT** `/subscriber/:id`
+**PUT** `/merchant/subscribers/:id`
 
 **Path Parameters:** `id` (UUID)
 
@@ -358,7 +365,7 @@ Content-Type: application/json
 | `customer_email` | string | No | Updated customer email |
 | `status` | string (`SubscriberStatus`) | No | New subscriber status |
 
-**Response:** `SubscriberResponse` (same shape as [#6](#6-create-subscriber))
+**Response:** The stored subscriber model described in [#6](#_6-create-subscriber), including capitalized `Status` and `WebhookMetadata`. Merchant responses wrap it in `data`; public responses return it directly.
 
 **Error Responses:**
 
@@ -373,11 +380,11 @@ Content-Type: application/json
 
 #### 10. Get Subscriber By ID
 
-**GET** `/subscriber/:id`
+**GET** `/merchant/subscribers/:id`
 
 **Path Parameters:** `id` (UUID)
 
-**Response:** `SubscriberResponse` (same shape as [#6](#6-create-subscriber))
+**Response:** The stored subscriber model described in [#6](#_6-create-subscriber), including capitalized `Status` and `WebhookMetadata`. Merchant responses wrap it in `data`; public responses return it directly.
 
 **Error Responses:**
 
@@ -389,20 +396,20 @@ Content-Type: application/json
 
 ---
 
-### Invitations — `/invitations`
+### Invitations — `/merchant/subscribers/invitations`
 
-#### 11. Get Invitations By Plan ID
+#### 11. Get Invitations
 
-**GET** `/invitations/`
+**GET** `/merchant/subscribers/invitations`
 
-**Query Parameters:** `plan_id` (string, UUID)
+**Query Parameters:** `page`, `page_size`, `search`, `plan_id`, `start_date`, `end_date`, `sort_order` (same list-filter DTO as subscribers).
 
 **Response (`InvitationListResponse`):**
 
 ```json
 {
   "invitations": [ { "...": "SubscriberResponse, see #6" } ],
-  "data": [ { "...": "Subscriber model" } ],
+  "data": null,
   "total": 0,
   "page": 0,
   "page_size": 0,
@@ -412,11 +419,11 @@ Content-Type: application/json
 
 ---
 
-### Subscription Links — `/subscriptions/link`
+### Subscription Links — `/merchant/subscription_links`
 
 #### 12. List Subscription Links
 
-**GET** `/subscriptions/link/`
+**GET** `/merchant/subscription_links/`
 
 **Query Parameters:**
 
@@ -446,7 +453,7 @@ Content-Type: application/json
 
 #### 13. Get Subscription Link
 
-**GET** `/subscriptions/link/:id`
+**GET** `/merchant/subscription_links/:id`
 
 **Path Parameters:** `id` (UUID)
 
@@ -470,7 +477,7 @@ Content-Type: application/json
   "customer_name": "string",
   "expires_at": "",
   "is_active": true,
-  "subscription_transactions": [ { "...": "SubscriptionResponse, see #21" } ],
+  "subscription_transactions": [ { "...": "SubscriptionResponse; see Request and Response Fields" } ],
   "plan": { "...": "SubscriptionPlanSummary" },
   "created_at": "",
   "updated_at": ""
@@ -481,7 +488,7 @@ Content-Type: application/json
 
 ## Public Routes
 
-The endpoints in this section are called directly from the customer-facing wallet/checkout flow and do **not** require `X-API-Key`/`X-API-Signature` headers. [Record Subscription Payment](#21-record-subscription-payment) instead identifies the merchant via a `merchant_key` field in the request body.
+Public controllers return their response data directly, without the merchant `message`/`data` wrapper, except where explicitly documented below. The endpoints in this section are called directly from the customer-facing wallet/checkout flow and do **not** require `X-API-Key`/`X-API-Signature` headers. [Record Subscription Payment](#_21-record-subscription-payment) additionally requires a `merchant_key` reference in the body; this is separate from request-signature authentication.
 
 ### Subscription Plans — `/public/subscriptions/plans`
 
@@ -489,7 +496,9 @@ The endpoints in this section are called directly from the customer-facing walle
 
 **GET** `/public/subscriptions/plans/`
 
-**Response:** `SubscriptionPlanListResponse` (same shape as [#2](#2-list-subscription-plans))
+**Query parameters:** `page`, `page_size`, `search`, `deprecated`, `start_date`, `end_date` (same filters as the merchant plan list).
+
+**Response:** `SubscriptionPlanListResponse` (same shape as [#2](#_2-list-subscription-plans))
 
 ---
 
@@ -499,7 +508,7 @@ The endpoints in this section are called directly from the customer-facing walle
 
 **Path Parameters:** `id` (UUID)
 
-**Response:** `SubscriptionPlanResponse` (same shape as [#1](#1-create-subscription-plan))
+**Response:** `SubscriptionPlanResponse` (same shape as [#1](#_1-create-subscription-plan))
 
 ---
 
@@ -509,7 +518,9 @@ The endpoints in this section are called directly from the customer-facing walle
 
 **GET** `/public/subscriber/prepare`
 
-Returns the on-chain parameters (plan digest, approval details, etc.) a customer's wallet needs to sign in order to complete enrollment for a given subscription plan.
+**Query parameters:** `subscriber_id` (required UUID) and `wallet_address` (customer wallet address).
+
+Returns an unwrapped object with `subscriber_id`, `plan_id`, `wallet_address`, `currency`, `value`, and `networks`. Each network contains `chain_id` and `tokens`; tokens include `address`, `symbol`, `decimals`, `quotable`, and optional `price`, `amount`, or `error`. Use this treasury-supported selection when preparing enrollment. Invalid subscriber IDs return `400`; missing subscribers/plans return `404`.
 
 ---
 
@@ -519,7 +530,7 @@ Returns the on-chain parameters (plan digest, approval details, etc.) a customer
 
 **Path Parameters:** `id` (UUID)
 
-**Response:** `SubscriberResponse` (same shape as [#6](#6-create-subscriber))
+**Response:** The stored subscriber model described in [#6](#_6-create-subscriber), including capitalized `Status` and `WebhookMetadata`. Merchant responses wrap it in `data`; public responses return it directly.
 
 ---
 
@@ -529,9 +540,9 @@ Returns the on-chain parameters (plan digest, approval details, etc.) a customer
 
 **Path Parameters:** `id` (UUID)
 
-**Request Body:** `UpdateSubscriberRequest` (same shape as [#9](#9-update-subscriber))
+**Request Body:** `UpdateSubscriberRequest` (same fields as [#9](#_9-update-subscriber))
 
-**Response:** `SubscriberResponse` (same shape as [#6](#6-create-subscriber))
+**Response:** The stored subscriber model described in [#6](#_6-create-subscriber), including capitalized `Status` and `WebhookMetadata`. Merchant responses wrap it in `data`; public responses return it directly.
 
 ---
 
@@ -569,10 +580,10 @@ Returns the on-chain parameters (plan digest, approval details, etc.) a customer
 | `token_address` | string | Yes | Approved token contract address |
 | `amount_approved` | string | Yes | Approved amount (raw units) |
 | `network_name` | string | Yes | Blockchain network name |
-| `chain_id` | integer | No | Chain ID |
-| `decimals` | integer | No | Token decimals |
+| `chain_id` | integer | Yes | Non-zero chain ID |
+| `decimals` | integer | Yes | Non-zero token decimals |
 
-**Response:** `SubscriptionLinkResponse` (same shape as [#13](#13-get-subscription-link))
+**Response:** `SubscriptionLinkResponse` (same shape as [#13](#_13-get-subscription-link))
 
 ---
 
@@ -582,7 +593,7 @@ Returns the on-chain parameters (plan digest, approval details, etc.) a customer
 
 **Path Parameters:** `walletAddress` (string)
 
-**Response:** `SubscriptionLinkListResponse` (same shape as [#12](#12-list-subscription-links))
+**Response:** `{ "data": [...], "total": 0 }`, where `data` holds stored subscription link models. This wallet lookup is not the paginated merchant link DTO. No matches return `404`.
 
 ---
 
@@ -595,7 +606,7 @@ Returns the on-chain parameters (plan digest, approval details, etc.) a customer
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `sub_link_id` | string (UUID) | Yes | Subscription link ID |
-| `merchant_key` | string | Yes | Merchant identifier used to authenticate this request |
+| `merchant_key` | string | Yes | Merchant reference stored with the payment record |
 | `tx_hash` | string | Yes | Blockchain transaction hash |
 | `block_number` | integer | No | Block number the transaction was included in |
 | `block_hash` | string | No | Block hash |
@@ -604,31 +615,15 @@ Returns the on-chain parameters (plan digest, approval details, etc.) a customer
 | `amount_paid` | string | Yes | Amount paid |
 | `wallet_used` | string | Yes | Wallet address the payment was made from |
 
-**Response (`SubscriptionResponse`):**
+**Response (200):**
 
 ```json
 {
-  "id": "uuid",
-  "merchant_id": "uuid",
-  "sub_link_id": "uuid",
-  "tx_hash": "string",
-  "block_number": 0,
-  "block_hash": "string",
-  "confirmations": 0,
-  "currency_id": "uuid",
-  "network_id": "uuid",
-  "amount": "string",
-  "user_wallet_address": "string",
-  "paid_at": "",
-  "status": "string",
-  "starts_at": "",
-  "ends_at": "",
-  "next_billing_at": "",
-  "plan": { "...": "SubscriptionLinkResponse, see #13" },
-  "created_at": "",
-  "updated_at": ""
+  "message": "Payment recorded successfully"
 }
 ```
+
+This endpoint returns an acknowledgement rather than a subscription payment DTO.
 
 ---
 
@@ -650,7 +645,7 @@ Returns the on-chain parameters (plan digest, approval details, etc.) a customer
 | `locked` | boolean | No | Updated locked status |
 | `owed` | string | No | Updated amount owed |
 
-**Response:** `SubscriptionLinkResponse` (same shape as [#13](#13-get-subscription-link))
+**Response:** `SubscriptionLinkResponse` (same shape as [#13](#_13-get-subscription-link))
 
 ---
 
@@ -680,7 +675,7 @@ Returns the on-chain parameters (plan digest, approval details, etc.) a customer
 
 ## Rate Limiting
 
-Rate limits are applied per route based on the configured rate limiter (payment-related routes use a stricter limiter than read/default routes). Contact your account team for the current per-route limits applicable to your account.
+The mounted subscription routes use payment/default rate limiters, both configured to 100 requests per minute in this checkout. Limiter identity falls back to client IP when no recognized user/API-key context is available. Handle HTTP `429` and honor `Retry-After` when present; deployment settings may differ.
 
 ---
 
@@ -700,6 +695,8 @@ curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptionPlans }}/ \
     "token": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
     "amount": "100000",
     "interval": 2592000,
+    "max_arrears": 1,
+    "plan_nonce": 1,
     "merchant_sig": "<merchant_onchain_signature>",
     "name": "Pro Plan Monthly"
   }'
@@ -762,17 +759,9 @@ curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.subscriptions }}/paymen
 
 ## Webhooks
 
-Subscription events can be delivered via webhooks. Configure your webhook URL in the dashboard to receive:
+Configure active subscriptions in the dashboard. Subscription event codes defined by the backend are `subscription_plan.created`, `subscription_invitation.created`, `subscription.created`, `subscription.renewed`, and `subscription.renewal_failed`. Availability depends on the operation and enabled catalog entries.
 
-- `subscription.created` - New subscription link created
-- `subscription.activated` - Subscription activated
-- `subscription.paused` - Subscription paused
-- `subscription.cancelled` - Subscription cancelled
-- `subscription.payment.success` - Payment successful
-- `subscription.payment.failed` - Payment failed
-- `subscription.expiring` - Subscription nearing expiration
-
-See the [Webhooks Guide](/get-started/webhooks) for detailed payload structures.
+See the [event data reference](/api-reference/webhook-events#subscription-created) for exact fields and emission behavior. Merchant subscriber creation emits `subscription.created` before on-chain enrollment; dashboard subscriber creation emits `subscription_invitation.created`. The plan-created and renewal event DTOs exist, but this checkout has no automatic producers for those three event types. Use the [test-notification API](/api-reference/webhooks#register-a-test-event) to exercise them. See the [Webhooks Guide](/get-started/webhooks) for signature verification.
 
 ---
 

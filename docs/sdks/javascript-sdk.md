@@ -1,302 +1,144 @@
 ---
-editLink:
-  pattern: https://www.npmjs.com/package/@bitxpay/sdk
-  text: View on npm
+title: JavaScript / TypeScript SDK
+description: Use BitxpayClient for signed server-side payment and subscription requests.
 ---
 
 # JavaScript / TypeScript SDK
 
-The `@bitxpay/sdk` package is the official server-side SDK for Node.js and TypeScript. It handles request authentication, response parsing, and provides a typed interface for the full BITXpay API.
-
-**npm:** [npmjs.com/package/@bitxpay/sdk](https://www.npmjs.com/package/@bitxpay/sdk)
+The server-side `@bitxpay/sdk` implementation in `bitxpay-api/sdks/typescript` provides payment links, merchant subscriptions, pagination, and webhook verification. It requires **Node.js 18+** and uses built-in `fetch` and `node:crypto`.
 
 ## Installation
 
-::: code-group
-
-```bash [npm]
+```bash
 npm install @bitxpay/sdk
 ```
 
-```bash [yarn]
-yarn add @bitxpay/sdk
-```
+For a repository checkout, build the package from `bitxpay-api/sdks/typescript` with `npm install` and `npm run build`.
 
-```bash [pnpm]
-pnpm add @bitxpay/sdk
-```
-
-:::
-
-## Requirements
-
-- **Node.js** 16 or higher
-- **TypeScript** 4.7+ (optional, but recommended)
-
-## Quick Start
+## Create a client
 
 ```typescript
-import { BITXpay } from '@bitxpay/sdk';
+import { BitxpayClient } from '@bitxpay/sdk';
 
-const client = new BITXpay({
+const client = new BitxpayClient({
   apiKey: process.env.BITXPAY_API_KEY!,
-  apiSecret: process.env.BITXPAY_API_SECRET!,
-  environment: 'sandbox' // 'sandbox' | 'production'
+  privateKey: process.env.BITXPAY_PRIVATE_KEY!,
+  environment: 'sandbox',
 });
 ```
 
-::: warning Keep credentials out of source code
-Always load `apiKey` and `apiSecret` from environment variables. Never hard-code them.
-:::
+Keep the private key on your server. Supply the dashboard-issued `Ed25519:<base64 PKCS#8 DER>` value. The SDK signs `METHOD + PATH + TIMESTAMP + BODY`, includes `/api/v1` in the signed path, and sends `X-API-Key`, `X-API-Signature`, and `X-API-Timestamp`.
 
----
-
-## Configuration
-
-### `new BITXpay(options)`
-
-| Option | Type | Required | Default | Description |
-|--------|------|----------|---------|-------------|
-| `apiKey` | `string` | ✅ | — | Your BITXpay API key |
-| `apiSecret` | `string` | ✅ | — | Your BITXpay API secret |
-| `environment` | `'sandbox' \| 'production'` | ❌ | `'sandbox'` | Target environment |
-| `timeout` | `number` | ❌ | `30000` | Request timeout in ms |
-
----
+| Option | Default | Description |
+|--------|---------|-------------|
+| `apiKey` | Required | Merchant API key |
+| `privateKey` | Required | Dashboard-issued Ed25519 private key |
+| `environment` | `sandbox` | `sandbox` or `production` |
+| `baseUrl` | Environment host | Override the host, without `/api/v1` (resource paths include it) |
+| `timeoutMs` | `30000` | Request timeout in milliseconds |
+| `maxRetries` | `2` | Transient failure retries |
+| `defaultHeaders` | `{}` | Extra headers |
+| `fetch` | Global `fetch` | Custom fetch implementation |
 
 ## Payments
 
-### Create a payment
-
 ```typescript
-const payment = await client.payments.create({
-  amount: '100.00',
+const link = await client.payments.create({
+  payment_name: 'Order #1234',
+  amount: 49.99,
   currency: 'USD',
-  description: 'Order #1234',
-  redirectUrl: 'https://yoursite.com/success',
-  webhookUrl: 'https://yoursite.com/webhook'
+  customer_email: 'customer@example.com',
+  success_url: 'https://example.com/thanks',
+  is_test: true,
 });
 
-console.log('Checkout URL:', payment.hostedUrl);
-console.log('Payment ID:', payment.id);
+console.log(link.id, link.payment_status);
+const current = await client.payments.get(link.id);
+await client.payments.updateStatus(link.id, 'deactivate');
+const currencies = await client.payments.listCurrencies();
 ```
 
-### Get a payment
+The REST response uses `payment_url` and `payment_name`. Currency discovery returns `id`, `code`, and `name`; the current SDK `Currency` type still describes a broader object with `symbol`. The bundled TypeScript `PaymentLink` interface still names these `payment_link` and `name`; use a raw request for an accurately typed checkout URL:
 
 ```typescript
-const payment = await client.payments.get('pay_xxxxxxxxxxxxxxxx');
-
-console.log('Status:', payment.status);
-console.log('Amount:', payment.amount, payment.currency);
-```
-
-### List payments
-
-```typescript
-const { data, pagination } = await client.payments.list({
-  page: 1,
-  limit: 20,
-  status: 'completed' // optional filter
-});
-
-data.forEach(payment => {
-  console.log(payment.id, payment.status);
-});
-```
-
-### Payment object
-
-```typescript
-interface Payment {
+const created = await client.http.requestData<{
   id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'expired';
-  amount: string;
-  currency: string;
-  description: string;
-  hostedUrl: string;
-  redirectUrl: string;
-  webhookUrl: string;
-  createdAt: string;
-  updatedAt: string;
+  payment_url: string;
+  payment_status: string;
+}>({
+  method: 'POST',
+  path: '/api/v1/payment_links',
+  body: { payment_name: 'Order #1235', amount: 49.99, currency: 'USD', is_test: true },
+});
+console.log(created.payment_url);
+```
+
+The current SDK action type lists `activate`, `deactivate`, and `expire`. `deactivate` and `expire` work with the mounted API; `activate` currently fails in the service. See [Payment Link Status](/api-reference/payments#_6-update-payment-link-status).
+
+## Pagination
+
+```typescript
+const page = await client.payments.list({ page: 1, page_size: 20, currency: 'USD' });
+console.log(page.data, page.page, page.pageSize, page.totalItems, page.totalPages, page.hasMore);
+```
+
+The SDK maps payment `page_size` to the REST API's `limit`. Subscription lists use `page_size` directly. List filters are documented in the [Payments](/api-reference/payments) and [Subscriptions](/api-reference/subscriptions) references.
+
+## Merchant subscriptions
+
+| SDK method | REST path (under `/api/v1`) |
+|------------|---------------------------|
+| `subscriptions.createPlan`, `listPlans` | `/merchant/subscription_plans` |
+| `subscriptions.getPlan`, `updatePlan` | `/merchant/subscription_plans/:id` |
+| `subscriptions.createSubscriber`, `listSubscribers` | `/merchant/subscribers` |
+| `subscriptions.getSubscriber`, `updateSubscriber` | `/merchant/subscribers/:id` |
+| `subscriptions.listInvitations` | `/merchant/subscribers/invitations` |
+| `subscriptions.listLinks`, `getLink` | `/merchant/subscription_links`, `/merchant/subscription_links/:id` |
+
+`listSubscribers({ plan_id })` uses `/merchant/subscribers/plan/:plan_id`, which returns all matches in a `subscribers` list object without populated pagination fields.
+
+The bundled SDK's create-plan types describe an older payload. Use the current [create-plan request](/api-reference/subscriptions#_1-create-subscription-plan), including `merchant`, `destination`, `token`, `amount`, `interval`, `max_arrears`, `plan_nonce`, `merchant_sig`, and `name`, through `client.http.requestData` when needed. Create-subscriber returns `{ subscriber, subscription_link }` inside `data`; it does not return a bare subscriber DTO.
+
+## Webhook verification
+
+```typescript
+import { constructWebhookEvent, WebhookSignatureError } from '@bitxpay/sdk';
+
+// rawBody is the unparsed body string; headers are the incoming HTTP headers.
+try {
+  const event = constructWebhookEvent(rawBody, headers, process.env.WEBHOOK_SECRET!);
+  console.log(event.event_type, event.data);
+} catch (error) {
+  if (error instanceof WebhookSignatureError) {
+    // Reject the delivery with a non-2xx response.
+  } else {
+    throw error;
+  }
 }
 ```
 
----
+The header is `X-Webhook-Signature: sha256=<hex>`. See [Webhooks](/get-started/webhooks) for complete Express/Flask examples and duplicate handling. Use the [exact event data reference](/api-reference/webhook-events) when reading `event.data`; metadata, IDs, and amount units vary by event. [Download example deliveries](/webhooks/examples.json) for each supported code.
 
-## Payment Links
+## Errors
 
-### Create a payment link
-
-```typescript
-const link = await client.paymentLinks.create({
-  amount: '50.00',
-  currency: 'USD',
-  title: 'Product Purchase',
-  description: 'Premium subscription',
-  expiresAt: '2025-12-31T23:59:59Z' // optional
-});
-
-console.log('Payment Link URL:', link.url);
-```
-
-### Get a payment link
+The SDK throws `BitxpayAPIError` subclasses for HTTP failures. Inspect `status`, optional string `code`, and `body`:
 
 ```typescript
-const link = await client.paymentLinks.get('pl_xxxxxxxxxxxxxxxx');
-```
-
-### List payment links
-
-```typescript
-const { data } = await client.paymentLinks.list({ page: 1, limit: 10 });
-```
-
----
-
-## Subscriptions
-
-### Create a subscription plan
-
-```typescript
-const plan = await client.subscriptions.createPlan({
-  name: 'Pro Plan',
-  amount: '29.99',
-  currency: 'USD',
-  interval: 'monthly', // 'daily' | 'weekly' | 'monthly' | 'yearly'
-  description: 'Monthly Pro subscription'
-});
-```
-
-### Subscribe a customer
-
-```typescript
-const subscription = await client.subscriptions.create({
-  planId: plan.id,
-  customerEmail: 'user@example.com',
-  webhookUrl: 'https://yoursite.com/webhook'
-});
-```
-
----
-
-## Webhooks
-
-### Verify a webhook signature
-
-Always verify incoming webhook payloads before processing them.
-
-```typescript
-import { verifyWebhook } from '@bitxpay/sdk';
-
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-bitxpay-signature'] as string;
-
-  const isValid = verifyWebhook({
-    payload: req.body,
-    signature,
-    secret: process.env.BITXPAY_WEBHOOK_SECRET!
-  });
-
-  if (!isValid) {
-    return res.status(401).send('Invalid signature');
-  }
-
-  const event = JSON.parse(req.body.toString());
-
-  switch (event.type) {
-    case 'payment.completed':
-      console.log('Payment completed:', event.data.id);
-      break;
-    case 'payment.failed':
-      console.log('Payment failed:', event.data.id);
-      break;
-    case 'subscription.renewed':
-      console.log('Subscription renewed:', event.data.subscriptionId);
-      break;
-  }
-
-  res.status(200).send('OK');
-});
-```
-
-### Webhook event types
-
-| Event | Description |
-|-------|-------------|
-| `payment.pending` | Payment created, awaiting funds |
-| `payment.processing` | Funds received, confirming on-chain |
-| `payment.completed` | Payment fully confirmed |
-| `payment.failed` | Payment failed or rejected |
-| `payment.expired` | Payment window expired |
-| `subscription.created` | New subscription started |
-| `subscription.renewed` | Subscription billing renewed |
-| `subscription.cancelled` | Subscription cancelled |
-
----
-
-## Error Handling
-
-The SDK throws typed errors. Always wrap API calls in a `try/catch`:
-
-```typescript
-import { BITXpayError, BITXpayAPIError } from '@bitxpay/sdk';
+import { BitxpayAPIError } from '@bitxpay/sdk';
 
 try {
-  const payment = await client.payments.create({ ... });
-} catch (err) {
-  if (err instanceof BITXpayAPIError) {
-    console.error('API error:', err.statusCode, err.message);
-    console.error('Error code:', err.code);
-  } else if (err instanceof BITXpayError) {
-    console.error('SDK error:', err.message);
+  await client.payments.get('22222222-2222-2222-2222-222222222222');
+} catch (error) {
+  if (error instanceof BitxpayAPIError) {
+    console.error(error.status, error.code, error.body);
   } else {
-    throw err;
+    throw error;
   }
 }
 ```
 
-### Common error codes
+The SDK also exports configuration, connection, and webhook signature errors. Transient retries use backoff and honor `Retry-After`. An ambiguous timeout after creation can leave an existing link; reconcile before creating another.
 
-| Code | Description |
-|------|-------------|
-| `INVALID_API_KEY` | API key is missing or invalid |
-| `INVALID_SIGNATURE` | Request signature does not match |
-| `INSUFFICIENT_FUNDS` | Wallet balance too low |
-| `PAYMENT_NOT_FOUND` | Payment ID does not exist |
-| `RATE_LIMIT_EXCEEDED` | Too many requests |
+## Current coverage
 
----
-
-## TypeScript Support
-
-The SDK ships with full TypeScript definitions. No `@types` package needed.
-
-```typescript
-import type { Payment, PaymentCreateParams, Subscription } from '@bitxpay/sdk';
-
-async function createOrder(params: PaymentCreateParams): Promise<Payment> {
-  return client.payments.create(params);
-}
-```
-
----
-
-## Environment Variables
-
-Recommended `.env` setup:
-
-```bash
-BITXPAY_API_KEY=your_api_key_here
-BITXPAY_API_SECRET=your_api_secret_here
-BITXPAY_WEBHOOK_SECRET=your_webhook_secret_here
-BITXPAY_ENVIRONMENT=sandbox
-```
-
----
-
-## Next Steps
-
-- [Wallet SDK](/sdks/wallet-sdk) Client-side wallet connection
-- [API Reference](/api-reference/) Full endpoint documentation
-- [Webhooks](/integration/webhooks) Webhook events and verification
-- [Testing](/testing/) Test your integration in sandbox
+The bundled SDK covers payment links and merchant subscriptions. Use REST or the raw HTTP client for the checkout catalog and public checkout flow. Webhook management requires a dashboard session. See [SDKs & Libraries](/sdks/) for Python and PHP packages.

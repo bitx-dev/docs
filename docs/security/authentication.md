@@ -21,7 +21,7 @@ Never store API keys directly in your source code.
 ```bash
 # .env (never commit this file)
 BITXPAY_API_KEY=your_api_key
-BITXPAY_SECRET_KEY=your_secret_key
+BITXPAY_PRIVATE_KEY=Ed25519:your_private_key
 ```
 
 2. **Secrets Manager**
@@ -97,31 +97,11 @@ const timestamp = new Date().toISOString(); // RFC 3339 string, not a Unix epoch
 
 ## Webhook Verification
 
-Always verify webhook signatures using the **raw request body** (before JSON parsing):
+Verify `X-Webhook-Signature: sha256=<hex>` over the exact raw request body, then parse the event. Reject missing or malformed signatures before comparison.
 
-```javascript
-// IMPORTANT: Use express.raw() so req.body is the raw Buffer
-app.post('/webhooks', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-bitxpay-signature'];
-  const rawPayload = req.body; // Raw Buffer — do NOT parse before verifying
+<<< @/snippets/webhook.mjs{javascript}
 
-  const expectedSignature = crypto
-    .createHmac('sha256', secretKey)
-    .update(rawPayload)
-    .digest('hex');
-
-  // Use timing-safe comparison to prevent timing attacks
-  if (!crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  )) {
-    return res.status(401).send('Invalid signature');
-  }
-
-  const event = JSON.parse(rawPayload);
-  // Process webhook...
-});
-```
+See the [Webhooks Guide](/get-started/webhooks) for the delivery envelope and duplicate handling.
 
 ## IP Whitelisting
 

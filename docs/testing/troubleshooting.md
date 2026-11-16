@@ -213,60 +213,64 @@ setTimeout(() => {
 
 ## Request Errors
 
-### Error: "Validation failed"
+### Error: "Invalid request payload"
 
-**Error Response:**
 ```json
 {
-  "error": "invalid_request",
-  "message": "Validation failed",
-  "code": 400,
-  "details": [
-    {
-      "field": "order_amount",
-      "issue": "must be greater than 0"
-    }
-  ]
+  "message": "Invalid request payload"
 }
 ```
 
-**Solutions:**
+The create-payment-link controller returns this when it cannot parse the body, before it validates required fields or calls the payment service. Valid-looking JSON in the editor can still fail if the outgoing request has a missing/incorrect `Content-Type`, a script changes the body, or a field's JSON type cannot be decoded.
 
-✅ **Check required fields:**
+For this endpoint, the following body is valid:
 
-For Create Payment Link:
-- `merchant_key` ✓
-- `order_currency` ✓
-- `order_amount` ✓
-- `payment_name` ✓
-- `payer_email` ✓
-- `success_url` ✓
-- `cancel_url` ✓
+```json
+{
+  "payment_name": "Invoice #12345",
+  "amount": 1,
+  "currency": "USDT"
+}
+```
 
-✅ **Validate field formats:**
+In Postman:
+
+1. Select **Body → raw → JSON**.
+2. Open **Headers**, including automatically generated/hidden headers. Keep one enabled `Content-Type: application/json`; remove conflicting manual values such as `text/plain`.
+3. Check collection, folder, and request pre-request scripts for body/header changes. Open **Postman Console** to inspect the actual outgoing request, rather than relying only on the editor.
+4. Send a JSON object with `amount` as a number, not a quoted string. Optional date fields must use RFC 3339 strings when supplied.
+5. Generate a fresh timestamp/signature over the exact body and full path you send, including the trailing slash if present.
+
+To set the JSON header explicitly before signing, add this to the collection's pre-request script:
 
 ```javascript
-// Currency: any code from GET /payment_links/currencies (case-insensitive)
-currency: "USDT" // ✅
-currency: "usdt" // ✅ (normalised to USDT)
-currency: "XYZ"  // ❌ 400 invalid currency code 'XYZ': currency not found
-
-// Email: Valid email format
-payer_email: "test@example.com" // ✅
-payer_email: "test@example" // ❌
-payer_email: "invalid-email" // ❌
-
-// Amount: Positive number
-order_amount: 10 // ✅
-order_amount: 0 // ❌
-order_amount: -5 // ❌
-order_amount: "10" // ⚠️ (should be number, not string)
-
-// URLs: Valid HTTP/HTTPS URLs
-success_url: "https://example.com/success" // ✅
-success_url: "example.com" // ❌ (missing protocol)
-success_url: "ftp://example.com" // ❌ (must be HTTP/HTTPS)
+pm.request.headers.upsert({ key: 'Content-Type', value: 'application/json' });
 ```
+
+If the request still fails with the minimal body and the correct sent header, inspect the backend log entry `Failed to parse merchant payment link creation request`. Its underlying parser error distinguishes an unsupported content type, invalid JSON, incompatible field type, and invalid date. The generic response alone cannot identify which one occurred. Compare the deployed backend version with the local checkout if behavior differs.
+
+### Error: "Validation failed"
+
+This means parsing succeeded, but request validation rejected a field. The controller returns a `message` string rather than a structured `details` array:
+
+```json
+{
+  "message": "Validation failed: amount is required"
+}
+```
+
+Exact validation text depends on the field and validator. Payment-link creation requires `payment_name`, a positive numeric `amount`, and `currency`. Merchant authentication is carried in request headers. Customer email, redirect URLs, customer/product fields, cart, and metadata are optional.
+
+| Field | Expected value |
+|-------|----------------|
+| `payment_name` | Non-empty string, maximum 100 characters |
+| `amount` | JSON number greater than zero, e.g. `1` or `10.5` |
+| `currency` | Currency code, 3–10 characters, present in the currency catalog |
+| `customer_email` | Valid email when supplied |
+| `starts_at`, `expires_at` | RFC 3339 strings when supplied; expiry must follow start |
+| `success_url`, `cancel_url` | Valid URLs when supplied, maximum 500 characters |
+
+Use the current [Payments request table](/api-reference/payments#_2-create-payment-link). Legacy names such as `order_amount`, `order_currency`, `merchant_key`, and `payer_email` are not the create-payment-link request fields.
 
 ---
 
@@ -458,52 +462,19 @@ In Postman:
 
 ### Error: "Too many requests"
 
-**Error Response:**
+Route limiters return HTTP `429`. The payment/default limiter response is:
+
 ```json
 {
   "error": "rate_limit_exceeded",
-  "message": "Too many requests",
-  "code": 429
+  "message": "Too many requests, please try again later",
+  "retry_after": "60 seconds"
 }
 ```
 
-**Rate Limits:**
-- Sandbox: 100 requests/minute
-- Production: 1000 requests/minute
+Payment/default limiters are configured to 100 requests per minute in this backend checkout, with route-specific exceptions. There is no separate 1000-request production account ceiling defined here. See [API Rate Limits](/api-reference/#rate-limits).
 
-**Solutions:**
-
-✅ **Check rate limit headers:**
-```
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1706721300
-```
-
-✅ **Implement retry logic:**
-```javascript
-async function makeRequestWithRetry(maxRetries = 3) {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const response = await makeRequest();
-      return response;
-    } catch (error) {
-      if (error.code === 429) {
-        const resetTime = error.headers['X-RateLimit-Reset'];
-        const waitTime = (resetTime * 1000) - Date.now();
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-      } else {
-        throw error;
-      }
-    }
-  }
-}
-```
-
-✅ **Reduce request frequency:**
-- Add delays between requests
-- Batch operations when possible
-- Cache responses
+Honor `Retry-After` and rate-limit response headers when present, reduce polling frequency, and retry with backoff and jitter. Generate a fresh timestamp and signature for every retry. Check the result of payment creation before retrying an ambiguous timeout to avoid creating duplicate links.
 
 ---
 

@@ -85,7 +85,7 @@ POST/api/v1/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT",
 ```
 
 ::: danger Sign the full path
-The server verifies the signature against the path it received, which includes `/api/v1`. Signing `/payment_links` while calling `{{ $api.sandbox.baseUrl }}/payment_links` fails with `SIGNATURE_VERIFICATION_FAILED`. Query strings (`?page=1`) are **not** part of the signed path.
+The server verifies the signature against the path it received, which includes `/api/v1`. Signing `/payment_links` while calling `{{ $api.sandbox.baseUrl }}/payment_links` fails with `SIGNATURE_VERIFICATION_FAILED`. Query strings (`?page=1`) are **not** part of the signed path. A trailing slash is part of the path: sign `/api/v1/payment_links/` if that is the URL you call.
 :::
 
 ::: warning Body must match byte-for-byte
@@ -112,7 +112,7 @@ Sign the exact string you send. Serialise the JSON once, sign that string, and s
 
 ### Node.js Example
 
-Both examples below were run as-is against the sandbox.
+These examples load the dashboard-issued key and sign the exact request bytes.
 
 <<< @/snippets/sign.mjs{javascript}
 
@@ -148,6 +148,7 @@ All authentication failures return a JSON body with `error`, `message` and a str
 | 401 | `API_KEY_REQUIRED` | Neither `X-API-Key` nor `Authorization` is present |
 | 401 | `INVALID_API_KEY_FORMAT` | Key does not start with `btxm_` |
 | 401 | `INVALID_API_KEY_LENGTH` | Key shorter than 17 characters |
+| 401 | `INVALID_API_KEY_HASH` | Legacy key without a public key fails hash validation |
 | 401 | `INVALID_API_KEY` | Key unknown in this environment, or deactivated |
 | 401 | `API_KEY_EXPIRED` | Key past its expiry date |
 | 401 | `SIGNATURE_REQUIRED` | `X-API-Signature` missing |

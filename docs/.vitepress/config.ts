@@ -130,7 +130,12 @@ export default defineConfig({
             { text: 'Overview', link: '/api-reference/' },
             { text: 'Authentication', link: '/api-reference/authentication' },
             { text: 'Payments', link: '/api-reference/payments' },
-            { text: 'Subscriptions', link: '/api-reference/subscriptions' }
+            { text: 'Public Checkout', link: '/api-reference/checkout' },
+            { text: 'Subscriptions', link: '/api-reference/subscriptions' },
+            { text: 'Webhook Event Data', link: '/api-reference/webhook-events' },
+            { text: 'Webhook Management', link: '/api-reference/webhooks' },
+            { text: 'Route Inventory', link: '/api-reference/public-api-routes' },
+            { text: 'Request & Response Fields', link: '/api-reference/data-models' }
           ]
         }
       ],

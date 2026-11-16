@@ -99,97 +99,21 @@ Create your first payment request:
 
 :::
 
-The response is `201 Created` with the link in `data`; the customer-facing checkout URL is `data.payment_url` (currently returned without a scheme, so prefix `https://`). New links start in `payment_status: "processing"`.
+The response is `201 Created` with the link in `data`; the customer-facing checkout URL is `data.payment_url`. The URL comes from the deployment configuration; add `https://` only if it has no scheme. New links start in `payment_status: "processing"`.
 
 ## Step 4: Handle webhooks
 
-Set up a webhook endpoint to receive payment notifications:
+Configure a webhook URL and secret in your dashboard, then verify `X-Webhook-Signature: sha256=<hex>` over the raw request body. Route events using `event_type`, for example `payment.succeeded`.
 
 ::: code-group
 
-```javascript [Express.js]
-const express = require('express');
-const crypto = require('crypto');
+<<< @/snippets/webhook.mjs{javascript} [Express.js]
 
-const app = express();
-
-// IMPORTANT: Use express.raw() for webhook routes to preserve the raw body for signature verification
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-bitxpay-signature'];
-  const payload = req.body; // Raw buffer
-  
-  // Verify webhook signature using HMAC-SHA256
-  const expectedSignature = crypto
-    .createHmac('sha256', process.env.WEBHOOK_SECRET)
-    .update(payload)
-    .digest('hex');
-  
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-    return res.status(401).send('Invalid signature');
-  }
-  
-  // Process the webhook
-  const event = JSON.parse(payload);
-  console.log('Webhook received:', event.type);
-  
-  switch (event.type) {
-    case 'payment.completed':
-      console.log('Payment completed:', event.data.id);
-      // Update your database, fulfill order, etc.
-      break;
-    case 'payment.failed':
-      console.log('Payment failed:', event.data.id);
-      break;
-  }
-  
-  res.status(200).send('OK');
-});
-
-app.listen(3000, () => console.log('Webhook server running on port 3000'));
-```
-
-```python [Flask]
-from flask import Flask, request
-import hmac
-import hashlib
-import json
-import os
-
-app = Flask(__name__)
-
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    signature = request.headers.get('X-Bitxpay-Signature')
-    # Use raw data for signature verification
-    payload = request.get_data()
-    
-    # Verify webhook signature using HMAC-SHA256
-    expected_signature = hmac.new(
-        os.environ['WEBHOOK_SECRET'].encode(),
-        payload,
-        hashlib.sha256
-    ).hexdigest()
-    
-    if not hmac.compare_digest(signature, expected_signature):
-        return 'Invalid signature', 401
-    
-    # Process the webhook
-    event = json.loads(payload)
-    print(f'Webhook received: {event["type"]}')
-    
-    if event['type'] == 'payment.completed':
-        print(f'Payment completed: {event["data"]["id"]}')
-        # Update your database, fulfill order, etc.
-    elif event['type'] == 'payment.failed':
-        print(f'Payment failed: {event["data"]["id"]}')
-    
-    return 'OK', 200
-
-if __name__ == '__main__':
-    app.run(port=3000)
-```
+<<< @/snippets/webhook.py{python} [Flask]
 
 :::
+
+See [Webhooks](/get-started/webhooks) for signatures, retries, and duplicate handling, and [Webhook Event Data](/api-reference/webhook-events) for exact payload fields. In engine payment events, `data.payment_id` identifies the payment link; `data.link_id` is its display reference.
 
 ## Step 5: Test in sandbox
 
@@ -198,7 +122,7 @@ BITXpay provides a sandbox environment for testing:
 - **Sandbox API**: `https://sandboxapi.bitxpay.com/api/v1`
 - **Sandbox Dashboard**: [sandbox.bitxpay.com](https://sandbox.bitxpay.com)
 
-Use sandbox credentials to test your integration without real funds.
+Use sandbox credentials for development. For engine-backed checkout, explicitly set `is_test: true` to request a simulated order; choosing the sandbox host alone does not set test mode.
 
 ## Next steps
 
@@ -216,7 +140,7 @@ Now that you've created your first payment, explore more features:
 Make sure you're:
 - Using the correct Ed25519 private key
 - Including the timestamp in the signature (ISO 8601 format)
-- Formatting the message string correctly: `${method}${path}${timestamp}${body}` — e.g. `POST/payment_links2026-01-31T12:00:00Z{...}`
+- Formatting the message string correctly: `${method}${path}${timestamp}${body}` — e.g. `POST/api/v1/payment_links2026-01-31T12:00:00Z{...}`
 - Signing with Ed25519 over `METHOD + /api/v1/... + TIMESTAMP + BODY` (do **not** pre-hash — Ed25519 hashes internally)
 - Encoding the final signature as Base64
 
@@ -230,7 +154,7 @@ Verify that:
 ### Payment not completing
 
 Check that:
-- The amount is formatted correctly (string with 2 decimal places)
+- The merchant `amount` is a JSON number greater than zero
 - The currency is supported
 - The redirect URL is valid
 

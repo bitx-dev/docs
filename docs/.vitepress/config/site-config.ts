@@ -18,7 +18,7 @@ export const SITE_CONFIG = {
     // API Server URLs (for examples and responses)
     apiServer: {
       development: 'http://localhost:3000',
-      sandbox: 'https://api-sandbox.bitxpay.com',
+      sandbox: 'https://sandboxapi.bitxpay.com',
       production: 'https://api.bitxpay.com',
     },
     
