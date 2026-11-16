@@ -102,16 +102,25 @@ new Promise((resolve, reject) => {
                 throw new Error("❌ Private key must be in Ed25519:base64 format");
             }
 
-            const method = pm.request.method;
-            const path = pm.request.url.getPath();
+            const method = pm.request.method.toUpperCase();
+            // Resolve BASE_URL first: it can contain the /api/v1 prefix.
+            const resolvedUrl = pm.variables.replaceIn(pm.request.url.toString());
+            const urlMatch = resolvedUrl.match(/^https?:\/\/[^/?#]+(\/[^?#]*)?(?:[?#]|$)/i);
+            if (!urlMatch) throw new Error('Expected an absolute HTTP(S) request URL');
+            const path = urlMatch[1] || '/'; // preserve trailing slash, exclude query
             const timestamp = new Date().toISOString();
-            const body = pm.request.body ? pm.request.body.raw || '' : '';
+            const body = pm.request.body && pm.request.body.mode === 'raw'
+                ? pm.variables.replaceIn(pm.request.body.raw || '') : '';
+            if (body) {
+                JSON.parse(body); // Fail before sending malformed JSON.
+                pm.request.body.update(body); // Send the exact resolved bytes signed below.
+                pm.request.headers.upsert({ key: 'Content-Type', value: 'application/json' });
+            }
 
             const message = `${method}${path}${timestamp}${body}`;
 
             console.log('🔐 Signing:', method, path);
             console.log('  Timestamp:', timestamp);
-            console.log('  API Key:', apiKey);
 
             // Extract base64 part from Ed25519:base64 format
             const base64PrivateKey = privateKeyFormatted.substring(8); // Remove "Ed25519:" prefix
@@ -247,7 +256,7 @@ Message = METHOD + PATH + TIMESTAMP + BODY
 
 **Example:**
 ```
-POST/payment_links2026-01-31T17:53:56Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USDT"}
+POST/api/v1/payment_links2026-01-31T17:53:56Z{"payment_name":"Invoice #12345","amount":100.50,"currency":"USDT"}
 ```
 
 This message is then signed using:
@@ -273,6 +282,8 @@ This message is then signed using:
 | `X-API-Key` | `{{X_API_KEY}}` |
 | `X-API-Signature` | `{{X_API_SIGNATURE}}` |
 | `X-API-Timestamp` | `{{X_API_TIMESTAMP}}` |
+
+Keep exactly one enabled `Content-Type` header. Postman's automatic JSON header can be overridden by a manually entered value; check hidden headers and the sent request in **Postman Console** when diagnosing `Invalid request payload`. That response is a body-parser failure, even if the JSON displayed in the editor looks valid. See [request parsing troubleshooting](/testing/troubleshooting#error-invalid-request-payload).
 
 6. Go to **Body** tab, select **raw** and **JSON**, then paste:
 

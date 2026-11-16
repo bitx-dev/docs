@@ -1,3 +1,37 @@
+# Merchant API documentation
+
+The published VitePress documentation is in `docs/`. To work on it:
+
+```bash
+npm install
+npm run docs:dev
+npm run docs:build
+```
+
+The API reference is synchronized against the sibling `../bitxpay-api` checkout.
+
+```bash
+npm run docs:sync        # regenerate event field tables/schema/examples, routes, and model fields
+npm run docs:check-sync  # fail when generated references differ from the backend
+npm run docs:build
+```
+
+Set `BITXPAY_API_DIR` to use another backend checkout. Generated pages are `docs/api-reference/webhook-events.md`, `public-api-routes.md`, and `data-models.md`; downloadable contracts/examples are under `docs/public/webhooks` and `docs/public/api`. The sync command reads event constants, event-to-payload mappings, Go JSON/query tags, and route registrations directly. New event types or webhook fields without a reviewed description fail generation.
+
+Producer-specific meaning (ID identity, amount denomination, metadata propagation, emission conditions, and optional values) is reviewed manually in `scripts/sync-api-docs.mjs` and the endpoint guides. A successful generated-field check does not substitute for reviewing service behavior when those producers change. For future updates, verify mounted routes and controller/service behavior first; generated Swagger annotations and SDK types can lag behind implementation.
+
+Source map:
+
+- Route ordering/authentication: `internal/routes/routes.go` and `globals/middlewares/merchant_auth.go`.
+- Payments: `internal/payments/route/merchant_payment_routes.go`, merchant controller/service, and `internal/payments/dto/merchant_payment_dto.go`.
+- Public checkout: `internal/payments_engine/route/checkout_routes.go`, checkout service, and client DTOs.
+- Subscriptions: `internal/subscription/route/merchant_route.go`, `subscription_route.go`, corresponding controllers/services, and DTOs.
+- Webhooks: `internal/notification/route/route.go`, `dto/webhook_dto.go`, `service/notification_worker.go`, and `internal/model/notification_event.go`.
+- SDKs: `sdks/typescript`, `sdks/python`, and `sdks/php`; compare their payload/types with the API before documenting examples.
+
+Shared API paths/hosts live in `docs/.vitepress/config/api-endpoints.ts`; runnable signing and webhook snippets live in `docs/snippets/`. Keep the API overview, quick start, integration/security guides, and SDK examples aligned when changing a contract.
+
+---
 
 [![Build Status](https://ci.bunyad.io/api/badges/bitx-dev/docs/status.svg)](https://ci.bunyad.io/bitx-dev/docs)
 

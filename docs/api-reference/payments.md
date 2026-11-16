@@ -19,10 +19,10 @@ All responses except the catalog are wrapped as `{"message": string, "data": …
 
 ## Supported Currencies
 
-Payment links accept any `code` returned by the [Get Currencies](#1-get-currencies) endpoint. The list is environment-specific and changes over time, so fetch it rather than hard-coding codes. At the time of writing the sandbox returns 54 records covering AAVE, ARB, BNB, BTC, ETH, EURC, GNO, LINK, OP, POL, SOL, TRX, UNI, USDC, USDCe, USDG, USDT, WAVAX, WBNB, WBTC, WETH, WPOL and the fiat codes AUD, CAD, CHF, EUR, GBP, USD.
+Payment links accept any `code` returned by the [Get Currencies](#_1-get-currencies) endpoint. The list is environment-specific and changes over time, so fetch it rather than hard-coding codes. Use `currency_type=fiat` or `currency_type=crypto` to filter records. For engine-backed checkout, also check the [catalog](#_7-get-checkout-catalog): a currency record alone does not guarantee an offerable payment route.
 
 ::: warning One record per currency *and* network
-The currencies endpoint returns one record per currency record in the catalogue, so the same `code` appears several times when a token exists on several networks (for example `USDT` seven times, `USDC` nine times in sandbox). Any of them is valid as the `currency` of a payment link; network selection happens at checkout. Deduplicate by `code` if you present the list to users.
+The currencies endpoint returns one record per currency record in the catalogue, so the same `code` appears several times when a token exists on several networks (for example a token supported on several networks). Any of them is valid as the `currency` of a payment link; network selection happens at checkout. Deduplicate by `code` if you present the list to users.
 :::
 
 ### Currency Validation
@@ -35,15 +35,7 @@ When creating a payment link:
 4. **Must exist in the currencies list** - unknown codes are rejected with `invalid currency code 'XYZ': currency not found`
 5. **Network selection** - happens automatically at checkout
 
-**Examples:**
-```json
-{
-  "currency": "USDT",  // ✅ Valid - Tether USD
-  "currency": "usdt",  // ✅ Valid - normalised to USDT
-  "currency": "ETH",   // ✅ Valid - Ethereum
-  "currency": "XYZ"    // ❌ 400 - currency doesn't exist
-}
-```
+**Examples:** `USDT`, `usdt`, and `ETH` are accepted when present in the currency catalog. Unknown codes such as `XYZ` return HTTP `400`.
 
 ---
 
@@ -66,7 +58,7 @@ X-API-Timestamp: 2026-01-31T12:00:00Z
 Accept: application/json
 ```
 
-This endpoint takes no query parameters; it always returns the full supported currency list.
+Optional query parameter: `currency_type=fiat` or `currency_type=crypto`. Omit it for the full currency list. Other non-empty values return HTTP `400` with `Invalid currency_type. Must be 'fiat' or 'crypto'`.
 
 #### Response (200 OK)
 
@@ -94,7 +86,6 @@ This endpoint takes no query parameters; it always returns the full supported cu
       "code": "USDT",
       "name": "Tether USD"
     }
-    // ... more currencies; a code may appear more than once
   ]
 }
 ```
@@ -153,27 +144,27 @@ Content-Type: application/json
 |-------|------|----------|-------------|---------|
 | `payment_name` | string | Yes | Payment link name (1-100 chars) | "Invoice #12345" |
 | `amount` | float | Yes | Payment amount (must be > 0) | 100.50 |
-| `currency` | string | Yes | Currency code (3-10 chars, case-insensitive). Must be a `code` from the [currencies list](#1-get-currencies) | "USDT" |
+| `currency` | string | Yes | Currency code (3-10 chars, case-insensitive). Must be a `code` from the [currencies list](#_1-get-currencies) | "USDT" |
 | `description` | string | No | Payment description (max 1000 chars) | "Payment for Order #12345" |
-| `expires_at` | timestamp | No | Expiration time (ISO 8601) | "2026-02-01T12:00:00Z" |
-| `max_uses` | integer | No | Maximum number of uses (must be > 0) | 1 |
+| `expires_at` | timestamp | No | RFC 3339 expiry; must be after `starts_at`. Defaults to 24 hours after the start | "2026-02-01T12:00:00Z" |
+| `max_uses` | integer | No | Maximum uses (must be > 0; default: 1) | 1 |
 | `customer_id` | string | No | Merchant's customer ID (1-100 chars) | "AB-001" |
 | `customer_name` | string | No | Customer name (1-100 chars) | "John Doe" |
 | `customer_email` | string | No | Customer email (valid email) | "john@example.com" |
 | `product_name` | string | No | Product name (1-200 chars) | "Course A" |
 | `product_description` | string | No | Product description (max 1000 chars) | "Art Course for Beginners" |
 | `cart` | object | No | Shopping cart details with items, subtotal, tax, and total | See cart object below |
-| `order_id` | string | No | Merchant's order ID (auto-generated if not provided) | "ORD-20260226-A1B2C3" |
-| `auto_fill` | boolean | No | Auto-generate `customer_id` / `order_id` when not provided (default: true) | true |
+| `order_id` | string | No | Merchant's order ID (1–200 chars; auto-generated if not provided) | "ORD-20260226-A1B2C3" |
+| `auto_fill` | boolean | No | Stored checkout auto-fill flag (default: true). Omitted customer/order IDs are generated even when false | true |
 | `starts_at` | timestamp | No | Time from which the link can be paid (ISO 8601, default: now) | "2026-02-01T00:00:00Z" |
 | `is_test` | boolean | No | Create a test payment link (default: false) | false |
 | `success_url` | string | No | Redirect URL after success (valid URL, max 500 chars) | "https://www.success.io/success.html" |
 | `cancel_url` | string | No | Redirect URL after cancellation (valid URL, max 500 chars) | "https://www.failure.io/cancel.html" |
-| `webhook_metadata` | object | No | Custom metadata for webhooks | {"merchant_id": "M-10001"} |
-| `checkout_mode` | string | No | Checkout flow mode | "redirect" |
-| `origin` | string | No | Origin URL of the requesting application | "https://yoursite.com" |
+| `webhook_metadata` | object | No | Metadata included in `payment_link.created`; not automatically propagated to later payment events | {"merchant_id": "M-10001"} |
 
-**Cart Object Structure:**
+The cart is stored as an arbitrary JSON object; the fields below are an application convention rather than a nested server-validated schema.
+
+**Cart Object Example:**
 
 ```json
 {
@@ -209,7 +200,7 @@ Content-Type: application/json
 | `total` | float | Yes | Total amount (should match payment amount) |
 
 ::: tip Response Variations
-The core fields (`id`, `payment_name`, `amount`, `currency`, `payment_url`, `payment_status`, `payment_type`, `source`, `starts_at`, `expires_at`, `max_uses`, `current_uses`, `is_active`, `is_test`, `customer_id`, `order_id`, `auto_fill`, `created_at`) are always returned. Optional fields (`description`, `customer_name`, `customer_email`, `product_name`, `product_description`, `cart`, `success_url`, `cancel_url`, `webhook_metadata`) are returned only when you provided them. `customer_id` and `order_id` are auto-generated when omitted.
+The optional `receipt_number` identifies a payment receipt when available. The core fields (`id`, `payment_name`, `amount`, `currency`, `payment_url`, `payment_status`, `payment_type`, `source`, `starts_at`, `expires_at`, `max_uses`, `current_uses`, `is_active`, `is_test`, `customer_id`, `order_id`, `auto_fill`, `created_at`) are always returned. Optional fields (`description`, `customer_name`, `customer_email`, `product_name`, `product_description`, `cart`, `success_url`, `cancel_url`, `webhook_metadata`) are returned only when you provided them. `customer_id` and `order_id` are auto-generated when omitted.
 :::
 
 #### Request Examples
@@ -311,7 +302,7 @@ The response structure varies based on the request parameters provided.
     "payment_type": "one_time",
     "source": "payment_link_api",
     "starts_at": "2026-07-05T07:30:05.703759Z",
-    "expires_at": "2026-02-01T12:00:00Z",
+    "expires_at": "2026-03-13T15:23:32.084432Z",
     "max_uses": 1,
     "current_uses": 0,
     "is_active": true,
@@ -358,7 +349,7 @@ The response structure varies based on the request parameters provided.
 | `description` | string | Payment description (if provided) |
 | `amount` | float | Payment amount |
 | `currency` | string | Currency code |
-| `payment_url` | string | Checkout page for customers. Currently returned **without a scheme** (`sandboxpay.bitxpay.com/payment_link?payment_id=…`); prefix `https://` before using it |
+| `payment_url` | string | Checkout URL built from deployment configuration. Add `https://` only if the returned URL has no scheme |
 | `payment_status` | string | `processing` on creation; later `completed`, `expired` or `cancelled` |
 | `payment_type` | string | Payment type: `one_time`, `recurring` |
 | `source` | string | Origin of the payment link: `payment_link_api` |
@@ -397,7 +388,7 @@ The response structure varies based on the request parameters provided.
 | 500 | Internal Server Error | Server error |
 
 **Common 400 Errors** (body is `{"message": "..."}`):
-- `Invalid request payload` - body is not valid JSON
+- `Invalid request payload` - body parsing failed: check the sent `Content-Type: application/json`, JSON syntax, field types, and optional date formats. See [Postman troubleshooting](/testing/troubleshooting#error-invalid-request-payload)
 - `Validation failed: currency is required` - missing `currency`
 - `Validation failed: amount is required` - missing, zero or negative `amount`
 - `Validation failed: payment_name must be at most 100 characters`
@@ -451,7 +442,7 @@ The response includes an array of payment links with varying detail levels based
         "payment_type": "one_time",
         "source": "payment_link_api",
         "starts_at": "2026-03-12T15:23:32.084432Z",
-        "expires_at": "2026-02-01T12:00:00Z",
+        "expires_at": "2026-03-13T15:23:32.084432Z",
         "max_uses": 1,
         "current_uses": 0,
         "is_active": true,
@@ -526,7 +517,7 @@ The response includes an array of payment links with varying detail levels based
 }
 ```
 
-`filters` echoes every filter that was applied (`status`, `is_active`, `currency`, `min_amount`, `max_amount`, `created_from`, `created_to`, `search`, `sort_by`, `sort_order`). Items have the same shape as the [create response](#2-create-payment-link) plus `is_expired`. Soft-deleted links are not listed.
+`filters` echoes every filter that was applied (`status`, `is_active`, `currency`, `min_amount`, `max_amount`, `created_from`, `created_to`, `search`, `sort_by`, `sort_order`). Items have the same shape as the [create response](#_2-create-payment-link) plus `is_expired`. Soft-deleted links are not listed.
 
 ::: tip Response Variations
 Payment links in the list may have different fields depending on how they were created:
@@ -578,7 +569,7 @@ The response structure varies based on how the payment link was created.
     "payment_type": "one_time",
     "source": "payment_link_api",
     "starts_at": "2026-03-12T15:23:32.084432Z",
-    "expires_at": "2026-02-01T12:00:00Z",
+    "expires_at": "2026-03-13T15:23:32.084432Z",
     "max_uses": 1,
     "current_uses": 0,
     "is_active": true,
@@ -733,7 +724,7 @@ Soft-deleted links are still returned by this endpoint (with `is_active: false`)
 
 ### 5. Delete Payment Link
 
-Soft delete a payment link by its ID. The link is marked deleted and inactive, disappears from [List Payment Links](#3-list-payment-links), can no longer be paid, and any pending checkout order for it is voided. It remains readable via [Get Payment Link by ID](#4-get-payment-link-by-id).
+Soft delete a payment link by its ID. The link is marked deleted and inactive, disappears from [List Payment Links](#_3-list-payment-links), can no longer be paid, and any pending checkout order for it is voided. It remains readable via [Get Payment Link by ID](#_4-get-payment-link-by-id).
 
 #### Request
 
@@ -782,7 +773,7 @@ Deactivate, re-activate or expire a payment link without deleting it.
 | `status` | Effect |
 |---|---|
 | `deactivate` | Sets `is_active: false`. The link can no longer be paid but can be re-activated later. |
-| `expire` | Sets `expires_at` to now and `is_active: false`, and voids any pending checkout order. Irreversible. |
+| `expire` | Sets `expires_at` to now and `is_active: false`. Requests engine-order cancellation where allowed; orders with observed/pending funds are left to finish. Expiry is irreversible. |
 | `activate` | Intended to set `is_active: true`. **Currently fails with 500** (`Failed to update payment link status`); re-activation is not available until this is fixed. |
 
 #### Response (200 OK)
@@ -800,7 +791,7 @@ Deactivate, re-activate or expire a payment link without deleting it.
     "payment_type": "one_time",
     "source": "payment_link_api",
     "starts_at": "2026-01-31T10:00:00Z",
-    "expires_at": "2026-02-01T12:00:00Z",
+    "expires_at": "2026-03-13T15:23:32.084432Z",
     "max_uses": 1,
     "current_uses": 0,
     "is_active": false,
@@ -814,7 +805,7 @@ Deactivate, re-activate or expire a payment link without deleting it.
 }
 ```
 
-`data` has the same shape as a [list item](#3-list-payment-links).
+`data` has the same shape as a [list item](#_3-list-payment-links).
 
 #### Error Responses
 
@@ -877,6 +868,19 @@ This response is not wrapped in `message`/`data`.
 
 ---
 
+## Webhook data
+
+See the [exact event payloads](/api-reference/webhook-events) for payment success, partial payment, overpayment, expiry, and refunds. Webhook data differs from REST responses: link creation uses `name` instead of `payment_name`, and `amount` is a string. `order_id` and `receipt_number` are not automatically added to notification data. `webhook_metadata` is supported on link creation but absent from payment status/refund DTOs. For engine status events, correlate with `data.payment_id` (the link UUID); `data.link_id` is an `INV-...` display reference.
+
+## Payer checkout
+
+When engine checkout is enabled and configured, newly created links receive an engine order. An engine attachment failure fails creation and removes the new link instead of returning an unusable checkout. `source` remains `payment_link_api`; it identifies provenance, not checkout capability.
+
+Use the [public checkout API](/api-reference/checkout) for options, quoting, and state polling. The [hosted checkout compatibility API](/api-reference/checkout#hosted-checkout-compatibility-api) also returns live fee/gas `breakdown` and a verbatim `engine_quote` when available. `is_test: true` creates a simulated engine order; sandbox host selection alone does not set this field. Fetch currently offerable chains and tokens from the catalog rather than assuming every currency/network record is payable.
+
+`receipt_number` is an optional field in create, list, detail, and status responses. Completed and overpaid-completed detail reads ensure a receipt reference is assigned. Treat it as a display reference, not the payment link UUID.
+
+
 ## Authentication
 
 All requests require the following headers:
@@ -911,7 +915,7 @@ For detailed implementation examples in various languages, see the [Merchant API
 ## Rate Limiting
 
 - **Create Payment Link, Get Currencies, Get Checkout Catalog:** 100 requests per minute per client IP (HTTP 429 `Too many requests, please try again later` when exceeded)
-- **List / Get / Update status / Delete:** no endpoint-specific limit beyond the global API limit
+- **List / Get / Update status / Delete:** no limiter attached directly by the merchant payment route registration; global middleware or infrastructure may add limits
 
 ---
 
@@ -967,7 +971,7 @@ curl -X POST {{ $api.sandbox.baseUrl }}/payment_links \
 ### List Payment Links with Filters
 
 ```bash
-curl {{ $api.sandbox.baseUrl }}/payment_links?status=pending&currency=USDT&limit=10 \
+curl '{{ $api.sandbox.baseUrl }}/payment_links?status=pending&currency=USDT&limit=10' \
   -H "X-API-Key: btxm_9b451fa04a2e" \
   -H "X-API-Signature: <signature>" \
   -H "X-API-Timestamp: 2026-01-31T12:00:00Z"

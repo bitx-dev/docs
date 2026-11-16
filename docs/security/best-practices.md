@@ -15,7 +15,7 @@ Never hardcode credentials in your application:
 
 ```javascript
 // ❌ Bad
-const apiKey = 'sk_live_abc123...';
+const apiKey = 'btxm_example_do_not_hardcode';
 
 // ✅ Good
 const apiKey = process.env.BITXPAY_API_KEY;
@@ -26,19 +26,19 @@ const apiKey = process.env.BITXPAY_API_KEY;
 Sanitize and validate all user input before sending to the API:
 
 ```javascript
-function createPayment(amount, currency) {
+function createPayment(paymentName, amount, currency, supportedCurrencyCodes) {
   // Validate amount
   if (typeof amount !== 'number' || amount <= 0) {
     throw new Error('Invalid amount');
   }
 
   // Validate currency
-  const validCurrencies = ['USD', 'EUR', 'GBP'];
-  if (!validCurrencies.includes(currency)) {
+  // Populate supportedCurrencyCodes from the currency/catalog endpoint.
+  if (!supportedCurrencyCodes.includes(currency)) {
     throw new Error('Invalid currency');
   }
 
-  return bitxpay.payments.create({ amount, currency, crypto: 'BTC' });
+  return bitxpay.payments.create({ payment_name: paymentName, amount, currency });
 }
 ```
 
@@ -63,18 +63,9 @@ catch (error) {
 
 ### 1. Always Verify Signatures
 
-```javascript
-app.post('/webhooks/bitxpay', (req, res) => {
-  const signature = req.headers['x-bitxpay-signature'];
+Verify `X-Webhook-Signature: sha256=<hex>` over the raw request body before JSON parsing:
 
-  if (!bitxpay.webhooks.verify(req.body, signature)) {
-    console.warn('Invalid webhook signature received');
-    return res.status(401).send('Invalid signature');
-  }
-
-  // Process verified webhook...
-});
-```
+<<< @/snippets/webhook.mjs{javascript}
 
 ### 2. Use HTTPS Endpoints
 
@@ -87,25 +78,7 @@ Always use HTTPS for webhook URLs:
 
 ### 3. Implement Idempotency
 
-Handle duplicate webhooks gracefully:
-
-```javascript
-const processedEvents = new Set();
-
-app.post('/webhooks/bitxpay', async (req, res) => {
-  const eventId = req.body.id;
-
-  // Check if already processed
-  if (processedEvents.has(eventId)) {
-    return res.status(200).send('Already processed');
-  }
-
-  // Process event...
-
-  processedEvents.add(eventId);
-  res.status(200).send('OK');
-});
-```
+Store or durably enqueue verified deliveries before acknowledging them. Apply business updates idempotently using resource and transaction references from `data`, plus the event transition. Delivery `id` changes on retry; `event_id` identifies the event definition. Neither is a stable business deduplication key by itself. See [Webhooks](/get-started/webhooks#retries-and-duplicate-handling).
 
 ## Data Protection
 

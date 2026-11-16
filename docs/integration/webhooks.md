@@ -1,129 +1,28 @@
 ---
 title: Webhooks
-description: Receive real-time payment notifications with BITXpay webhooks.
+description: Configure webhook subscriptions and verify BITXpay event deliveries.
 ---
 
 # Webhooks
 
-Webhooks allow you to receive real-time notifications when payment events occur. Instead of polling the API, BITXpay will send HTTP POST requests to your specified endpoint.
+BITXpay sends HTTP POST requests to subscribed webhook URLs. Configure the URL, shared secret, and active events in your dashboard. The [Webhooks Guide](/get-started/webhooks) describes the payload, event codes, retries, and management endpoints.
 
-## Setting Up Webhooks
+## Verify deliveries
 
-### 1. Configure Your Endpoint
+The header is `X-Webhook-Signature: sha256=<hex>`. Verify HMAC-SHA256 over the exact raw body with your webhook secret before parsing JSON.
 
-In your [BITXpay Dashboard](https://dashboard.bitxpay.com), navigate to **Settings** → **Webhooks** and add your endpoint URL.
+::: code-group
 
-### 2. Create a Webhook Handler
+<<< @/snippets/webhook.mjs{javascript} [Express.js]
 
-```javascript
-import express from 'express';
-import crypto from 'crypto';
+<<< @/snippets/webhook.py{python} [Flask]
 
-const app = express();
-
-// IMPORTANT: Use express.raw() for webhook routes to get the raw body for signature verification
-app.post('/webhooks/bitxpay', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-bitxpay-signature'];
-  const payload = req.body; // Raw buffer
-
-  // Verify the webhook signature
-  const expectedSignature = crypto
-    .createHmac('sha256', process.env.WEBHOOK_SECRET)
-    .update(payload)
-    .digest('hex');
-
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-    return res.status(401).send('Invalid signature');
-  }
-
-  const event = JSON.parse(payload);
-
-  switch (event.type) {
-    case 'payment.completed':
-      handlePaymentCompleted(event.data);
-      break;
-    case 'payment.failed':
-      handlePaymentFailed(event.data);
-      break;
-    case 'payment.expired':
-      handlePaymentExpired(event.data);
-      break;
-  }
-
-  res.status(200).send('OK');
-});
-```
-
-## Webhook Events
-
-| Event | Description |
-|-------|-------------|
-| `payment.created` | Payment was created |
-| `payment.pending` | Payment is awaiting confirmation |
-| `payment.completed` | Payment was successfully completed |
-| `payment.failed` | Payment failed |
-| `payment.expired` | Payment expired before completion |
-| `payment.refunded` | Payment was refunded |
-
-## Webhook Payload
-
-```json
-{
-  "id": "evt_1234567890",
-  "type": "payment.completed",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "data": {
-    "paymentId": "pay_abc123",
-    "amount": 100.00,
-    "currency": "USDT",
-    "cryptoAmount": 0.0025,
-    "crypto": "BTC",
-    "status": "completed",
-    "txHash": "abc123def456..."
-  }
-}
-```
-
-## Verifying Signatures
-
-::: warning Important
-Always verify webhook signatures to ensure requests are from BITXpay.
 :::
 
-```javascript
-import crypto from 'crypto';
+## Handle events reliably
 
-// payload must be the raw request body (Buffer or string), NOT a parsed JSON object
-function verifyWebhook(rawPayload, signature, secretKey) {
-  const expectedSignature = crypto
-    .createHmac('sha256', secretKey)
-    .update(rawPayload)
-    .digest('hex');
+Read `event.event_type`, for example `payment.succeeded` or `payment.failed`. Event-specific fields are inside `event.data`. Use the [complete field reference](/api-reference/webhook-events) and [downloadable examples](/webhooks/examples.json) to map each event to your order model. For engine payment events, `payment_id` is the link UUID and `link_id` is an `INV-...` display reference; refund events use the dispute UUID as `payment_id`. Partial/overpayment amounts are display token units, while success/failure engine events use the invoice denomination. Metadata is not present on every event.
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
-}
-```
+Return HTTP `2xx` after storing or durably enqueueing the verified event. Failed deliveries retry with configurable exponential backoff and jitter. Apply updates idempotently using the business resource and transition in `data`: `id` is generated for each delivery attempt, and `event_id` identifies the notification event definition rather than an individual payment.
 
-## Retry Policy
-
-BITXpay will retry failed webhook deliveries:
-
-- **Attempt 1**: Immediate
-- **Attempt 2**: After 5 minutes
-- **Attempt 3**: After 30 minutes
-- **Attempt 4**: After 2 hours
-- **Attempt 5**: After 24 hours
-
-Your endpoint should return a `2xx` status code to acknowledge receipt.
-
-## Testing Webhooks
-
-Use our webhook testing tool in the dashboard to send test events to your endpoint.
-
-```bash
-# Or use the CLI
-bitxpay webhooks test --event payment.completed --url https://your-site.com/webhooks
-```
+Use the dashboard's webhook activity view to inspect attempt status, request payloads, and responses. See [Testing Webhooks](/get-started/webhooks#testing-webhooks) for local setup.

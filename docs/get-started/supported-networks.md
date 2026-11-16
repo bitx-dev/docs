@@ -1,10 +1,18 @@
 # Supported Networks
 
-BITXpay supports 16 blockchain networks across both EVM and non-EVM ecosystems. All networks run on mainnet only. Choose the network that fits your assets, your users, and your fee requirements. This page provides an overview of the blockchain networks we currently support.
+BITXpay integrates EVM and non-EVM networks. Availability is environment-specific and depends on the operation. Discover active networks and currencies at runtime instead of treating a fixed count or token list as the payment contract.
 
-**Total Networks**: 16  
-**EVM networks**: 13  
-**Non-EVM Networks**: 3
+## Network discovery API
+
+These routes are public, relative to `/api/v1`, and do not require merchant signatures:
+
+| Method | Path | Query parameters | Response data |
+|--------|------|------------------|---------------|
+| `GET` | `/networks/active` | None | Active network records in `data` |
+| `GET` | `/get-networks` | `active_only` (default true), `include_testnets` (default false), `chain_id` | `data.networks`, with supported currencies per network |
+| `GET` | `/get-network-currencies` | `active_only` (default true), `compact` (default false) | Combined network, fiat, and crypto metadata in `data` |
+
+General network metadata is broader than checkout capability. For an engine-backed payment, use the [checkout catalog](/api-reference/payments#_7-get-checkout-catalog) and then the [specific link's options](/api-reference/checkout#get-payment-options).
 
 ## What is a network?
 
@@ -18,7 +26,9 @@ Ethereum Virtual Machine-compatible chains share the same address format, toolin
 
 Bitcoin, Solana, and Tron use their own address formats and transaction models. Addresses are visually distinct and not compatible with EVM wallets. Each requires dedicated integration handling.
 
-## Network List
+## Network overview
+
+The following table gives examples of network families and assets. Query the endpoints above for the current deployment catalog.
 
 | # | Network | Type | Status | Native token | Common assets |
 |---|---------|------|--------|--------------|---------------|
@@ -39,8 +49,8 @@ Bitcoin, Solana, and Tron use their own address formats and transaction models. 
 | 15 | Unichain | EVM | Mainnet | ETH | ETH, USDC, UNI |
 | 16 | Ink | EVM | Mainnet | ETH | ETH, USDC |
 
-::: tip Payment Link Currencies vs Networks
-The above table lists all **blockchain networks** supported by BITXpay. For **Payment Link creation**, only the following currencies are currently accepted: AVAX, BNB, ETH, LINK, USDC, USDT, WBTC, WETH. Use the [Get Currencies](/api-reference/payments#_1-get-currencies) endpoint for the real-time list.
+::: tip Discover payment availability
+Use [Get Currencies](/api-reference/payments#_1-get-currencies) for denomination codes and the [checkout catalog](/api-reference/payments#_7-get-checkout-catalog) for currently offerable chains/tokens. Availability depends on deployment and the payment route; the overview table is not a checkout availability guarantee. Use [public checkout options](/api-reference/checkout#get-payment-options) for a specific link.
 :::
 
 ## Mainnets
@@ -65,5 +75,5 @@ Reading live balances, transaction history, and blockchain events
 Staking, lending, yield farming, or any live protocol interaction
 
 ::: warning Important Note
-BITXpay currently operates exclusively on mainnets. We do not support testnets at this time.
+Do not assume that selecting the sandbox host makes a payment simulated. For engine checkout, explicitly create a link with `is_test: true` and check its returned state.
 :::

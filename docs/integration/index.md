@@ -30,7 +30,7 @@ Understand the difference between sandbox and production environments.
 ## Best Practices
 
 1. **Always verify webhooks** - Validate the HMAC signature on every webhook
-2. **Use idempotency keys** - Prevent duplicate transactions
+2. **Apply updates idempotently** - Deduplicate by business resource and transition; webhook delivery IDs change on retries
 3. **Handle timeouts gracefully** - Cryptocurrency transactions can take time
 4. **Log everything** - Keep detailed logs for debugging and auditing
 5. **Test in sandbox first** - Always test your integration before going live

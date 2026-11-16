@@ -1,371 +1,131 @@
 # Webhooks
 
-BITXpay Merchant Platform supports webhook subscriptions across several products, all using the same underlying API and authentication. Use webhooks to receive real-time HTTP notifications when events happen onchain, in your wallets, or across your BITXpay accounts.
+BITXpay delivers subscribed events to your webhook URL using HTTP POST. Set up a publicly reachable HTTPS endpoint, then configure its URL, secret, and active event subscriptions in your dashboard.
 
-## Getting started
+## Event types
 
-Before you get started, ensure you have:
+The backend defines these payment and subscription event codes. Discover the active event IDs in your environment through the dashboard or `GET /webhooks/events` using your dashboard session.
 
-### A Secret API Key
+| Event type | Meaning |
+|------------|---------|
+| `payment_link.created` | Payment link created |
+| `payment.succeeded` | Payment received successfully |
+| `payment.partial_succeeded` | Partial payment received |
+| `transaction.overpaid` | Overpayment received |
+| `payment.failed` | Payment failed |
+| `payment.expired` | Payment link expired |
+| `refund.initiated` | Refund requested |
+| `refund.succeeded` | Refund completed |
+| `subscription_plan.created` | Subscription plan created |
+| `subscription_invitation.created` | Subscription invitation created |
+| `subscription.created` | Subscription created |
+| `subscription.renewed` | Subscription renewed |
+| `subscription.renewal_failed` | Subscription renewal failed |
 
-1. Sign up at [sandbox.bitxpay.com/auth/signup](https://sandbox.bitxpay.com/auth/signup)
-2. Navigate to **API Keys**
-3. Select **Create API key** under the Secret API Keys tab
-4. Enter an API key nickname (restrictions are optional)
-5. Click **Create**
-6. Secure your API Key ID and Secret in a safe location
+Availability depends on the active event catalog, enabled subscriptions, and the operation that produces the event. See [Webhook Event Data](/api-reference/webhook-events) for every field, omission rule, and producer-specific example. Some defined subscription events have no automatic producer in this checkout.
 
-### A webhook URL
-
-You'll need an HTTPS URL to receive webhook events. 
-
-- **For quick testing**: [webhook.site](https://webhook.site) gives free temporary URLs instantly
-- **For production**: Use your own HTTPS endpoint
-
-### BITXpay CLI (Optional)
-
-Install the BITXpay CLI to make authenticated requests to BITXpay APIs:
-
-```bash
-# With npm
-npm install -g @bitxpay/cli
-
-# Or with pip
-pip install bitxpay-cli
-```
-
-## Webhook Events
-
-BITXpay sends webhook notifications for the following event types:
-
-### Payment Events
-
-| Event Type | Description |
-|------------|-------------|
-| `payment.created` | A new payment has been created |
-| `payment.pending` | Payment is awaiting blockchain confirmation |
-| `payment.completed` | Payment has been confirmed on-chain |
-| `payment.failed` | Payment has failed or expired |
-| `payment.refunded` | Payment has been refunded |
-
-### Transfer Events
-
-| Event Type | Description |
-|------------|-------------|
-| `transfer.initiated` | A transfer has been initiated |
-| `transfer.completed` | Transfer has been confirmed |
-| `transfer.failed` | Transfer has failed |
-
-### Wallet Events
-
-| Event Type | Description |
-|------------|-------------|
-| `wallet.deposit` | Funds deposited to wallet |
-| `wallet.withdrawal` | Funds withdrawn from wallet |
-
-## Subscribe by product
-
-Webhook support is actively expanding across BITXpay products. Check back as more integrations are added.
-
-### Onchain Data
-Monitor smart contract events and token transfers on supported networks.
-
-### Server Wallets
-Track transfer activity in and out of your BITXpay Server Wallet addresses.
-
-### Embedded Wallets
-Track transfer activity on your users' wallets using Onchain Data Webhooks. Native Embedded Wallet webhook support is coming soon.
-
-### Onramp & Offramp
-Receive real-time status updates for your users' buy and sell transactions.
-
-## Webhook Payload Structure
-
-All webhooks follow a consistent structure:
+## Webhook payload structure
 
 ```json
 {
-  "id": "evt_1234567890",
-  "type": "payment.completed",
-  "created_at": "2024-01-15T10:30:00Z",
+  "id": "558e008e-a31c-4fe8-8c81-284ece730cdf",
+  "event_type": "payment.succeeded",
+  "event_id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+  "timestamp": "2026-11-16T12:00:00Z",
   "data": {
-    "id": "pay_abc123",
-    "amount": "100.00",
-    "currency": "USDT",
-    "status": "completed",
-    "network": "ethereum",
-    "transaction_hash": "0x123...",
-    "metadata": {
-      "order_id": "12345"
-    }
+    "event_code": "payment.succeeded",
+    "customer_email": "customer@example.com",
+    "customer_name": "Alex Customer",
+    "link_id": "INV-EIRCEI-DQ",
+    "payment_id": "22222222-2222-2222-2222-222222222222",
+    "amount": "100.50",
+    "currency": "USD",
+    "transaction_hash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "network": "Ethereum",
+    "asset": "",
+    "fees": "",
+    "received_at": "2026-11-16 12:00:00 +0000 UTC"
   }
 }
 ```
 
-## Verifying Webhook Signatures
+This example shows the common envelope. `data` contains the original event-specific payload, including `event_code` and any fields emitted for that event. `webhook_metadata` is declared only for `payment_link.created`, `subscription.created`, and `subscription_invitation.created`. It is not automatically copied into payment success, partial payment, overpayment, expiry, or refund events. [See all payloads](/api-reference/webhook-events).
 
-Always verify webhook signatures to ensure requests are from BITXpay:
+| Field | Description |
+|-------|-------------|
+| `id` | Delivery identifier, newly generated on each attempt |
+| `event_type` | Event code; use this to choose your handler |
+| `event_id` | Notification event definition ID |
+| `timestamp` | Delivery time in RFC 3339 format |
+| `data` | Event-specific data |
+
+## Verifying webhook signatures
+
+Deliveries with a configured secret include:
+
+```http
+Content-Type: application/json
+X-Webhook-Signature: sha256=<64 lowercase hexadecimal characters>
+X-Webhook-Timestamp: <Unix time in seconds>
+X-Webhook-Event: payment.succeeded
+```
+
+`X-Webhook-Event` is included when the event definition is loaded. Authenticate the body using `X-Webhook-Signature`, then read the signed `event_type` field. Compute HMAC-SHA256 over the **raw request body bytes** using your webhook secret. The signature has a literal `sha256=` prefix. The timestamp header is separate from the HMAC input; the body's `timestamp` is covered by the signature.
 
 ::: code-group
 
-```javascript [Node.js]
-const crypto = require('crypto');
+<<< @/snippets/webhook.mjs{javascript} [Express.js]
 
-function verifyWebhookSignature(payload, signature, secret) {
-  const expectedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex');
-  
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
-}
-
-// Express.js example
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['x-bitxpay-signature'];
-  const payload = req.body.toString();
-  
-  if (!verifyWebhookSignature(payload, signature, process.env.WEBHOOK_SECRET)) {
-    return res.status(401).send('Invalid signature');
-  }
-  
-  const event = JSON.parse(payload);
-  // Process the event
-  
-  res.status(200).send('OK');
-});
-```
-
-```python [Python]
-import hmac
-import hashlib
-
-def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> bool:
-    expected_signature = hmac.new(
-        secret.encode(),
-        payload,
-        hashlib.sha256
-    ).hexdigest()
-    
-    return hmac.compare_digest(signature, expected_signature)
-
-# Flask example
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    signature = request.headers.get('X-Bitxpay-Signature')
-    payload = request.get_data()
-    
-    if not verify_webhook_signature(payload, signature, os.environ['WEBHOOK_SECRET']):
-        return 'Invalid signature', 401
-    
-    event = request.json
-    # Process the event
-    
-    return 'OK', 200
-```
-
-```php [PHP]
-<?php
-
-function verifyWebhookSignature($payload, $signature, $secret) {
-    $expectedSignature = hash_hmac('sha256', $payload, $secret);
-    return hash_equals($signature, $expectedSignature);
-}
-
-// Example usage
-$signature = $_SERVER['HTTP_X_BITXPAY_SIGNATURE'];
-$payload = file_get_contents('php://input');
-$secret = getenv('WEBHOOK_SECRET');
-
-if (!verifyWebhookSignature($payload, $signature, $secret)) {
-    http_response_code(401);
-    exit('Invalid signature');
-}
-
-$event = json_decode($payload, true);
-// Process the event
-
-http_response_code(200);
-echo 'OK';
-```
+<<< @/snippets/webhook.py{python} [Flask]
 
 :::
 
-## Handling Webhook Events
+Configure a secret and reject missing or invalid signatures. Parse JSON after verification. See [Integration Webhooks](/integration/webhooks) for handling guidance.
 
-Implement idempotent event handling to prevent duplicate processing:
+## Retries and duplicate handling
 
-```javascript
-const processedEvents = new Set();
+HTTP `200`–`299` acknowledges delivery. Connection failures, timeouts, and other status codes cause retries until the configured attempt limit is reached. The backend defaults to five total attempts and a 10-second request timeout. With the default 1-second initial delay and 2× multiplier, retries are scheduled approximately 2, 4, 8, and 16 seconds after failed attempts, with ±10% jitter. Scheduling/worker load can delay actual delivery. The delay is capped at one hour before jitter, and all these settings are configurable.
 
-app.post('/webhook', async (req, res) => {
-  const event = req.body;
-  
-  // Check if already processed
-  if (processedEvents.has(event.id)) {
-    return res.status(200).send('Already processed');
-  }
-  
-  try {
-    // Process based on event type
-    switch (event.type) {
-      case 'payment.completed':
-        await handlePaymentCompleted(event.data);
-        break;
-      case 'payment.failed':
-        await handlePaymentFailed(event.data);
-        break;
-      case 'transfer.completed':
-        await handleTransferCompleted(event.data);
-        break;
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
+Store or durably enqueue the verified event before returning `2xx`. Deduplicate business changes by the resource and transition in `data`, such as a payment/transaction reference plus the event type. Do not use only `id` (it changes on retries) or `event_id` (shared by all deliveries of an event type). Do not assume delivery order.
+
+## Webhook management
+
+Webhook management uses your authenticated **dashboard session**, rather than merchant API-key signatures. All paths below are relative to `/api/v1`. Use the dashboard for setup when integrating the Merchant API.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/webhooks/events` | Discover active event definitions and IDs |
+| `POST` | `/webhooks/` | Register a webhook |
+| `GET` | `/webhooks/` | List webhooks |
+| `GET` | `/webhooks/:id` | Retrieve a webhook |
+| `PUT` | `/webhooks/:id` | Update URL, secret, status, or subscriptions |
+| `DELETE` | `/webhooks/:id` | Remove a webhook |
+| `GET` | `/webhooks/activity` | Inspect delivery activity |
+| `GET` | `/webhooks/poll` | Poll delivery events |
+| `POST` | `/webhooks/regenerate-secret` | Regenerate the shared secret |
+| `POST` | `/webhooks/validate-secret` | Validate the shared secret |
+| `POST` | `/webhooks/subscriptions/update` | Toggle existing subscriptions |
+| `POST` | `/webhooks/notifications/register` | Register a test event |
+| `POST` | `/webhooks/notifications/acknowledge` | Acknowledge a job for testing |
+
+Registration body:
+
+```json
+{
+  "url": "https://example.com/webhook",
+  "event_subscriptions": [
+    {
+      "id": "3f01958c-8f10-4982-87f9-c129f60531b5",
+      "is_active": true
     }
-    
-    // Mark as processed
-    processedEvents.add(event.id);
-    
-    res.status(200).send('OK');
-  } catch (error) {
-    console.error('Webhook processing error:', error);
-    res.status(500).send('Processing error');
-  }
-});
+  ]
+}
 ```
 
-## Best Practices
+Use actual event IDs from `/webhooks/events`. An omitted `is_active` defaults to false. Omitting subscriptions creates inactive subscriptions to the active catalog, so enable the desired events explicitly. The first webhook gets a generated shared secret; later webhooks reuse it. See [Webhook Management](/api-reference/webhooks) for complete request/response contracts, shared-secret behavior, and polling.
 
-### 1. Respond quickly
-Return a 200 status code as quickly as possible. Process events asynchronously if needed.
+## Testing webhooks
 
-```javascript
-app.post('/webhook', async (req, res) => {
-  // Immediately acknowledge receipt
-  res.status(200).send('OK');
-  
-  // Process asynchronously
-  processWebhookAsync(req.body).catch(console.error);
-});
-```
+Use the [authenticated test-notification API](/api-reference/webhooks#register-a-test-event) to send any supported event with its exact payload. Run one of the sample handlers locally and expose port 3000 through your development tunnel. Configure the resulting HTTPS URL in the dashboard. Trigger an enabled payment/subscription event and inspect its delivery activity. A temporary webhook inspection URL can also help inspect payloads, but use a handler with signature verification for your integration.
 
-### 2. Handle retries
-BITXpay will retry failed webhooks with exponential backoff. Implement idempotency to handle duplicate events.
-
-### 3. Use HTTPS
-Webhook URLs must use HTTPS in production. HTTP is only allowed for local development.
-
-### 4. Validate event types
-Always check the event type before processing to handle new event types gracefully.
-
-### 5. Store webhook secrets securely
-Never hardcode webhook secrets. Use environment variables or secure secret management.
-
-## Retry Policy
-
-BITXpay automatically retries failed webhook deliveries:
-
-- **Attempt 1**: Immediate
-- **Attempt 2**: After 5 minutes
-- **Attempt 3**: After 30 minutes
-- **Attempt 4**: After 2 hours
-- **Attempt 5**: After 24 hours
-- **Success criteria**: HTTP 2xx response
-- **Timeout**: 30 seconds per attempt
-
-## Testing Webhooks Locally
-
-### Using ngrok
-
-```bash
-# Install ngrok
-npm install -g ngrok
-
-# Start your local server
-node server.js
-
-# Expose it via ngrok
-ngrok http 3000
-```
-
-Use the ngrok URL (e.g., `https://abc123.ngrok.io/webhook`) as your webhook URL in the BITXpay dashboard.
-
-### Using webhook.site
-
-1. Go to [webhook.site](https://webhook.site)
-2. Copy your unique URL
-3. Use it as your webhook URL for testing
-4. View incoming webhooks in real-time
-
-## Monitoring Webhooks
-
-Monitor webhook delivery in your BITXpay dashboard:
-
-1. Navigate to **Developers** → **Webhooks**
-2. View delivery history, status codes, and response times
-3. Manually retry failed deliveries
-4. View webhook payload and response details
-
-## Webhook Endpoints Management
-
-### Create a webhook endpoint
-
-```bash
-curl -X POST {{ $api.sandbox.baseUrl }}{{ $api.endpoints.webhookEndpoints }} \
-  -H "X-API-Key: your-api-key" \
-  -H "X-Signature: your-signature" \
-  -H "X-Timestamp: $(date +%s)000" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "url": "https://yoursite.com/webhook",
-    "events": ["payment.completed", "payment.failed"],
-    "description": "Production webhook endpoint"
-  }'
-```
-
-### List webhook endpoints
-
-```bash
-curl -X GET {{ $api.sandbox.baseUrl }}{{ $api.endpoints.webhookEndpoints }} \
-  -H "X-API-Key: your-api-key" \
-  -H "X-Signature: your-signature" \
-  -H "X-Timestamp: $(date +%s)000"
-```
-
-### Delete a webhook endpoint
-
-```bash
-curl -X DELETE {{ $api.sandbox.baseUrl }}{{ $api.endpoints.webhookEndpoints }}/{endpoint_id} \
-  -H "X-API-Key: your-api-key" \
-  -H "X-Signature: your-signature" \
-  -H "X-Timestamp: $(date +%s)000"
-```
-
-## Troubleshooting
-
-### Webhooks not being received
-
-1. **Check your endpoint is publicly accessible**: Test with `curl https://yoursite.com/webhook`
-2. **Verify HTTPS**: Production webhooks require HTTPS
-3. **Check firewall rules**: Ensure your server accepts requests from BITXpay IPs
-4. **Review response codes**: Must return 200-299 for success
-
-### Signature verification failing
-
-1. **Use raw request body**: Don't parse JSON before verification
-2. **Check secret**: Ensure you're using the correct webhook secret
-3. **Verify header name**: Look for `X-Bitxpay-Signature` (case-insensitive)
-
-### Duplicate events
-
-Implement idempotency using the event `id` field to prevent duplicate processing.
-
-## Support
-
-For webhook-related issues:
-
-- **Documentation**: {{ $site.urls.support.documentation }}
-<!-- - **Discord**: [discord.gg/bitxpay](https://discord.gg/bitxpay) -->
-- **Email**: support@bitxpay.com
+If delivery fails, check public reachability, your configured secret, the raw-body parser, the `sha256=` prefix, and the HTTP response code. Inspect request and response details in the dashboard's activity view.

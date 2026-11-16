@@ -28,7 +28,7 @@ An HMAC-SHA256 scheme is planned for a future set of standard (non-merchant) API
 These keys are for server side use only. If a secret key is exposed, delete it immediately from the dashboard and generate a new one.
 :::
 
-## Signature authentication (Ed25519) — merchant APIs
+## Signature authentication (Ed25519) — merchant APIs {#signature-authentication-ed25519-merchant-apis}
 
 ### Getting your keys
 
@@ -94,9 +94,9 @@ POST/api/v1/payment_links2026-01-31T17:53:56Z{"amount":100.50,"currency":"USDT",
 
 :::
 
-Both samples were run as-is against the sandbox. The private key is loaded straight from the `Ed25519:…` string the dashboard shows.
+Both samples load the dashboard-issued key and sign the exact request bytes. The private key is loaded straight from the `Ed25519:…` string the dashboard shows.
 
-## HMAC-SHA256 — planned
+## HMAC-SHA256 — planned {#hmac-sha256-planned}
 
 ::: info Not yet available
 An HMAC-SHA256 authentication scheme is planned for a future set of standard (non-merchant) APIs. **No live endpoints use it today**, and it is not part of the current contract. Header names, message format, and code samples will be documented here once those endpoints ship. Until then, use the Ed25519 signature scheme above for all merchant-facing requests.
@@ -104,11 +104,7 @@ An HMAC-SHA256 authentication scheme is planned for a future set of standard (no
 
 ## API key permissions
 
-When creating API keys, you can optionally restrict their permissions to specific operations:
-
-- **Read-only**: Query balances and transaction history
-- **Payment creation**: Create payment links and invoices
-- **Full access**: All operations including withdrawals
+Key configuration supports scopes, expiry, and an optional domain restriction. Scope enforcement depends on each route's middleware; the mounted payment/subscription groups do not supply endpoint-specific required scopes. Do not assume a configured read scope prevents writes on these groups. Dashboard-only APIs also require a dashboard session; a merchant key does not grant access to every account operation.
 
 ## Security best practices
 
